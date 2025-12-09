@@ -2,21 +2,24 @@
   "name": "@eliware/discord",
   "type": "module",
   "version": "1.1.0",
-  "description": "A Node.js discord.",
-  "main": "index.cjs",
+  "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
   "module": "index.mjs",
   "types": "index.d.ts",
   "files": [
     "index.mjs",
-    "index.cjs",
     "index.d.ts",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "example.mjs",
+    "commands/",
+    "events/",
+    "locales/",
+    "src/",
+    "tests/"
   ],
   "exports": {
     ".": {
       "import": "./index.mjs",
-      "require": "./index.cjs",
       "types": "./index.d.ts"
     }
   },
@@ -27,10 +30,25 @@
     "type": "git",
     "url": "git+https://github.com/eliware/discord.git"
   },
-    "keywords": [
-        "discord",
-        "nodejs"
-    ],
+  "keywords": [
+    "discord",
+    "discord-app",
+    "discordjs",
+    "discord-js",
+    "discord-app-framework",
+    "discord-app-template",
+    "slash-commands",
+    "localization",
+    "i18n",
+    "event-driven",
+    "nodejs",
+    "node",
+    "framework",
+    "typescript",
+    "app",
+    "modular",
+    "extensible"
+  ],
   "author": "Eli Sterling, eliware.org <eli@eliware.org>",
   "license": "MIT",
   "bugs": {
@@ -38,7 +56,7 @@
   },
   "homepage": "https://github.com/eliware/discord#readme",
   "devDependencies": {
-    "jest": "^30.0.4"
+    "jest": "^30.2.0"
   },
   "jest": {
     "testEnvironment": "node",
@@ -49,6 +67,8 @@
     ]
   },
   "dependencies": {
-    "@eliware/common": "^1.1.1"
+    "@eliware/common": "^1.1.1",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3"
   }
 }
