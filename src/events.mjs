@@ -1,5 +1,4 @@
-import logger from '@eliware/log';
-import { pathUrl } from '@eliware/path';
+import { log as logger, pathUrl } from '@eliware/common';
 import { readdirSync } from 'fs';
 
 /**

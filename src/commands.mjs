@@ -1,5 +1,4 @@
-import logger from '@eliware/log';
-import { path, pathUrl } from '@eliware/path';
+import { log as logger, path, pathUrl } from '@eliware/common';
 import { readdirSync, readFileSync, existsSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord.js';

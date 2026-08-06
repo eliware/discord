@@ -1,5 +1,4 @@
-import path from '@eliware/path';
-import logger from '@eliware/log';
+import { log as logger, path } from '@eliware/common';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { setupEvents } from './src/events.mjs';
 import { setupCommands, registerCommands } from './src/commands.mjs';
