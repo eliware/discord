@@ -28,6 +28,10 @@ describe('Command definitions (.json) are valid and follow Discord command schem
     if (parsed.type === 1) {
       test(`${file} (CHAT_INPUT) has valid description, name, and localizations`, () => {
         expect(typeof parsed.description).toBe('string');
+        // description length must be between 1 and 100
+        expect(parsed.description.length).toBeGreaterThanOrEqual(1);
+        expect(parsed.description.length).toBeLessThanOrEqual(100);
+
         expect(chatInputRegex.test(parsed.name)).toBe(true);
         for (const ch of parsed.name) {
           if (ch.toLowerCase && ch.toUpperCase && ch.toLowerCase() !== ch.toUpperCase()) {
@@ -49,6 +53,9 @@ describe('Command definitions (.json) are valid and follow Discord command schem
         for (const key of localeKeys) {
           expect(parsed.description_localizations[key]).toBeDefined();
           expect(typeof parsed.description_localizations[key]).toBe('string');
+          // localized description length must be between 1 and 100
+          expect(parsed.description_localizations[key].length).toBeGreaterThanOrEqual(1);
+          expect(parsed.description_localizations[key].length).toBeLessThanOrEqual(100);
         }
       });
       if (parsed.options) {
@@ -73,6 +80,15 @@ describe('Command definitions (.json) are valid and follow Discord command schem
               }
               expect(opt.description_localizations[key]).toBeDefined();
               expect(typeof opt.description_localizations[key]).toBe('string');
+              // option descriptions must be between 1 and 100 chars
+              expect(opt.description_localizations[key].length).toBeGreaterThanOrEqual(1);
+              expect(opt.description_localizations[key].length).toBeLessThanOrEqual(100);
+            }
+            // also check the base description if present
+            if (opt.description) {
+              expect(typeof opt.description).toBe('string');
+              expect(opt.description.length).toBeGreaterThanOrEqual(1);
+              expect(opt.description.length).toBeLessThanOrEqual(100);
             }
           });
         }
