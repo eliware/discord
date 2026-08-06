@@ -137,3 +137,6 @@ dist
 
 # jest
 .jest.result.agentx*
+
+.jest.result
+.agentx*
