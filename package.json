@@ -1,74 +1,74 @@
 {
-  "name": "@eliware/discord",
-  "type": "module",
-  "version": "1.1.2",
-  "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
-  "module": "index.mjs",
-  "main": "index.mjs",
-  "types": "index.d.ts",
-  "files": [
-    "index.mjs",
-    "index.d.ts",
-    "README.md",
-    "LICENSE",
-    "src/"
-  ],
-  "exports": {
-    ".": {
-      "import": "./index.mjs",
-      "types": "./index.d.ts"
+    "name": "@eliware/discord",
+    "type": "module",
+    "version": "1.1.3",
+    "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
+    "module": "index.mjs",
+    "main": "index.mjs",
+    "types": "index.d.ts",
+    "files": [
+        "index.mjs",
+        "index.d.ts",
+        "README.md",
+        "LICENSE",
+        "src/"
+    ],
+    "exports": {
+        ".": {
+            "import": "./index.mjs",
+            "types": "./index.d.ts"
+        }
+    },
+    "scripts": {
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --coverage --detectOpenHandles --silent --runInBand",
+        "lint": "npx oxlint .",
+        "test:gaps": "npm test -- --coverageReporters=text 2>&1 | awk -F'|' 'NF >= 6 && $2 ~ /[0-9]/ && !($2 ~ /^[[:space:]]*100[[:space:]]*$/ && $3 ~ /^[[:space:]]*100[[:space:]]*$/ && $4 ~ /^[[:space:]]*100[[:space:]]*$/ && $5 ~ /^[[:space:]]*100[[:space:]]*$/)'"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/eliware/discord.git"
+    },
+    "keywords": [
+        "discord",
+        "discord-app",
+        "discordjs",
+        "discord-js",
+        "discord-app-framework",
+        "discord-app-template",
+        "slash-commands",
+        "localization",
+        "i18n",
+        "event-driven",
+        "nodejs",
+        "node",
+        "framework",
+        "typescript",
+        "app",
+        "modular",
+        "extensible"
+    ],
+    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
+    "license": "MIT",
+    "engines": {
+        "node": ">=26"
+    },
+    "bugs": {
+        "url": "https://github.com/eliware/discord/issues"
+    },
+    "homepage": "https://github.com/eliware/discord#readme",
+    "devDependencies": {
+        "jest": "^30.4.2"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs"
+        ]
+    },
+    "dependencies": {
+        "@eliware/common": "^1.1.6",
+        "discord.js": "^14.27.0",
+        "dotenv": "^17.4.2"
     }
-  },
-  "scripts": {
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --coverage --detectOpenHandles --silent --runInBand",
-    "lint": "npx oxlint .",
-    "test:gaps": "npm test -- --coverageReporters=text 2>&1 | awk -F'|' 'NF >= 6 && $2 ~ /[0-9]/ && !($2 ~ /^[[:space:]]*100[[:space:]]*$/ && $3 ~ /^[[:space:]]*100[[:space:]]*$/ && $4 ~ /^[[:space:]]*100[[:space:]]*$/ && $5 ~ /^[[:space:]]*100[[:space:]]*$/)'"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/discord.git"
-  },
-  "keywords": [
-    "discord",
-    "discord-app",
-    "discordjs",
-    "discord-js",
-    "discord-app-framework",
-    "discord-app-template",
-    "slash-commands",
-    "localization",
-    "i18n",
-    "event-driven",
-    "nodejs",
-    "node",
-    "framework",
-    "typescript",
-    "app",
-    "modular",
-    "extensible"
-  ],
-  "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-  "license": "MIT",
-  "engines": {
-    "node": ">=26"
-  },
-  "bugs": {
-    "url": "https://github.com/eliware/discord/issues"
-  },
-  "homepage": "https://github.com/eliware/discord#readme",
-  "devDependencies": {
-    "jest": "^30.4.2"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs"
-    ]
-  },
-  "dependencies": {
-    "@eliware/common": "^1.1.6",
-    "discord.js": "^14.27.0",
-    "dotenv": "^17.4.2"
-  }
 }
