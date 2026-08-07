@@ -11,10 +11,6 @@
     "index.d.ts",
     "README.md",
     "LICENSE",
-    "example.mjs",
-    "commands/",
-    "events/",
-    "locales/",
     "src/"
   ],
   "exports": {

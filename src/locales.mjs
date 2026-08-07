@@ -45,9 +45,9 @@ export const setupLocales = ({
     log = logger,
     fsLib = { readdirSync, readFileSync },
 } = {}) => {
+    Object.keys(locales).forEach(key => delete locales[key]);
     let loadedLocales = [];
-    try {
-        let files = [];
+    let files = [];
         try {
             // Check if directory exists before reading
             if (fsLib.existsSync && !fsLib.existsSync(localesDir)) {
@@ -55,7 +55,7 @@ export const setupLocales = ({
                 return { msg, loadedLocales };
             }
             files = fsLib.readdirSync(localesDir).filter(f => f.endsWith('.json'));
-        } catch (err) {
+        } catch {
             //log.warn(`Locales directory missing or unreadable: ${localesDir}`);
             return { msg, loadedLocales };
         }
@@ -63,14 +63,11 @@ export const setupLocales = ({
             try {
                 const content = fsLib.readFileSync(path(localesDir, file), 'utf8');
                 locales[file.replace(/\.json$/, '')] = JSON.parse(content);
-            } catch (err) {
-                log.error(`Failed to load or parse locale file ${file}:`, err);
+            } catch (_err) {
+                log.error(`Failed to load or parse locale file ${file}:`, _err);
             }
         }
-        loadedLocales = Object.keys(locales);
-    } catch (err) {
-        log.error('Unexpected error in loadLocales:', err);
-    }
+    loadedLocales = Object.keys(locales);
     return { msg, loadedLocales };
 };
 

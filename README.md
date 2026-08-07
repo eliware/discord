@@ -2,7 +2,7 @@
 
 ## @eliware/discord [![npm version](https://img.shields.io/npm/v/@eliware/discord.svg)](https://www.npmjs.com/package/@eliware/discord)[![license](https://img.shields.io/github/license/eliware/discord.svg)](LICENSE)[![build status](https://github.com/eliware/discord/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/discord/actions)
 
-> A modular, extensible Discord app framework for Node.js, with built-in support for slash commands, localization, and event-driven architecture.
+> An ESM-first Discord app framework for Node.js, with built-in support for slash commands, localization, and event-driven architecture.
 
 ---
 
@@ -12,7 +12,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [ESM Example](#esm-example)
-  - [CommonJS Example](#commonjs-example)
 - [API](#api)
 - [TypeScript](#typescript)
 - [Support](#support)
@@ -26,6 +25,7 @@
 - Event handler auto-loading for all Discord Gateway events
 - Built-in localization system with easy locale file management
 - TypeScript type definitions included
+- Application-owned commands, events, and locales live in the consuming project (see `@eliware/discord-template` for a starter layout)
 - Dependency injection and testability for all major components
 - Logging and error handling hooks
 - Extensible and modular directory structure
@@ -57,27 +57,6 @@ try {
 }
 ```
 
-### CommonJS Example
-
-```js
-require('dotenv/config');
-const log = require('@eliware/log').default;
-const path = require('@eliware/path').default;
-const { createDiscord } = require('@eliware/discord');
-
-(async () => {
-  try {
-    await createDiscord({
-      log,
-      rootDir: path(__filename),
-      intents: { MessageContent: true }
-    });
-  } catch (err) {
-    log.error('Failed to start app:', err);
-  }
-})();
-```
-
 ## API
 
 ### `createDiscord(options): Promise<Client>`
@@ -86,7 +65,8 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 
 **Options:**
 
-- `client_id` (string): Discord application client ID (required)
+- `clientId` (string): Discord application client ID (required)
+  - `client_id` remains supported as a compatibility alias
 - `token` (string): Discord bot token (required)
 - `log` (Logger): Logger instance (optional)
 - `rootDir` (string): Root directory for events, commands, and locales (default: autodetect)
@@ -94,7 +74,7 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 - `commandsDir` (string): Directory for command definitions and handlers (default: `<rootDir>/commands`)
 - `eventsDir` (string): Directory for event handlers (default: `<rootDir>/events`)
 - `intents` (object): Discord Gateway Intents (default: Guilds and GuildMessages enabled)
-- `partials` (array): Discord.js partials (default: `['MESSAGE', 'CHANNEL', 'REACTION']`)
+- `partials` (object): Partial flags keyed by Discord.js partial name (default: `Message`, `Channel`, and `Reaction`)
 - `clientOptions` (object): Additional Discord.js client options
 - `ClientClass` (constructor): Custom Discord.js Client class (for testing)
 - `setupEventsFn`, `setupCommandsFn`, `registerCommandsFn`, `setupLocalesFn`: Dependency injection for advanced use/testing
@@ -112,15 +92,12 @@ Splits a message into chunks of up to `maxLength` characters, attempting to spli
 
 ### Command and Event Structure
 
-- **Commands:**  
-  - Place `.json` files in the `commands/` directory for each command definition (see `commands/help.json` for structure).
-  - Place a `.mjs` file with the same name for the command handler (see `commands/help.mjs`).
-- **Events:**  
-  - Place `.mjs` files in the `events/` directory, named after Discord Gateway events (e.g., `ready.mjs`, `messageCreate.mjs`).
+- **Commands:** Place `.json` definitions and matching `.mjs` handlers in the configured `commandsDir`.
+- **Events:** Place `.mjs` handlers in the configured `eventsDir`, named after Discord Gateway events (e.g., `ready.mjs`, `messageCreate.mjs`).
 
 ### Localization
 
-- Place locale files in the `locales/` directory (e.g., `en-US.json`, `es-ES.json`).
+- Place locale files in the configured `localesDir` (e.g., `en-US.json`, `es-ES.json`).
 - Each file should be a flat key-value JSON object for that locale.
 
 ## TypeScript

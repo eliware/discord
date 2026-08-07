@@ -4,10 +4,8 @@ import type { REST } from '@discordjs/rest';
 import type { Routes } from 'discord.js';
 
 export interface SetupCommandsOptions {
-  client?: any;
   commandsDir: string;
   log?: Logger;
-  msg?: string;
   fsLib?: {
     readdirSync: (...args: any[]) => string[];
     readFileSync: (...args: any[]) => string;

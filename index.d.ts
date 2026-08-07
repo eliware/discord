@@ -7,6 +7,8 @@ import type { Client, ClientOptions } from 'discord.js';
 import type { Logger } from '@eliware/log';
 
 export interface CreateDiscordOptions {
+  clientId?: string;
+  /** Deprecated compatibility alias for clientId. */
   client_id?: string;
   token?: string;
   log?: Logger;
@@ -40,7 +42,7 @@ export interface CreateDiscordOptions {
     DirectMessagePolls?: boolean;
     [key: string]: boolean | undefined;
   };
-  partials?: string[];
+  partials?: Partial<Record<'Message' | 'Channel' | 'Reaction' | 'GuildMember' | 'User' | 'ThreadMember' | 'GuildScheduledEvent', boolean>>;
   context?: Record<string, any>;
   clientOptions?: ClientOptions;
   ClientClass?: typeof Client;
@@ -65,3 +67,5 @@ export function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
  * @returns An array of message chunks, each no longer than maxLength
  */
 export function splitMsg(msg: string, maxLength?: number): string[];
+
+export function shutdownDiscord(client: Client, options?: { cleanupEvents?: () => void; clearLocalesFn?: () => void }): Promise<void>;

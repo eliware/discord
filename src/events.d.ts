@@ -8,6 +8,7 @@ export interface SetupEventsOptions {
   log?: Logger;
   msg?: (locale: string, key: string, defaultMsg?: string) => string;
   commandHandlers?: Record<string, (...args: any[]) => any>;
+  context?: Record<string, any>;
   fsLib?: {
     readdirSync: (...args: any[]) => string[];
   };
@@ -16,6 +17,7 @@ export interface SetupEventsOptions {
 
 export interface SetupEventsResult {
   loadedEvents: string[];
+  cleanup: () => void;
 }
 
 export function setupEvents(options: SetupEventsOptions): Promise<SetupEventsResult>;

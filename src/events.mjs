@@ -26,24 +26,44 @@ export const setupEvents = async ({
     fsLib = { readdirSync },
     importFn = (p) => import(p),
 } = {}) => {
-    const files = fsLib.readdirSync(eventsDir).filter(f => f.endsWith('.mjs'));
+    let files = [];
+    try {
+        files = fsLib.readdirSync(eventsDir).filter(f => f.endsWith('.mjs'));
+    } catch {
+        log.warn(`Events directory missing or unreadable: ${eventsDir}`);
+        return { loadedEvents: [] };
+    }
     const loadedEvents = [];
+    const listeners = [];
     for (const file of files) {
         const eventName = file.replace(/\.mjs$/, '');
         try {
             const handler = await importFn(pathUrl(eventsDir, file));
             if (!client) throw new Error('Discord client is undefined');
             if (typeof handler.default === 'function') {
-                client.on(eventName, (...eventArgs) => {
+                const listener = (...eventArgs) => {
                     const handlerContext = { client, log, msg, ...context };
                     if (eventName === 'interactionCreate') handlerContext.commandHandlers = commandHandlers;
-                    handler.default(handlerContext, ...eventArgs);
-                });
+                    Promise.resolve(handler.default(handlerContext, ...eventArgs)).catch((error) => {
+                        log.error(`Event handler failed for ${eventName}:`, error);
+                    });
+                };
+                client.on(eventName, listener);
+                listeners.push([eventName, listener]);
             }
             loadedEvents.push(eventName);
         } catch (err) {
             log.error(`Failed to load event ${eventName}:`, err);
         }
     }
-    return { loadedEvents };
+    return {
+        loadedEvents,
+        cleanup: () => {
+            for (const [eventName, listener] of listeners) {
+                if (typeof client.off === 'function') client.off(eventName, listener);
+                else if (typeof client.removeListener === 'function') client.removeListener(eventName, listener);
+            }
+            listeners.length = 0;
+        },
+    };
 };

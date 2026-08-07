@@ -3,6 +3,19 @@ import { readdirSync, readFileSync, existsSync } from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord.js';
 
+const validateCommandDefinition = (definition) => {
+    if (!definition || typeof definition !== 'object' || Array.isArray(definition)) {
+        return 'definition must be an object';
+    }
+    if (typeof definition.name !== 'string' || definition.name.length < 1 || definition.name.length > 32) {
+        return 'name must be 1-32 characters';
+    }
+    if (typeof definition.description !== 'string' || definition.description.length < 1 || definition.description.length > 100) {
+        return 'description must be 1-100 characters';
+    }
+    return null;
+};
+
 /**
  * Loads and registers Discord commands from JSON files and their handlers.
  * @param {Object} options - Options for setting up commands
@@ -15,10 +28,8 @@ import { Routes } from 'discord.js';
  * @returns {Promise<{commandDefs: Array, commandHandlers: Object}>} Map of command names to handler functions and command definitions
  */
 export const setupCommands = async ({
-    client,
     commandsDir,
     log = logger,
-    msg,
     fsLib = { readdirSync, readFileSync, existsSync },
     importFn = (p) => import(p),
 } = {}) => {
@@ -30,7 +41,7 @@ export const setupCommands = async ({
             return { commandDefs: [], commandHandlers: {} };
         }
         files = fsLib.readdirSync(commandsDir).filter(f => f.endsWith('.json'));
-    } catch (err) {
+    } catch {
         log.warn(`Commands directory missing or unreadable: ${commandsDir}`);
         return { commandDefs: [], commandHandlers: {} };
     }
@@ -39,6 +50,11 @@ export const setupCommands = async ({
     for (const file of files) {
         try {
             const def = JSON.parse(fsLib.readFileSync(path(commandsDir, file), 'utf8'));
+            const validationError = validateCommandDefinition(def);
+            if (validationError) {
+                log.error(`Invalid command definition for ${file}: ${validationError}`);
+                continue;
+            }
             const cmdName = file.replace(/\.json$/, '');
             const handlerPath = path(commandsDir, cmdName + '.mjs');
             if (fsLib.existsSync(handlerPath)) {
@@ -57,8 +73,8 @@ export const setupCommands = async ({
             } else {
                 log.warn(`No handler found for command ${cmdName}`);
             }
-        } catch (err) {
-            log.error(`Failed to load command definition for ${file}:`, err);
+        } catch (_err) {
+            log.error(`Failed to load command definition for ${file}:`, _err);
             continue;
         }
     }
@@ -111,7 +127,7 @@ export const registerCommands = async ({
         } else if (error && error.status === 403) {
             log.error('Failed to register commands: Forbidden (403). The bot may lack permissions.');
         } else {
-            log.error('Failed to register commands:', error.message || error);
+            log.error('Failed to register commands:', error?.message || error);
         }
         return false;
     }
