@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.1.4 — 2026-08-07
+
+- Standardized validation scripts, TypeScript checking, CI, and package metadata.
+- Updated `@eliware/common` to 1.1.7.
+- Expanded requirements, troubleshooting, development, and security documentation.
+
 ## 1.1.3
 
 - Modernized Discord lifecycle management and shared integrations.

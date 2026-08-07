@@ -9,11 +9,15 @@
 ## Table of Contents
 
 - [Features](#features)
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
   - [ESM Example](#esm-example)
 - [API](#api)
 - [TypeScript](#typescript)
+- [Errors / Troubleshooting](#errors--troubleshooting)
+- [Development](#development)
+- [Security](#security)
 - [Support](#support)
 - [License](#license)
 - [Links](#links)
@@ -29,6 +33,11 @@
 - Dependency injection and testability for all major components
 - Logging and error handling hooks
 - Extensible and modular directory structure
+
+## Requirements
+
+- Node.js 26 or newer
+- A Discord application, bot token, and configured intents for live connections
 
 ## Installation
 
@@ -109,6 +118,26 @@ import type { CreateDiscordOptions } from '@eliware/discord';
 
 declare function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
 ```
+
+## Errors / Troubleshooting
+
+`createDiscord()` requires a valid application client ID and bot token. Connection, command-loading, event-loading, and localization failures are surfaced through the configured logger. Keep credentials out of source control and use dependency injection for tests. Process signal and exception integrations are opt-in; call the client shutdown method during application cleanup.
+
+## Development
+
+```bash
+npm test
+npm run test:gaps
+npm run lint
+npm run typecheck
+npm run pack
+```
+
+Tests inject Discord client and loader dependencies, so a live Discord connection is not required.
+
+## Security
+
+Keep Discord tokens and application credentials in environment variables or secret storage. Do not log tokens, credential-bearing URLs, private data, or full sensitive event payloads. Review intents and permissions before deployment.
 
 ## Support
 
