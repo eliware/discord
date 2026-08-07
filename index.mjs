@@ -1,8 +1,9 @@
-import { log as logger, path } from '@eliware/common';
+import { log as logger, path, registerHandlers, registerSignals } from '@eliware/common';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { setupEvents } from './src/events.mjs';
 import { setupCommands, registerCommands } from './src/commands.mjs';
 import { setupLocales, clearLocales } from './src/locales.mjs';
+import { validateBooleanMap, validateContext } from './src/validation.mjs';
 
 /**
  * Creates and logs in a Discord client, allowing dependency injection for testability.
@@ -25,6 +26,10 @@ import { setupLocales, clearLocales } from './src/locales.mjs';
  * @param {Function} [options.setupCommandsFn] - Function to set up commands (for dependency injection/testing)
  * @param {Function} [options.registerCommandsFn] - Function to register commands (for dependency injection/testing)
  * @param {Function} [options.setupLocalesFn] - Function to set up locales (for dependency injection/testing)
+ * @param {boolean} [options.signals=false] - Register graceful process signal handling
+ * @param {Object} [options.signalOptions] - Options for @eliware/signals
+ * @param {boolean} [options.processHandlers=false] - Register process error handlers
+ * @param {Object} [options.processHandlerOptions] - Options for @eliware/errors
  * @returns {Promise<import('discord.js').Client>} Discord client instance
  */
 const DEFAULT_INTENTS = {
@@ -57,6 +62,8 @@ const DEFAULT_PARTIALS = {
   Reaction: true
 };
 
+const shutdownClients = new WeakSet();
+
 const PARTIALS_MAP = {
   Message: Partials.Message,
   Channel: Partials.Channel,
@@ -85,6 +92,10 @@ export const createDiscord = async ({
   setupCommandsFn = setupCommands,
   registerCommandsFn = registerCommands,
   setupLocalesFn = setupLocales,
+  signals = false,
+  signalOptions = {},
+  processHandlers = false,
+  processHandlerOptions = {},
 } = {}) => {
   const resolvedClientId = clientId ?? client_id ?? process.env.DISCORD_CLIENT_ID;
   if (!resolvedClientId) throw new Error('DISCORD_CLIENT_ID is not set. Please check your .env file.');
@@ -116,6 +127,10 @@ export const createDiscord = async ({
     DirectMessagePolls: GatewayIntentBits.DirectMessagePolls
   };
 
+  validateContext(context);
+  validateBooleanMap(intents, new Set(Object.keys(INTENT_MAP)), 'intents');
+  validateBooleanMap(partials, new Set(Object.keys(PARTIALS_MAP)), 'partials');
+
   // Merge user intents with defaults
   const mergedIntents = { ...DEFAULT_INTENTS, ...intents };
   const resolvedIntents = Object.entries(mergedIntents)
@@ -133,36 +148,87 @@ export const createDiscord = async ({
     partials: resolvedPartials,
     ...clientOptions
   });
+  const appLog = typeof log.child === 'function' ? log.child({ component: 'discord', clientId: resolvedClientId }) : log;
+  let signalRegistration;
+  let processHandlerRegistration;
+  let cleanupEvents = () => {};
+  const cleanup = () => shutdownDiscord(client, { cleanupEvents, signalRegistration, processHandlerRegistration });
+  client.shutdown = cleanup;
 
-  const { msg, loadedLocales } = await setupLocalesFn({ localesDir, log });
-  const { commandDefs, commandHandlers } = await setupCommandsFn({ commandsDir, log });
-  const { loadedEvents, cleanup: cleanupEvents = () => {} } = await setupEventsFn({ client, eventsDir, log, msg, commandHandlers, context });
-  let registerSuccess = true;
-  if (commandDefs && commandDefs.length > 0) {
-    registerSuccess = await registerCommandsFn({ commandDefs, clientId: resolvedClientId, token, log });
-    if (!registerSuccess) {
-      await shutdownDiscord(client, { cleanupEvents });
-      throw new Error('Failed to register commands with Discord API. Please check your command definitions and token.');
-    }
-  } else {
-    log.warn('No commands to register.');
-  }
-  log.info(`Loaded ${loadedEvents.length} event(s), ${loadedLocales.length} locale(s), and ${commandDefs ? Object.keys(commandDefs).length : 0} command(s).`);
-  client.shutdown = () => shutdownDiscord(client, { cleanupEvents });
   try {
-    await client.login(token);
+    if (signals) {
+      signalRegistration = registerSignals({ ...signalOptions, log: appLog, exit: false, shutdownHook: async (signal) => {
+        await cleanup();
+        await signalOptions.shutdownHook?.(signal);
+      } });
+    }
+    if (processHandlers) {
+      processHandlerRegistration = registerHandlers({ ...processHandlerOptions, log: appLog });
+    }
+
+    const localeResult = await setupLocalesFn({ localesDir, log: appLog });
+    if (!localeResult || typeof localeResult.msg !== 'function' || !Array.isArray(localeResult.loadedLocales)) {
+      throw new TypeError('setupLocalesFn must return { msg, loadedLocales }.');
+    }
+    const { msg, loadedLocales } = localeResult;
+
+    const commandResult = await setupCommandsFn({ commandsDir, log: appLog });
+    if (!commandResult ||
+        (commandResult.commandDefs !== undefined && !Array.isArray(commandResult.commandDefs)) ||
+        !commandResult.commandHandlers || typeof commandResult.commandHandlers !== 'object') {
+      throw new TypeError('setupCommandsFn must return { commandDefs, commandHandlers }.');
+    }
+    const commandDefs = commandResult.commandDefs ?? [];
+    const { commandHandlers } = commandResult;
+
+    const eventResult = await setupEventsFn({ client, eventsDir, log: appLog, msg, commandHandlers, context });
+    if (!eventResult || !Array.isArray(eventResult.loadedEvents)) {
+      throw new TypeError('setupEventsFn must return { loadedEvents, cleanup }.');
+    }
+    const { loadedEvents } = eventResult;
+    cleanupEvents = typeof eventResult.cleanup === 'function' ? eventResult.cleanup : () => {};
+
+    if (commandDefs.length > 0) {
+      const registerSuccess = await registerCommandsFn({ commandDefs, clientId: resolvedClientId, token, log: appLog });
+      if (!registerSuccess) {
+        throw new Error('Failed to register commands with Discord API. Please check your command definitions and token.');
+      }
+    } else {
+      appLog.warn('No commands to register.');
+    }
+    appLog.info('Discord app initialized', {
+      eventCount: loadedEvents.length,
+      localeCount: loadedLocales.length,
+      commandCount: commandDefs.length,
+    });
+
+    try {
+      await client.login(token);
+    } catch (error) {
+      throw new Error(`Failed to log in to Discord: ${error.message}`, { cause: error });
+    }
+    return client;
   } catch (error) {
-    await shutdownDiscord(client, { cleanupEvents });
-    throw new Error(`Failed to log in to Discord: ${error.message}`);
+    await cleanup();
+    throw error;
   }
-  return client;
 };
 
 /** Cleanly removes loaded handlers, clears locales, and destroys a Discord client. */
-export const shutdownDiscord = async (client, { cleanupEvents = () => {}, clearLocalesFn = clearLocales } = {}) => {
-  cleanupEvents();
-  clearLocalesFn();
-  if (client && typeof client.destroy === 'function') await client.destroy();
+export const shutdownDiscord = async (client, { cleanupEvents = () => {}, clearLocalesFn = clearLocales, signalRegistration, processHandlerRegistration } = {}) => {
+  if (!client || shutdownClients.has(client)) return;
+  shutdownClients.add(client);
+  try {
+    cleanupEvents();
+  } finally {
+    try {
+      clearLocalesFn();
+    } finally {
+      signalRegistration?.removeHandlers?.();
+      processHandlerRegistration?.removeHandlers?.();
+      if (typeof client.destroy === 'function') await client.destroy();
+    }
+  }
 };
 
 /**
@@ -173,6 +239,9 @@ export const shutdownDiscord = async (client, { cleanupEvents = () => {}, clearL
  * @returns {string[]} An array of message chunks, each no longer than maxLength
  */
 export function splitMsg(msg, maxLength = 2000) {
+    if (typeof msg !== 'string') {
+        throw new TypeError('msg must be a string.');
+    }
     if (!Number.isFinite(maxLength) || maxLength < 1) {
         throw new RangeError('maxLength must be a positive finite number.');
     }

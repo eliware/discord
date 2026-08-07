@@ -1,4 +1,5 @@
 import { log as logger, path } from '@eliware/common';
+import { validateLocale } from './validation.mjs';
 import { readdirSync, readFileSync } from 'fs';
 
 /**
@@ -62,7 +63,11 @@ export const setupLocales = ({
         for (const file of files) {
             try {
                 const content = fsLib.readFileSync(path(localesDir, file), 'utf8');
-                locales[file.replace(/\.json$/, '')] = JSON.parse(content);
+                const locale = JSON.parse(content);
+                if (!validateLocale(locale)) {
+                    throw new TypeError('locale must be a flat object containing only string values');
+                }
+                locales[file.replace(/\.json$/, '')] = locale;
             } catch (_err) {
                 log.error(`Failed to load or parse locale file ${file}:`, _err);
             }

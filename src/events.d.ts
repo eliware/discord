@@ -1,6 +1,6 @@
 // Type definitions for event setup and registration
 import type { Client } from 'discord.js';
-import type { Logger } from '@eliware/log';
+import type { Logger } from '@eliware/common';
 
 export interface SetupEventsOptions {
   client: Client;
@@ -8,7 +8,8 @@ export interface SetupEventsOptions {
   log?: Logger;
   msg?: (locale: string, key: string, defaultMsg?: string) => string;
   commandHandlers?: Record<string, (...args: any[]) => any>;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
+  onHandlerError?: (error: unknown, eventName: string) => void;
   fsLib?: {
     readdirSync: (...args: any[]) => string[];
   };

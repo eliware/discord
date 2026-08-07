@@ -171,6 +171,11 @@ describe('splitMsg', () => {
     ({ splitMsg } = await import('../index.mjs'));
   });
 
+  it('rejects non-string messages', () => {
+    expect(() => splitMsg(null)).toThrow(TypeError);
+    expect(() => splitMsg(123)).toThrow(TypeError);
+  });
+
   it('rejects invalid maxLength values', () => {
     expect(() => splitMsg('hello', 0)).toThrow(RangeError);
     expect(() => splitMsg('hello', -1)).toThrow(RangeError);
@@ -207,5 +212,102 @@ describe('splitMsg', () => {
 
   it('does not add an empty final chunk', () => {
     expect(splitMsg('abcdef', 3)).toEqual(['abc', 'def']);
+  });
+});
+
+describe('createDiscord lifecycle cleanup', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+
+  it.each(['locales', 'commands', 'events'])('cleans up when %s setup fails', async (stage) => {
+    const destroy = jest.fn().mockResolvedValue(undefined);
+    const client = { destroy, login: jest.fn() };
+    const setupLocalesFn = stage === 'locales' ? jest.fn().mockRejectedValue(new Error('setup failed')) : jest.fn(() => ({ msg: jest.fn(), loadedLocales: [] }));
+    const setupCommandsFn = stage === 'commands' ? jest.fn().mockRejectedValue(new Error('setup failed')) : jest.fn(async () => ({ commandDefs: [], commandHandlers: {} }));
+    const setupEventsFn = stage === 'events' ? jest.fn().mockRejectedValue(new Error('setup failed')) : jest.fn(async () => ({ loadedEvents: [], cleanup: jest.fn() }));
+    await expect(createDiscord({ clientId: 'cid', token: 'token', log: logger, ClientClass: jest.fn(() => client), setupLocalesFn, setupCommandsFn, setupEventsFn })).rejects.toThrow('setup failed');
+    expect(destroy).toHaveBeenCalledTimes(1);
+  });
+
+  it('makes shutdown idempotent', async () => {
+    const destroy = jest.fn().mockResolvedValue(undefined);
+    const cleanup = jest.fn();
+    const client = { destroy, login: jest.fn().mockResolvedValue('ok') };
+    await createDiscord({ clientId: 'cid', token: 'token', log: logger, ClientClass: jest.fn(() => client), setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }), setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }), setupEventsFn: async () => ({ loadedEvents: [], cleanup }) });
+    await client.shutdown();
+    await client.shutdown();
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(destroy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('createDiscord setup result validation', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+
+  const options = (overrides = {}) => ({
+    clientId: 'cid',
+    token: 'token',
+    log: logger,
+    ClientClass: jest.fn(() => ({ destroy: jest.fn().mockResolvedValue(undefined) })),
+    setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
+    setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
+    setupEventsFn: async () => ({ loadedEvents: [] }),
+    ...overrides,
+  });
+
+  it('rejects an invalid locale setup result', async () => {
+    await expect(createDiscord(options({ setupLocalesFn: () => ({}) })))
+      .rejects.toThrow('setupLocalesFn must return { msg, loadedLocales }.');
+  });
+
+  it('rejects an invalid command setup result', async () => {
+    await expect(createDiscord(options({ setupCommandsFn: async () => ({ commandDefs: 'bad', commandHandlers: {} }) })))
+      .rejects.toThrow('setupCommandsFn must return { commandDefs, commandHandlers }.');
+  });
+
+  it('rejects an invalid event setup result', async () => {
+    await expect(createDiscord(options({ setupEventsFn: async () => ({ loadedEvents: 'bad' }) })))
+      .rejects.toThrow('setupEventsFn must return { loadedEvents, cleanup }.');
+  });
+});
+
+describe('shared lifecycle integrations', () => {
+  it('registers and cleans up signal and process handlers', async () => {
+    const processObj = { on: jest.fn(), once: jest.fn(), off: jest.fn(), exit: jest.fn() };
+    const shutdownHook = jest.fn().mockResolvedValue(undefined);
+    const client = { login: jest.fn().mockResolvedValue('ok'), destroy: jest.fn().mockResolvedValue(undefined) };
+    const log = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+    await createDiscord({
+      clientId: 'cid', token: 'token', log, ClientClass: jest.fn(() => client),
+      signals: true,
+      signalOptions: { processObj, shutdownHook },
+      processHandlers: true,
+      processHandlerOptions: { processObj },
+      setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
+      setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
+      setupEventsFn: async () => ({ loadedEvents: [], cleanup: jest.fn() }),
+    });
+    await client.shutdown();
+    const sigtermListener = processObj.on.mock.calls.find(([event]) => event === 'SIGTERM')?.[1];
+    expect(sigtermListener).toEqual(expect.any(Function));
+    await sigtermListener();
+    expect(shutdownHook).toHaveBeenCalledWith('SIGTERM');
+    expect(processObj.off).toHaveBeenCalled();
+    expect(client.destroy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('logger context', () => {
+  it('uses child logger context when available', async () => {
+    const child = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+    const log = { child: jest.fn(() => child), error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+    await createDiscord({
+      clientId: 'cid', token: 'token', log,
+      ClientClass: jest.fn(() => ({ login: jest.fn().mockResolvedValue('ok') })),
+      setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
+      setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
+      setupEventsFn: async () => ({ loadedEvents: [], cleanup: jest.fn() }),
+    });
+    expect(log.child).toHaveBeenCalledWith({ component: 'discord', clientId: 'cid' });
+    expect(child.info).toHaveBeenCalled();
   });
 });

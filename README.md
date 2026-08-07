@@ -132,3 +132,26 @@ For help, questions, or to chat with the author and community, visit:
 - [Discord](https://discord.gg/M6aTR9eTwN)
 
 ---
+
+## Complete example
+
+For a complete working application, see the
+[`@eliware/discord-template`](https://github.com/eliware/discord-template)
+repository. It demonstrates commands, events, locales, testing, Docker, and
+systemd deployment. This package README focuses on the reusable library API.
+
+### Lifecycle integrations
+
+Process integrations are opt-in:
+
+```js
+await createDiscord({
+  signals: true,
+  processHandlers: true,
+  signalOptions: { exit: false },
+  processHandlerOptions: { events: ['uncaughtException', 'unhandledRejection'] }
+});
+```
+
+Signal and process-handler registrations are removed during `client.shutdown()`.
+The library never enables global process handlers by default.

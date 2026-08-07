@@ -4,7 +4,39 @@
 // TypeScript Version: 4.5
 
 import type { Client, ClientOptions } from 'discord.js';
-import type { Logger } from '@eliware/log';
+import type { Logger } from '@eliware/common';
+
+export type CommandHandler = (context: EventHandlerContext, ...args: unknown[]) => unknown | Promise<unknown>;
+
+export interface EventHandlerContext {
+  client: Client;
+  log: Logger;
+  msg: (locale: string, key: string, defaultValue?: string) => string;
+  commandHandlers?: Record<string, CommandHandler>;
+  [key: string]: unknown;
+}
+
+export interface CommandDefinition {
+  name: string;
+  description: string;
+  options?: readonly Record<string, unknown>[];
+  [key: string]: unknown;
+}
+
+export interface SetupLocalesResult {
+  msg: (locale: string, key: string, defaultValue?: string, log?: Logger) => string;
+  loadedLocales: string[];
+}
+
+export interface SetupCommandsResult {
+  commandDefs: CommandDefinition[];
+  commandHandlers: Record<string, CommandHandler>;
+}
+
+export interface SetupEventsResult {
+  loadedEvents: string[];
+  cleanup: () => void;
+}
 
 export interface CreateDiscordOptions {
   clientId?: string;
@@ -43,13 +75,17 @@ export interface CreateDiscordOptions {
     [key: string]: boolean | undefined;
   };
   partials?: Partial<Record<'Message' | 'Channel' | 'Reaction' | 'GuildMember' | 'User' | 'ThreadMember' | 'GuildScheduledEvent', boolean>>;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   clientOptions?: ClientOptions;
   ClientClass?: typeof Client;
-  setupEventsFn?: (options: any) => Promise<any>;
-  setupCommandsFn?: (options: any) => Promise<any>;
-  registerCommandsFn?: (options: any) => Promise<boolean>;
-  setupLocalesFn?: (options: any) => any;
+  setupEventsFn?: (options: unknown) => Promise<SetupEventsResult>;
+  setupCommandsFn?: (options: unknown) => Promise<SetupCommandsResult>;
+  registerCommandsFn?: (options: unknown) => Promise<boolean>;
+  setupLocalesFn?: (options: unknown) => SetupLocalesResult;
+  signals?: boolean;
+  signalOptions?: Record<string, unknown>;
+  processHandlers?: boolean;
+  processHandlerOptions?: Record<string, unknown>;
 }
 
 /**

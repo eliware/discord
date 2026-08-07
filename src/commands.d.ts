@@ -1,5 +1,5 @@
 // Type definitions for Discord command setup and registration
-import type { Logger } from '@eliware/log';
+import type { Logger } from '@eliware/common';
 import type { REST } from '@discordjs/rest';
 import type { Routes } from 'discord.js';
 

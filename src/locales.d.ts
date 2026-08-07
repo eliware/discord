@@ -1,5 +1,5 @@
 // Type definitions for locales setup and management
-import type { Logger } from '@eliware/log';
+import type { Logger } from '@eliware/common';
 
 export interface SetupLocalesOptions {
   localesDir?: string;

@@ -121,4 +121,39 @@ describe('setupEvents', () => {
     expect(msg('en-US', 'key')).toBe('An error occurred.');
     expect(msg('en-US', 'key', 'fallback')).toBe('fallback');
   });
+  it('catches synchronous handler failures', async () => {
+    const client = { on: jest.fn() };
+    const log = logger();
+    const handler = jest.fn(() => { throw new Error('sync failed'); });
+    const onHandlerError = jest.fn();
+    await setupEvents({
+      client,
+      eventsDir: '/events',
+      log,
+      onHandlerError,
+      fsLib: { readdirSync: () => ['ready.mjs'] },
+      importFn: async () => ({ default: handler }),
+    });
+    client.on.mock.calls[0][1]('arg');
+    await new Promise(resolve => setImmediate(resolve));
+    expect(onHandlerError).toHaveBeenCalledWith(expect.any(Error), 'ready');
+  });
+
+});
+
+describe('setupEvents cleanup on unexpected failure', () => {
+  it('removes listeners attached before setup fails', async () => {
+    const off = jest.fn();
+    const on = jest.fn()
+      .mockImplementationOnce(() => {})
+      .mockImplementationOnce(() => { throw new Error('attach failed'); });
+    const client = { on, off };
+    await expect(setupEvents({
+      client,
+      eventsDir: '/events',
+      fsLib: { readdirSync: () => ['ready.mjs', 'error.mjs'] },
+      importFn: async () => ({ default: jest.fn() }),
+    })).rejects.toThrow('attach failed');
+    expect(off).toHaveBeenCalledTimes(1);
+  });
 });

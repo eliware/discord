@@ -23,6 +23,7 @@ export const setupEvents = async ({
     },
     commandHandlers = {},
     context = {},
+    onHandlerError = (error, eventName) => log.error(`Event handler failed for ${eventName}:`, error),
     fsLib = { readdirSync },
     importFn = (p) => import(p),
 } = {}) => {
@@ -35,35 +36,46 @@ export const setupEvents = async ({
     }
     const loadedEvents = [];
     const listeners = [];
-    for (const file of files) {
+    const cleanup = () => {
+        for (const [eventName, listener] of listeners) {
+            if (typeof client.off === 'function') client.off(eventName, listener);
+            else if (typeof client.removeListener === 'function') client.removeListener(eventName, listener);
+        }
+        listeners.length = 0;
+    };
+    try {
+        for (const file of files) {
         const eventName = file.replace(/\.mjs$/, '');
         try {
             const handler = await importFn(pathUrl(eventsDir, file));
             if (!client) throw new Error('Discord client is undefined');
             if (typeof handler.default === 'function') {
                 const listener = (...eventArgs) => {
-                    const handlerContext = { client, log, msg, ...context };
+                    const handlerContext = { ...context, client, log, msg };
                     if (eventName === 'interactionCreate') handlerContext.commandHandlers = commandHandlers;
-                    Promise.resolve(handler.default(handlerContext, ...eventArgs)).catch((error) => {
-                        log.error(`Event handler failed for ${eventName}:`, error);
-                    });
+                    Promise.resolve()
+                        .then(() => handler.default(handlerContext, ...eventArgs))
+                        .catch((error) => {
+                            onHandlerError(error, eventName);
+                        });
                 };
-                client.on(eventName, listener);
+                try {
+                    client.on(eventName, listener);
+                } catch (error) {
+                    error.eventListenerAttach = true;
+                    throw error;
+                }
                 listeners.push([eventName, listener]);
             }
             loadedEvents.push(eventName);
         } catch (err) {
+            if (err?.eventListenerAttach) throw err;
             log.error(`Failed to load event ${eventName}:`, err);
-        }
-    }
-    return {
-        loadedEvents,
-        cleanup: () => {
-            for (const [eventName, listener] of listeners) {
-                if (typeof client.off === 'function') client.off(eventName, listener);
-                else if (typeof client.removeListener === 'function') client.removeListener(eventName, listener);
             }
-            listeners.length = 0;
-        },
-    };
+        }
+    } catch (error) {
+        cleanup();
+        throw error;
+    }
+    return { loadedEvents, cleanup };
 };

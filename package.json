@@ -49,6 +49,9 @@
   ],
   "author": "Eli Sterling, eliware.org <eli@eliware.org>",
   "license": "MIT",
+  "engines": {
+    "node": ">=26"
+  },
   "bugs": {
     "url": "https://github.com/eliware/discord/issues"
   },
@@ -64,7 +67,7 @@
     ]
   },
   "dependencies": {
-    "@eliware/common": "^1.1.5",
+    "@eliware/common": "^1.1.6",
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2"
   }

@@ -70,6 +70,16 @@ describe('locales.mjs', () => {
     expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
+  it('logs error if locale is not a flat string map', () => {
+    mockFs.readdirSync.mockReturnValue(['bad.json']);
+    mockFs.readFileSync.mockReturnValue(JSON.stringify({ nested: { value: 'no' } }));
+    setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining('Failed to load or parse locale file bad.json:'),
+      expect.any(TypeError)
+    );
+  });
+
   it('logs error if file parse fails', () => {
     mockFs.readdirSync.mockReturnValue(['en-US.json']);
     mockFs.readFileSync.mockImplementation(() => '{bad json');
