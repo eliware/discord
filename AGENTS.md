@@ -46,3 +46,7 @@ Keep Discord tokens and application credentials in environment variables or secr
 ## Release
 
 Do not bump versions, edit release notes, tag, publish, deploy, or push unless explicitly requested. Before release, run all validation commands above and review package contents with `npm pack --dry-run`.
+- Do not over-engineer simple tasks.
+- Do not guess when confused.
+- Do not make random, pointless changes.
+- Check your own work before saying you're done.
