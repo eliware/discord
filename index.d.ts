@@ -6,6 +6,12 @@
 import type { Client, ClientOptions } from 'discord.js';
 import type { Logger } from '@eliware/common';
 
+export type { PurgeCommandsOptions } from './src/commands.d.ts';
+
+export type DiscordClient = Client & {
+  shutdown: () => Promise<void>;
+};
+
 export type CommandHandler = (context: EventHandlerContext, ...args: unknown[]) => unknown | Promise<unknown>;
 
 export interface EventHandlerContext {
@@ -91,9 +97,9 @@ export interface CreateDiscordOptions {
 /**
  * Creates and logs in a Discord client, allowing dependency injection for testability.
  * @param options Configuration options for the Discord client
- * @returns Promise resolving to a Discord.js Client instance
+ * @returns Promise resolving to a Discord.js Client instance with shutdown()
  */
-export function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
+export function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient>;
 
 /**
  * Splits a message into chunks of up to maxLength characters, attempting to split at newlines or periods for readability.
@@ -105,3 +111,6 @@ export function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
 export function splitMsg(msg: string, maxLength?: number): string[];
 
 export function shutdownDiscord(client: Client, options?: { cleanupEvents?: () => void; clearLocalesFn?: () => void }): Promise<void>;
+
+/** Deletes all application commands globally or for a specific guild. */
+export function purgeCommands(options?: import('./src/commands.d.ts').PurgeCommandsOptions): Promise<void>;

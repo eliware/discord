@@ -1,7 +1,7 @@
 import { log as logger, path, registerHandlers, registerSignals } from '@eliware/common';
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import { setupEvents } from './src/events.mjs';
-import { setupCommands, registerCommands } from './src/commands.mjs';
+import { setupCommands, registerCommands, purgeCommands } from './src/commands.mjs';
 import { setupLocales, clearLocales } from './src/locales.mjs';
 import { validateBooleanMap, validateContext } from './src/validation.mjs';
 
@@ -30,30 +30,30 @@ import { validateBooleanMap, validateContext } from './src/validation.mjs';
  * @param {Object} [options.signalOptions] - Options for @eliware/signals
  * @param {boolean} [options.processHandlers=false] - Register process error handlers
  * @param {Object} [options.processHandlerOptions] - Options for @eliware/errors
- * @returns {Promise<import('discord.js').Client>} Discord client instance
+ * @returns {Promise<import('discord.js').Client>} Discord client instance with shutdown()
  */
 const DEFAULT_INTENTS = {
-  Guilds: true,
+  Guilds: false,
   GuildMembers: false, // privileged
-  GuildModeration: true,
-  GuildExpressions: true,
-  GuildIntegrations: true,
-  GuildWebhooks: true,
-  GuildInvites: true,
-  GuildVoiceStates: true,
+  GuildModeration: false,
+  GuildExpressions: false,
+  GuildIntegrations: false,
+  GuildWebhooks: false,
+  GuildInvites: false,
+  GuildVoiceStates: false,
   GuildPresences: false, // privileged
-  GuildMessages: true,
-  GuildMessageReactions: true,
-  GuildMessageTyping: true,
-  DirectMessages: true,
-  DirectMessageReactions: true,
-  DirectMessageTyping: true,
+  GuildMessages: false,
+  GuildMessageReactions: false,
+  GuildMessageTyping: false,
+  DirectMessages: false,
+  DirectMessageReactions: false,
+  DirectMessageTyping: false,
   MessageContent: false, // privileged
-  GuildScheduledEvents: true,
-  AutoModerationConfiguration: true,
-  AutoModerationExecution: true,
-  GuildMessagePolls: true,
-  DirectMessagePolls: true
+  GuildScheduledEvents: false,
+  AutoModerationConfiguration: false,
+  AutoModerationExecution: false,
+  GuildMessagePolls: false,
+  DirectMessagePolls: false
 };
 
 const DEFAULT_PARTIALS = {
@@ -131,7 +131,7 @@ export const createDiscord = async ({
   validateBooleanMap(intents, new Set(Object.keys(INTENT_MAP)), 'intents');
   validateBooleanMap(partials, new Set(Object.keys(PARTIALS_MAP)), 'partials');
 
-  // Merge user intents with defaults
+  // Intents are strictly opt-in; unspecified intents remain disabled.
   const mergedIntents = { ...DEFAULT_INTENTS, ...intents };
   const resolvedIntents = Object.entries(mergedIntents)
     .filter(([key, value]) => value && INTENT_MAP[key])
@@ -230,6 +230,8 @@ export const shutdownDiscord = async (client, { cleanupEvents = () => {}, clearL
     }
   }
 };
+
+export { purgeCommands };
 
 /**
  * Splits a message into chunks of up to maxLength characters, attempting to split at newlines or periods for readability.

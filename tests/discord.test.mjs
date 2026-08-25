@@ -1,4 +1,4 @@
-import { createDiscord, shutdownDiscord } from '../index.mjs';
+import { createDiscord, shutdownDiscord, purgeCommands } from '../index.mjs';
 import { jest } from '@jest/globals';
 
 describe('createDiscord', () => {
@@ -73,6 +73,18 @@ describe('createDiscord', () => {
     expect(client._eventsSetup).toBe(true);
   });
 
+  it('disables every gateway intent unless explicitly enabled', async () => {
+    const client = { login: jest.fn().mockResolvedValue('ok') };
+    const ClientClass = jest.fn(() => client);
+    await createDiscord({
+      clientId: 'cid', token: 'abc', ClientClass,
+      setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
+      setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
+      setupEventsFn: async () => ({ loadedEvents: [] }),
+    });
+    expect(ClientClass.mock.calls[0][0].intents).toEqual([]);
+  });
+
   it('throws if registerCommandsFn fails when commands exist', async () => {
     const login = jest.fn(() => Promise.resolve('logged-in'));
     const setupEventsFn = jest.fn(async (opts) => { opts.client._eventsSetup = true; return { loadedEvents: ['ready'] }; });
@@ -145,6 +157,12 @@ describe('createDiscord', () => {
       clientOptions: { foo: 'bar' }
     })).rejects.toThrow('Failed to log in to Discord: fail');
     expect(logger.error).not.toHaveBeenCalled(); // Error is thrown, not logged
+  });
+});
+
+describe('public exports', () => {
+  it('exports purgeCommands from the package root', () => {
+    expect(purgeCommands).toEqual(expect.any(Function));
   });
 });
 

@@ -68,7 +68,7 @@ try {
 
 ## API
 
-### `createDiscord(options): Promise<Client>`
+### `createDiscord(options): Promise<DiscordClient>`
 
 Creates and logs in a Discord client, auto-registers commands, loads event handlers, and sets up localization.
 
@@ -82,7 +82,7 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 - `localesDir` (string): Directory for locale files (default: `<rootDir>/locales`)
 - `commandsDir` (string): Directory for command definitions and handlers (default: `<rootDir>/commands`)
 - `eventsDir` (string): Directory for event handlers (default: `<rootDir>/events`)
-- `intents` (object): Discord Gateway Intents (default: Guilds and GuildMessages enabled)
+- `intents` (object): Discord Gateway Intents. All intents are disabled by default and must be explicitly enabled.
 - `partials` (object): Partial flags keyed by Discord.js partial name (default: `Message`, `Channel`, and `Reaction`)
 - `clientOptions` (object): Additional Discord.js client options
 - `ClientClass` (constructor): Custom Discord.js Client class (for testing)
@@ -99,6 +99,10 @@ Splits a message into chunks of up to `maxLength` characters, attempting to spli
 - `maxLength` (number, optional): The maximum length of each chunk (default: 2000)
 - **Returns:** An array of message chunks, each no longer than `maxLength`.
 
+### `purgeCommands(options): Promise<void>`
+
+Deletes all registered application commands. Without `guildId`, it deletes global commands; with `guildId`, it deletes commands for that guild. It requires `clientId` and `token` (or the corresponding environment variables). This is a destructive administrative operation and is never run automatically by `createDiscord()`.
+
 ### Command and Event Structure
 
 - **Commands:** Place `.json` definitions and matching `.mjs` handlers in the configured `commandsDir`.
@@ -114,9 +118,9 @@ Splits a message into chunks of up to `maxLength` characters, attempting to spli
 Type definitions are included and cover all public APIs and options:
 
 ```ts
-import type { CreateDiscordOptions } from '@eliware/discord';
+import type { CreateDiscordOptions, DiscordClient } from '@eliware/discord';
 
-declare function createDiscord(options?: CreateDiscordOptions): Promise<Client>;
+declare function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient>;
 ```
 
 ## Errors / Troubleshooting
