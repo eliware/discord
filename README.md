@@ -50,18 +50,14 @@ npm install @eliware/discord
 ### ESM Example
 
 ```js
-import 'dotenv/config';
-import { log, path } from '@eliware/common';
 import { createDiscord } from '@eliware/discord';
 
 try {
   await createDiscord({
-    log,
-    rootDir: path(import.meta),
     intents: { MessageContent: true }
   });
 } catch (err) {
-    log.error('Failed to start app:', err);
+    console.error('Failed to start app:', err);
 }
 ```
 
