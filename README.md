@@ -51,8 +51,7 @@ npm install @eliware/discord
 
 ```js
 import 'dotenv/config';
-import log from '@eliware/log';
-import path from '@eliware/path';
+import { log, path } from '@eliware/common';
 import { createDiscord } from '@eliware/discord';
 
 try {
@@ -131,9 +130,9 @@ declare function createDiscord(options?: CreateDiscordOptions): Promise<DiscordC
 
 ```bash
 npm test
-npm run test:gaps
 npm run lint
 npm run typecheck
+npm audit --omit=dev --audit-level=moderate
 npm run pack
 ```
 

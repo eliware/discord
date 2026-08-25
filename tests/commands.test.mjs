@@ -35,7 +35,7 @@ const testHandler = { default: jest.fn() };
 beforeAll(() => {
   if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
   fs.writeFileSync(`${testDir}/help.json`, testJson);
-  fs.writeFileSync(`${testDir}/help.mjs`, '/* istanbul ignore file */\nexport default () => {}');
+  fs.writeFileSync(`${testDir}/help.mjs`, 'const handler = () => {}; handler(); export default handler');
 });
 afterAll(() => {
   fs.rmSync(testDir, { recursive: true, force: true });

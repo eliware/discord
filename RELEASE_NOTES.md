@@ -1,5 +1,17 @@
 # Release notes
 
+## 2.0.0 — Unreleased
+
+- Adopted the shared `@eliware/test` harness for testing and linting with
+  strict 100×4 coverage and removed direct Jest/Oxlint dependencies.
+- Updated CI validation for Ubuntu and Windows, production dependency auditing,
+  and separate tag-only publishing.
+- Added public package publishing configuration and included release notes in
+  the package allowlist.
+- Removed the unused `dotenv` runtime dependency.
+- Breaking: the standard `test` and `lint` scripts now delegate to
+  `@eliware/test`; the package remains ESM-only.
+
 ## 1.1.4 — 2026-08-07
 
 - Standardized validation scripts, TypeScript checking, CI, and package metadata.

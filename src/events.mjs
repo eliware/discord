@@ -6,7 +6,7 @@ import { readdirSync } from 'fs';
  * @param {Object} options - Options for setting up events
  * @param {import('discord.js').Client} options.client - The Discord client instance
  * @param {string} options.eventsDir - Directory path for events
- * @param {import('@eliware/log').Logger} [options.log] - Logger instance
+ * @param {import('@eliware/common').Logger} [options.log] - Logger instance
  * @param {Function} [options.msg] - Localization function (locale, key, defaultMsg?) => string (optional)
  * @param {Object} [options.commandHandlers] - Map of command handlers (optional)
  * @param {Object} [options.fsLib] - File system library (for testing)

@@ -27,9 +27,9 @@ Run before committing:
 
 ```bash
 npm test
-npm run test:gaps
 npm run lint
 npm run typecheck
+npm audit --omit=dev --audit-level=moderate
 npm run pack
 ```
 

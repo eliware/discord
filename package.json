@@ -9,8 +9,12 @@
         "src",
         "index.d.ts",
         "README.md",
-        "LICENSE"
+        "LICENSE",
+        "RELEASE_NOTES.md"
     ],
+    "publishConfig": {
+        "access": "public"
+    },
     "exports": {
         ".": {
             "import": "./index.mjs",
@@ -18,9 +22,8 @@
         }
     },
     "scripts": {
-        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --coverage --detectOpenHandles --silent --runInBand",
-        "lint": "npx oxlint .",
-        "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'",
+        "test": "eliware-test",
+        "lint": "eliware-test --lint",
         "typecheck": "tsc --project tsconfig.json",
         "pack": "npm pack --dry-run"
     },
@@ -57,7 +60,7 @@
     },
     "homepage": "https://github.com/eliware/discord#readme",
     "devDependencies": {
-        "jest": "^30.4.2",
+        "@eliware/test": "^2.0.0",
         "typescript": "^7.0.2"
     },
     "jest": {
@@ -69,7 +72,6 @@
     },
     "dependencies": {
         "@eliware/common": "^2.0.0",
-        "discord.js": "^14.27.0",
-        "dotenv": "^17.4.2"
+        "discord.js": "^14.27.0"
     }
 }

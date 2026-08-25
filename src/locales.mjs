@@ -13,7 +13,7 @@ export const locales = {};
  * @param {string} locale - The locale code (e.g., 'en-US')
  * @param {string} key - The message key
  * @param {string} [defaultValue='A serious error occurred.'] - Default value if not found
- * @param {import('@eliware/log').Logger} [log=logger] - Logger instance
+ * @param {import('@eliware/common').Logger} [log=logger] - Logger instance
  * @returns {string} The localized message or default value
  */
 export const msg = (locale, key, defaultValue = 'A serious error occurred.', log = logger) => {
@@ -37,7 +37,7 @@ export const msg = (locale, key, defaultValue = 'A serious error occurred.', log
  * Loads all locale files from the specified directory into memory.
  * @param {Object} [options] - Options for loading locales
  * @param {string} [options.localesDir] - Directory path for locale files
- * @param {import('@eliware/log').Logger} [options.log] - Logger instance
+ * @param {import('@eliware/common').Logger} [options.log] - Logger instance
  * @param {Object} [options.fsLib] - File system library (for testing)
  * @returns {{ msg: typeof msg, loadedLocales: string[] }} Object with msg function and loadedLocales array
  */
