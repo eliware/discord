@@ -1,16 +1,24 @@
 # Release notes
 
-## 2.0.0 — Unreleased
+## 2.0.0 — 2026-08-25
 
-- Adopted the shared `@eliware/test` harness for testing and linting with
-  strict 100×4 coverage and removed direct Jest/Oxlint dependencies.
-- Updated CI validation for Ubuntu and Windows, production dependency auditing,
-  and separate tag-only publishing.
-- Added public package publishing configuration and included release notes in
-  the package allowlist.
-- Removed the unused `dotenv` runtime dependency.
-- Breaking: the standard `test` and `lint` scripts now delegate to
-  `@eliware/test`; the package remains ESM-only.
+- Breaking: all Discord Gateway intents are now disabled by default and must be
+  explicitly enabled by the consuming application.
+- Breaking: the standard `test` and `lint` scripts now delegate to the shared
+  `@eliware/test` harness; direct Jest/Oxlint dependencies were removed.
+- Breaking: upgraded the runtime dependency on `@eliware/common` to the 2.x
+  shared stack and removed the unused `dotenv` runtime dependency.
+- Added the typed `DiscordClient` return contract, including the idempotent
+  `client.shutdown()` lifecycle method.
+- Added `purgeCommands()` to the root public API for explicit administrative
+  command cleanup; it is never invoked automatically.
+- Modernized CI validation for Node.js 26 on Ubuntu and Windows, added
+  production dependency auditing, and separated validation from tag-only
+  publishing.
+- Added public npm publishing metadata and included release notes in the
+  package allowlist.
+- Maintained native ESM, dependency injection, application-owned resources,
+  strict 100×4 coverage, and focused failure/cleanup tests.
 
 ## 1.1.4 — 2026-08-07
 

@@ -54,12 +54,19 @@ import { createDiscord } from '@eliware/discord';
 
 try {
   await createDiscord({
-    intents: { MessageContent: true }
+    intents: { Guilds: true }
   });
 } catch (err) {
     console.error('Failed to start app:', err);
 }
 ```
+
+Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment before
+starting the application. The library does not load `.env` files itself; an
+application may use its own environment or dotenv setup. Gateway intents are
+disabled by default, so enable only the intents the application needs. The
+Discord developer portal must also allow privileged intents such as
+`MessageContent`, `GuildMembers`, and `GuildPresences`.
 
 ## API
 
@@ -84,7 +91,8 @@ Creates and logs in a Discord client, auto-registers commands, loads event handl
 - `setupEventsFn`, `setupCommandsFn`, `registerCommandsFn`, `setupLocalesFn`: Dependency injection for advanced use/testing
 - `context` (object): Additional arbitrary data to be injected into all event and command handlers
 
-Returns: A logged-in Discord.js `Client` instance.
+Returns: A logged-in Discord.js `Client` instance with an idempotent
+`shutdown()` method. Call `await client.shutdown()` during application cleanup.
 
 ### `splitMsg(msg, maxLength = 2000): string[]`
 
