@@ -2,6 +2,8 @@
 
 ## @eliware/discord [![npm version](https://img.shields.io/npm/v/@eliware/discord.svg)](https://www.npmjs.com/package/@eliware/discord)[![license](https://img.shields.io/github/license/eliware/discord.svg)](LICENSE)[![build status](https://github.com/eliware/discord/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/discord/actions)
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 > An ESM-first Discord app framework for Node.js, with built-in support for slash commands, localization, and event-driven architecture.
 
 ---
