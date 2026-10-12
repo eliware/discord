@@ -1,30 +1,28 @@
 # Release Notes
 
-## Unreleased
-
-### Changed
-
-No changes are listed.
-
 ## 12.0.0 — 2026-10-12
 
 ### Added
 
-The package now includes guides for setup, configuration, commands, events, locales, lifecycle, and the public API.
+The package now includes end-user guides and a runnable example.
+The package adds focused modules for client options, command removal, and message splitting.
 
 ### Changed
 
-The team moved package source and declarations into `src/`.
-The team split Discord setup into modules for client options, validation, command registration, and shutdown.
-The package replaced `@eliware/common` with `@eliware/errors`, `@eliware/log`, `@eliware/path`, and `@eliware/signals`.
-The team updated validation tools and GitHub workflows to current shared conventions.
-The team rewrote the README, agent guide, and end-user docs in direct language.
+The package now stores source files and TypeScript declarations in `src/`.
+The package replaces `@eliware/common` with `@eliware/errors`, `@eliware/log`, `@eliware/path`, and `@eliware/signals`.
+The package now validates command names, client options, locale maps, and app context.
+The package now uses updated CI, npm publishing, and Knit deployment workflows.
+The package now documents setup, commands, events, locales, lifecycle, and the public API.
 
 ### Fixed
 
-The package now checks command names, descriptions, gateway intents, partials, locale maps, and app context.
-The package now cleans up after setup and login errors.
-The team removed stale package paths and incomplete end-user instructions.
+Command handler names must match their command definition files.
+The package now cleans up event listeners after setup and registration errors.
+Locale lookups now treat inherited names as missing keys.
+Message splitting now rejects fractional maximum lengths.
+The package now handles invalid event handlers and logger child results.
+The package now supports repeated shutdown for a reused client.
 
 ## 2.0.0 — 2026-08-25
 
