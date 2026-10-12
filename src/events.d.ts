@@ -1,6 +1,6 @@
 // Type definitions for event setup and registration
-import type { Client } from 'discord.js';
-import type { Logger } from '@eliware/common';
+import type { Client } from "discord.js";
+import type { Logger } from "@eliware/log";
 
 export interface SetupEventsOptions {
   client: Client;

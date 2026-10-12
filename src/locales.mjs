@@ -1,6 +1,7 @@
-import { log as logger, path } from '@eliware/common';
-import { validateLocale } from './validation.mjs';
-import { readdirSync, readFileSync } from 'fs';
+import { log as logger } from "@eliware/log";
+import { path } from "@eliware/path";
+import { validateLocale } from "./validation.mjs";
+import { readdirSync, readFileSync } from "fs";
 
 /**
  * In-memory object containing all loaded locales.
@@ -13,67 +14,67 @@ export const locales = {};
  * @param {string} locale - The locale code (e.g., 'en-US')
  * @param {string} key - The message key
  * @param {string} [defaultValue='A serious error occurred.'] - Default value if not found
- * @param {import('@eliware/common').Logger} [log=logger] - Logger instance
+ * @param {import('@eliware/log').Logger} [log=logger] - Logger instance
  * @returns {string} The localized message or default value
  */
-export const msg = (locale, key, defaultValue = 'A serious error occurred.', log = logger) => {
-    if (!locales[locale]) {
-        log.warn(`Locale "${locale}" not found, falling back to default.`);
-        locale = 'en-US';
-    }
-    if (!locales[locale]) {
-        log.error(`Default locale "en-US" not found. Returning default value.`);
-        return defaultValue;
-    }
-    const message = locales[locale][key];
-    if (message === undefined) {
-        log.warn(`Key "${key}" not found in locale "${locale}", returning default value.`);
-        return defaultValue;
-    }
-    return message;
+export const msg = (locale, key, defaultValue = "A serious error occurred.", log = logger) => {
+  if (!locales[locale]) {
+    log.warn(`Locale "${locale}" not found, falling back to default.`);
+    locale = "en-US";
+  }
+  if (!locales[locale]) {
+    log.error(`Default locale "en-US" not found. Returning default value.`);
+    return defaultValue;
+  }
+  const message = locales[locale][key];
+  if (message === undefined) {
+    log.warn(`Key "${key}" not found in locale "${locale}", returning default value.`);
+    return defaultValue;
+  }
+  return message;
 };
 
 /**
  * Loads all locale files from the specified directory into memory.
  * @param {Object} [options] - Options for loading locales
  * @param {string} [options.localesDir] - Directory path for locale files
- * @param {import('@eliware/common').Logger} [options.log] - Logger instance
+ * @param {import('@eliware/log').Logger} [options.log] - Logger instance
  * @param {Object} [options.fsLib] - File system library (for testing)
  * @returns {{ msg: typeof msg, loadedLocales: string[] }} Object with msg function and loadedLocales array
  */
 export const setupLocales = ({
-    localesDir = path(import.meta, '..', 'locales'),
-    log = logger,
-    fsLib = { readdirSync, readFileSync },
+  localesDir = path(import.meta, "..", "locales"),
+  log = logger,
+  fsLib = { readdirSync, readFileSync },
 } = {}) => {
-    Object.keys(locales).forEach(key => delete locales[key]);
-    let loadedLocales = [];
-    let files = [];
-        try {
-            // Check if directory exists before reading
-            if (fsLib.existsSync && !fsLib.existsSync(localesDir)) {
-                //log.warn(`Locales directory does not exist: ${localesDir}`);
-                return { msg, loadedLocales };
-            }
-            files = fsLib.readdirSync(localesDir).filter(f => f.endsWith('.json'));
-        } catch {
-            //log.warn(`Locales directory missing or unreadable: ${localesDir}`);
-            return { msg, loadedLocales };
-        }
-        for (const file of files) {
-            try {
-                const content = fsLib.readFileSync(path(localesDir, file), 'utf8');
-                const locale = JSON.parse(content);
-                if (!validateLocale(locale)) {
-                    throw new TypeError('locale must be a flat object containing only string values');
-                }
-                locales[file.replace(/\.json$/, '')] = locale;
-            } catch (_err) {
-                log.error(`Failed to load or parse locale file ${file}:`, _err);
-            }
-        }
-    loadedLocales = Object.keys(locales);
+  Object.keys(locales).forEach((key) => delete locales[key]);
+  let loadedLocales = [];
+  let files = [];
+  try {
+    // Check if directory exists before reading
+    if (fsLib.existsSync && !fsLib.existsSync(localesDir)) {
+      //log.warn(`Locales directory does not exist: ${localesDir}`);
+      return { msg, loadedLocales };
+    }
+    files = fsLib.readdirSync(localesDir).filter((f) => f.endsWith(".json"));
+  } catch {
+    //log.warn(`Locales directory missing or unreadable: ${localesDir}`);
     return { msg, loadedLocales };
+  }
+  for (const file of files) {
+    try {
+      const content = fsLib.readFileSync(path(localesDir, file), "utf8");
+      const locale = JSON.parse(content);
+      if (!validateLocale(locale)) {
+        throw new TypeError("locale must be a flat object containing only string values");
+      }
+      locales[file.replace(/\.json$/, "")] = locale;
+    } catch (_err) {
+      log.error(`Failed to load or parse locale file ${file}:`, _err);
+    }
+  }
+  loadedLocales = Object.keys(locales);
+  return { msg, loadedLocales };
 };
 
 /**
@@ -81,5 +82,5 @@ export const setupLocales = ({
  * @returns {void}
  */
 export const clearLocales = () => {
-    Object.keys(locales).forEach(key => delete locales[key]);
+  Object.keys(locales).forEach((key) => delete locales[key]);
 };

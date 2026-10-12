@@ -1,96 +1,125 @@
 {
-    "name": "@eliware/discord",
-    "type": "module",
-    "version": "2.0.0",
-    "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
-    "types": "index.d.ts",
-    "files": [
-        "index.mjs",
-        "src",
-        "index.d.ts",
-        "README.md",
-        "LICENSE",
-        "RELEASE_NOTES.md"
+  "name": "@eliware/discord",
+  "version": "12.0.0",
+  "type": "module",
+  "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
+  "keywords": [
+    "discord",
+    "discord-app",
+    "discordjs",
+    "discord-js",
+    "discord-app-framework",
+    "discord-app-template",
+    "slash-commands",
+    "localization",
+    "i18n",
+    "event-driven",
+    "nodejs",
+    "node",
+    "framework",
+    "typescript",
+    "app",
+    "modular",
+    "extensible"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "main": "./src/index.mjs",
+  "files": [
+    "src/",
+    "docs/",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE",
+    "RELEASE_NOTES.md",
+    "examples/",
+    "specs/",
+    ".env.example"
+  ],
+  "scripts": {
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check",
+    "typecheck": "tsc --project tsconfig.json",
+    "pack": "eliware-test --pack"
+  },
+  "engines": {
+    "node": ">=26"
+  },
+  "dependencies": {
+    "@eliware/errors": "^12.0.0",
+    "@eliware/log": "^12.0.0",
+    "@eliware/path": "^12.0.0",
+    "@eliware/signals": "^12.0.0",
+    "discord.js": "^14.27.0"
+  },
+  "devDependencies": {
+    "@eliware/test": "^12.0.0",
+    "typescript": "^7.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
     ],
-    "publishConfig": {
-        "access": "public"
-    },
-    "exports": {
-        ".": {
-            "import": "./index.mjs",
-            "types": "./index.d.ts"
-        }
-    },
-    "scripts": {
-        "test": "eliware-test",
-        "lint": "eliware-test --lint",
-        "typecheck": "tsc --project tsconfig.json",
-        "pack": "npm pack --dry-run"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/eliware/discord.git"
-    },
-    "keywords": [
-        "discord",
-        "discord-app",
-        "discordjs",
-        "discord-js",
-        "discord-app-framework",
-        "discord-app-template",
-        "slash-commands",
-        "localization",
-        "i18n",
-        "event-driven",
-        "nodejs",
-        "node",
-        "framework",
-        "typescript",
-        "app",
-        "modular",
-        "extensible"
+    "collectCoverageFrom": [
+      "src/**/*.mjs"
     ],
-    "author": "Eli Sterling, eliware.org <eli@eliware.org>",
-    "license": "MIT",
-    "engines": {
-        "node": ">=26"
-    },
-    "bugs": {
-        "url": "https://github.com/eliware/discord/issues"
-    },
-    "homepage": "https://github.com/eliware/discord#readme",
-    "devDependencies": {
-        "@eliware/test": "^5.0.0",
-        "typescript": "^7.0.2"
-    },
-    "jest": {
-        "testEnvironment": "node",
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs"
-        ]
-    },
-    "dependencies": {
-        "@eliware/common": "^2.0.0",
-        "discord.js": "^14.27.0"
-    },
-    "prettier": {
-      "printWidth": 100,
-      "tabWidth": 2,
-      "useTabs": false,
-      "semi": true,
-      "singleQuote": false,
-      "quoteProps": "as-needed",
-      "jsxSingleQuote": false,
-      "trailingComma": "all",
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "arrowParens": "always",
-      "proseWrap": "preserve",
-      "endOfLine": "lf"
-    },
-    "eliware": {
-      "id": "E-200",
-      "apply": ["general", "library", "npm-published"]
+    "coverageReporters": [
+      "text",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
     }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": false,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "proseWrap": "preserve",
+    "endOfLine": "lf"
+  },
+  "author": "Eliware <eliware@eliware.org>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/discord.git"
+  },
+  "homepage": "https://github.com/eliware/discord#readme",
+  "bugs": {
+    "url": "https://github.com/eliware/discord/issues"
+  },
+  "eliware": {
+    "id": "E-200",
+    "apply": [
+      "general",
+      "library",
+      "npm-published"
+    ]
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs"
+    }
+  }
 }

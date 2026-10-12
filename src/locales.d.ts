@@ -1,5 +1,5 @@
 // Type definitions for locales setup and management
-import type { Logger } from '@eliware/common';
+import type { Logger } from "@eliware/log";
 
 export interface SetupLocalesOptions {
   localesDir?: string;
@@ -37,4 +37,4 @@ export function msg(locale: string, key: string, defaultValue?: string, log?: Lo
 /**
  * In-memory object containing all loaded locales.
  */
-export const locales: Locales;
+export declare const locales: Locales;

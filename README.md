@@ -1,152 +1,137 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-## @eliware/discord [![npm version](https://img.shields.io/npm/v/@eliware/discord.svg)](https://www.npmjs.com/package/@eliware/discord)[![license](https://img.shields.io/github/license/eliware/discord.svg)](LICENSE)[![build status](https://github.com/eliware/discord/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/discord/actions)
+## @eliware/discord [![npm](https://img.shields.io/npm/v/@eliware/discord)](https://www.npmjs.com/package/@eliware/discord) [![License](https://img.shields.io/github/license/eliware/discord)](https://github.com/eliware/discord/blob/main/LICENSE) [![CI](https://github.com/eliware/discord/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/discord/actions/workflows/ci.yaml)
 
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
-
-> An ESM-first Discord app framework for Node.js, with built-in support for slash commands, localization, and event-driven architecture.
-
----
+A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.
 
 ## Table of Contents
 
 - [Features](#features)
 - [Requirements](#requirements)
-- [Installation](#installation)
+- [Setup](#setup)
 - [Usage](#usage)
-  - [ESM Example](#esm-example)
-- [API](#api)
-- [TypeScript](#typescript)
-- [Errors / Troubleshooting](#errors--troubleshooting)
 - [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
 - [Security](#security)
+- [API](#api)
+- [Packaging](#packaging)
+- [Examples](#examples)
 - [Support](#support)
-- [License](#license)
 - [Links](#links)
+- [License](#license)
 
 ## Features
 
-- Simple, opinionated Discord app setup for Node.js
-- Slash command registration and handler auto-loading
-- Event handler auto-loading for all Discord Gateway events
-- Built-in localization system with easy locale file management
-- TypeScript type definitions included
-- Application-owned commands, events, and locales live in the consuming project (see `@eliware/discord-template` for a starter layout)
-- Dependency injection and testability for all major components
-- Logging and error handling hooks
-- Extensible and modular directory structure
+- Create a Discord.js client with `createDiscord`.
+- Load command, event, and locale files from the app folder.
+- Register slash commands with Discord.
+- Set gateway intents and partials.
+- Add optional signal and process error handlers.
+- Stop the client with `client.shutdown()`.
 
 ## Requirements
 
-- Node.js 26 or newer
-- A Discord application, bot token, and configured intents for live connections
+Use Node.js 26 or later. Create a Discord app and bot token before live use.
+Enable only the gateway intents that the app needs.
 
-## Installation
+## Setup
+
+Install the package:
 
 ```bash
 npm install @eliware/discord
 ```
 
+Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment, or pass
+`clientId` and `token` to `createDiscord`. This package does not read `.env` files.
+`DISCORD_GUILD_ID` is optional. It sets the guild target for `purgeCommands`.
+Use [`.env.example`](.env.example) as a template for these values.
+
 ## Usage
 
-### ESM Example
-
 ```js
-import { createDiscord } from '@eliware/discord';
+import { createDiscord } from "@eliware/discord";
 
-try {
-  await createDiscord({
-    intents: { Guilds: true }
-  });
-} catch (err) {
-    console.error('Failed to start app:', err);
-}
+const client = await createDiscord({
+  intents: { Guilds: true },
+});
+
+await client.shutdown();
 ```
 
-Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment before
-starting the application. The library does not load `.env` files itself; an
-application may use its own environment or dotenv setup. Gateway intents are
-disabled by default, so enable only the intents the application needs. The
-Discord developer portal must also allow privileged intents such as
-`MessageContent`, `GuildMembers`, and `GuildPresences`.
+The app can set `clientId`, `token`, or both in the options. The package uses the
+environment values when an option is missing. The package reads app files from
+`rootDir/commands`, `rootDir/events`, and `rootDir/locales` by default.
 
-## API
-
-### `createDiscord(options): Promise<DiscordClient>`
-
-Creates and logs in a Discord client, auto-registers commands, loads event handlers, and sets up localization.
-
-**Options:**
-
-- `clientId` (string): Discord application client ID (required)
-  - `client_id` remains supported as a compatibility alias
-- `token` (string): Discord bot token (required)
-- `log` (Logger): Logger instance (optional)
-- `rootDir` (string): Root directory for events, commands, and locales (default: autodetect)
-- `localesDir` (string): Directory for locale files (default: `<rootDir>/locales`)
-- `commandsDir` (string): Directory for command definitions and handlers (default: `<rootDir>/commands`)
-- `eventsDir` (string): Directory for event handlers (default: `<rootDir>/events`)
-- `intents` (object): Discord Gateway Intents. All intents are disabled by default and must be explicitly enabled.
-- `partials` (object): Partial flags keyed by Discord.js partial name (default: `Message`, `Channel`, and `Reaction`)
-- `clientOptions` (object): Additional Discord.js client options
-- `ClientClass` (constructor): Custom Discord.js Client class (for testing)
-- `setupEventsFn`, `setupCommandsFn`, `registerCommandsFn`, `setupLocalesFn`: Dependency injection for advanced use/testing
-- `context` (object): Additional arbitrary data to be injected into all event and command handlers
-
-Returns: A logged-in Discord.js `Client` instance with an idempotent
-`shutdown()` method. Call `await client.shutdown()` during application cleanup.
-
-### `splitMsg(msg, maxLength = 2000): string[]`
-
-Splits a message into chunks of up to `maxLength` characters, attempting to split at newlines or periods for readability.
-
-- `msg` (string): The message to split
-- `maxLength` (number, optional): The maximum length of each chunk (default: 2000)
-- **Returns:** An array of message chunks, each no longer than `maxLength`.
-
-### `purgeCommands(options): Promise<void>`
-
-Deletes all registered application commands. Without `guildId`, it deletes global commands; with `guildId`, it deletes commands for that guild. It requires `clientId` and `token` (or the corresponding environment variables). This is a destructive administrative operation and is never run automatically by `createDiscord()`.
-
-### Command and Event Structure
-
-- **Commands:** Place `.json` definitions and matching `.mjs` handlers in the configured `commandsDir`.
-- **Events:** Place `.mjs` handlers in the configured `eventsDir`, named after Discord Gateway events (e.g., `ready.mjs`, `messageCreate.mjs`).
-
-### Localization
-
-- Place locale files in the configured `localesDir` (e.g., `en-US.json`, `es-ES.json`).
-- Each file should be a flat key-value JSON object for that locale.
-
-## TypeScript
-
-Type definitions are included and cover all public APIs and options:
-
-```ts
-import type { CreateDiscordOptions, DiscordClient } from '@eliware/discord';
-
-declare function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient>;
-```
-
-## Errors / Troubleshooting
-
-`createDiscord()` requires a valid application client ID and bot token. Connection, command-loading, event-loading, and localization failures are surfaced through the configured logger. Keep credentials out of source control and use dependency injection for tests. Process signal and exception integrations are opt-in; call the client shutdown method during application cleanup.
+See the [usage guide](docs/usage.md), [docs index](docs/README.md), and
+[release notes](RELEASE_NOTES.md).
 
 ## Development
 
-```bash
-npm test
-npm run lint
-npm run typecheck
-npm audit --omit=dev --audit-level=moderate
-npm run pack
-```
+Use Node.js 26 or later. Run `npm ci` before local work.
 
-Tests inject Discord client and loader dependencies, so a live Discord connection is not required.
+## Testing
+
+Run `npm test` for all checks. Run `npm run typecheck` for TypeScript checks.
+The tests use injected clients and loaders. They do not need a live Discord app.
+
+## Troubleshooting
+
+Check the [troubleshooting guide](docs/troubleshooting.md). Check the
+[specification index](specs/README.md) for repository requirements.
 
 ## Security
 
-Keep Discord tokens and application credentials in environment variables or secret storage. Do not log tokens, credential-bearing URLs, private data, or full sensitive event payloads. Review intents and permissions before deployment.
+Keep tokens in environment variables or secret storage. Do not log tokens or
+private event data. Review intents and Discord permissions before live use.
+
+## API
+
+### `createDiscord(options)`
+
+Create and log in to a Discord client. The function loads app files and registers
+valid command definitions. It returns a client with an idempotent `shutdown()` method.
+
+Options include `clientId`, `token`, `log`, `rootDir`, `localesDir`, `commandsDir`,
+`eventsDir`, `intents`, `partials`, `clientOptions`, and `context`. The function also
+accepts setup functions and a custom client class for tests.
+
+`clientId` and `token` are optional when their environment values exist.
+`rootDir` defaults to the package root. The three folder options default to
+`rootDir/locales`, `rootDir/commands`, and `rootDir/events`.
+
+All intents default to `false`. Partials default to `Message`, `Channel`, and
+`Reaction`. Set `signals` or `processHandlers` to `true` to enable those handlers.
+The `context` value must be a plain object. Do not set `client`, `log`, `msg`, or
+`commandHandlers` in that object.
+
+All gateway intents are disabled by default. Set each needed intent to `true`.
+The Discord developer portal must allow privileged intents.
+
+### `splitMsg(message, maxLength)`
+
+Split a string into message chunks. Each chunk stays within `maxLength` characters.
+The default limit is 2,000 characters.
+
+### `purgeCommands(options)`
+
+Delete all global commands or all commands for one guild. The function needs a
+client ID and token. Set `guildId` or `DISCORD_GUILD_ID` to select a guild.
+The package never calls it automatically.
+
+## Packaging
+
+The npm package includes `src/`, `docs/`, `examples/`, and `specs/`. It also
+includes this README, the agent guide, the license, and release notes.
+
+The package does not include app command, event, or locale files. The app owns
+those files. The public package is [@eliware/discord on npm](https://www.npmjs.com/package/@eliware/discord).
+
+## Examples
+
+See the [example index](examples/README.md) for the runnable example and its
+requirements.
 
 ## Support
 
@@ -156,40 +141,15 @@ For help, questions, or to chat with the author and community, visit:
 
 **[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
 
-## License
-
-[MIT © 2025 Eli Sterling, eliware.org](LICENSE)
-
 ## Links
 
 - [Home Page](https://eliware.org)
-- [GitHub (Module)](https://github.com/eliware/discord)
-- [GitHub (Org)](https://github.com/eliware)
-- [GitHub (Personal)](https://github.com/eli-sterling)
+- [GitHub Org](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/discord)
+- [Bug Reports](https://github.com/eliware/discord/issues)
 - [npm](https://www.npmjs.com/package/@eliware/discord)
 - [Discord](https://discord.gg/M6aTR9eTwN)
 
----
+## License
 
-## Complete example
-
-For a complete working application, see the
-[`@eliware/discord-template`](https://github.com/eliware/discord-template)
-repository. It demonstrates commands, events, locales, testing, Docker, and
-systemd deployment. This package README focuses on the reusable library API.
-
-### Lifecycle integrations
-
-Process integrations are opt-in:
-
-```js
-await createDiscord({
-  signals: true,
-  processHandlers: true,
-  signalOptions: { exit: false },
-  processHandlerOptions: { events: ['uncaughtException', 'unhandledRejection'] }
-});
-```
-
-Signal and process-handler registrations are removed during `client.shutdown()`.
-The library never enables global process handlers by default.
+[MIT © Eliware](LICENSE)
