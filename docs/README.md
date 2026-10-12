@@ -1,12 +1,12 @@
 # Documentation
 
-This directory contains end-user documentation for `@eliware/discord`.
-
-## Contents
+Use these guides to install, configure, and run `@eliware/discord`.
 
 - [Usage](usage.md)
+- [Configuration](configuration.md)
+- [Commands](commands.md)
+- [Events](events.md)
+- [Localization](localization.md)
+- [Lifecycle](lifecycle.md)
+- [API](api.md)
 - [Troubleshooting](troubleshooting.md)
-
-Audience: Discord integration users. Prerequisites: a supported runtime,
-authorized credentials, and required Discord permissions. Expected result:
-documented operations complete within their stated safety boundaries.
