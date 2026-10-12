@@ -145,6 +145,19 @@ describe("createDiscord", () => {
     expect(client.destroy).toHaveBeenCalledTimes(1);
   });
 
+  it("uses the parent logger when child returns no logger", async () => {
+    const client = { login: jest.fn().mockResolvedValue("ok") };
+    const parent = { ...setup.log, child: jest.fn(() => undefined) };
+    await createDiscord({
+      ...setup,
+      clientId: "cid",
+      token: "token",
+      log: parent,
+      ClientClass: jest.fn(() => client),
+    });
+    expect(parent.info).toHaveBeenCalledWith("Discord app initialized", expect.any(Object));
+  });
+
   it("cleans up when app setup fails before event setup", async () => {
     const destroy = jest.fn().mockResolvedValue(undefined);
     await expect(

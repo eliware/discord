@@ -40,7 +40,7 @@ export const createDiscord = async ({
   resetShutdownState(client);
   const appLog =
     typeof log.child === "function"
-      ? log.child({ component: "discord", clientId: resolvedClientId })
+      ? (log.child({ component: "discord", clientId: resolvedClientId }) ?? log)
       : log;
   let signalRegistration;
   let processHandlerRegistration;

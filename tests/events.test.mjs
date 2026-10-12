@@ -104,7 +104,10 @@ describe("setupEvents", () => {
       fsLib,
       importFn: () => imports.shift()(),
     });
-    expect(result.loadedEvents).toEqual(["ignored", "missing-client", "bad-handler"]);
+    expect(result.loadedEvents).toEqual(["missing-client", "bad-handler"]);
+    expect(log.warn).toHaveBeenCalledWith(
+      "Event handler for ignored does not export a default function.",
+    );
     expect(log.error).toHaveBeenCalledWith("Failed to load event broken:", expect.any(Error));
     expect(log.error).not.toHaveBeenCalledWith(
       "Failed to load event missing-client:",

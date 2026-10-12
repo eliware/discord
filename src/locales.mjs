@@ -9,6 +9,8 @@ import { readdirSync, readFileSync } from "fs";
  */
 export const locales = {};
 
+const hasOwn = (value, key) => Object.hasOwn(value, key);
+
 /**
  * Retrieves a localized message for a given locale and key.
  * @param {string} locale - The locale code (e.g., 'en-US')
@@ -18,20 +20,20 @@ export const locales = {};
  * @returns {string} The localized message or default value
  */
 export const msg = (locale, key, defaultValue = "A serious error occurred.", log = logger) => {
-  if (!locales[locale]) {
+  if (!hasOwn(locales, locale) || !locales[locale]) {
     log.warn(`Locale "${locale}" not found, falling back to default.`);
     locale = "en-US";
   }
-  if (!locales[locale]) {
+  if (!hasOwn(locales, locale) || !locales[locale]) {
     log.error(`Default locale "en-US" not found. Returning default value.`);
     return defaultValue;
   }
-  const message = locales[locale][key];
-  if (message === undefined) {
+  const messageMap = locales[locale];
+  if (!hasOwn(messageMap, key)) {
     log.warn(`Key "${key}" not found in locale "${locale}", returning default value.`);
     return defaultValue;
   }
-  return message;
+  return messageMap[key];
 };
 
 /**
@@ -68,7 +70,12 @@ export const setupLocales = ({
       if (!validateLocale(locale)) {
         throw new TypeError("locale must be a flat object containing only string values");
       }
-      locales[file.replace(/\.json$/, "")] = locale;
+      Object.defineProperty(locales, file.replace(/\.json$/, ""), {
+        value: locale,
+        configurable: true,
+        enumerable: true,
+        writable: true,
+      });
     } catch (_err) {
       log.error(`Failed to load or parse locale file ${file}:`, _err);
     }

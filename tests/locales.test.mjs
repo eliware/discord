@@ -117,6 +117,21 @@ describe("locales.mjs", () => {
     delete locales["en-US"];
     expect(msg("es-ES", "help", "default", defaultMockLogger)).toBe("default");
   });
+
+  it("treats inherited locale and message names as missing", () => {
+    locales["en-US"] = { help: "Help text" };
+    expect(msg("constructor", "help", "fallback", defaultMockLogger)).toBe("Help text");
+    expect(msg("en-US", "constructor", "fallback", defaultMockLogger)).toBe("fallback");
+    expect(msg("en-US", "toString", "fallback", defaultMockLogger)).toBe("fallback");
+  });
+
+  it("loads a locale named __proto__ as an own locale", () => {
+    mockFs.readdirSync.mockReturnValue(["__proto__.json"]);
+    mockFs.readFileSync.mockReturnValue('{"hello":"Hello"}');
+    setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
+    expect(Object.hasOwn(locales, "__proto__")).toBe(true);
+    expect(msg("__proto__", "hello", "fallback", defaultMockLogger)).toBe("Hello");
+  });
   it("covers missing locale, missing key, and default locale branches", () => {
     locales["en-US"] = { help: "Help text" };
     expect(msg("fr-FR", "help", "fallback", defaultMockLogger)).toBe("Help text");

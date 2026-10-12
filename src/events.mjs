@@ -52,24 +52,26 @@ export const setupEvents = async ({
       try {
         const handler = await importFn(pathUrl(eventsDir, file));
         if (!client) throw new Error("Discord client is undefined");
-        if (typeof handler.default === "function") {
-          const listener = createEventListener({
-            client,
-            context,
-            log,
-            msg,
-            eventName,
-            commandHandlers,
-            handler: handler.default,
-            onHandlerError,
-          });
-          listeners.push([eventName, listener]);
-          try {
-            client.on(eventName, listener);
-          } catch (error) {
-            error.eventListenerAttach = true;
-            throw error;
-          }
+        if (typeof handler?.default !== "function") {
+          log.warn(`Event handler for ${eventName} does not export a default function.`);
+          continue;
+        }
+        const listener = createEventListener({
+          client,
+          context,
+          log,
+          msg,
+          eventName,
+          commandHandlers,
+          handler: handler.default,
+          onHandlerError,
+        });
+        listeners.push([eventName, listener]);
+        try {
+          client.on(eventName, listener);
+        } catch (error) {
+          error.eventListenerAttach = true;
+          throw error;
         }
         loadedEvents.push(eventName);
       } catch (err) {
