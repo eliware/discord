@@ -1,6 +1,6 @@
 import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
-import { purgeCommands, registerCommands } from "../src/command-registration.mjs";
+import { registerCommands } from "../src/command-registration.mjs";
 
 const log = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 const routes = {
@@ -86,47 +86,6 @@ describe("registerCommands", () => {
     process.env.DISCORD_TOKEN = "token";
     try {
       await withSilentDefaultLog(() => registerCommands({ commandDefs: [], restClass, routes }));
-    } finally {
-      if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-      else process.env.DISCORD_CLIENT_ID = oldId;
-      if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-      else process.env.DISCORD_TOKEN = oldToken;
-    }
-  });
-});
-
-describe("purgeCommands", () => {
-  it("deletes global and guild commands", async () => {
-    await purgeCommands({ clientId: "cid", token: "token", log, restClass, routes });
-    expect(restClass.mock.results[0].value.put).toHaveBeenCalledWith("/commands", { body: [] });
-    await purgeCommands({
-      clientId: "cid",
-      token: "token",
-      guildId: "gid",
-      log,
-      restClass,
-      routes,
-    });
-    expect(restClass.mock.results[1].value.put).toHaveBeenCalledWith("/guild-commands", {
-      body: [],
-    });
-  });
-
-  it("rejects missing credentials", async () => {
-    await expect(purgeCommands({ clientId: undefined, token: undefined, log })).rejects.toThrow(
-      "Missing credentials",
-    );
-  });
-
-  it("uses environment credentials and the default logger", async () => {
-    const oldId = process.env.DISCORD_CLIENT_ID;
-    const oldToken = process.env.DISCORD_TOKEN;
-    delete process.env.DISCORD_CLIENT_ID;
-    delete process.env.DISCORD_TOKEN;
-    try {
-      await withSilentDefaultLog(async () => {
-        await expect(purgeCommands()).rejects.toThrow("Missing credentials");
-      });
     } finally {
       if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
       else process.env.DISCORD_CLIENT_ID = oldId;

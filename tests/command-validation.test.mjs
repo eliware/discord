@@ -1,4 +1,6 @@
+import { jest } from "@jest/globals";
 import { validateCommandDefinition } from "../src/command-validation.mjs";
+import { setupCommands } from "../src/commands.mjs";
 
 describe("validateCommandDefinition", () => {
   it.each([
@@ -18,5 +20,20 @@ describe("validateCommandDefinition", () => {
 
   it("accepts a valid definition", () => {
     expect(validateCommandDefinition({ name: "help", description: "Help" })).toBeNull();
+  });
+
+  it("skips invalid definitions during command loading", async () => {
+    const log = { error: jest.fn() };
+    const result = await setupCommands({
+      commandsDir: "/commands",
+      log,
+      fsLib: {
+        readdirSync: () => ["bad.json"],
+        readFileSync: () => JSON.stringify({ name: "bad", description: "x".repeat(101) }),
+        existsSync: () => true,
+      },
+    });
+    expect(result.commandDefs).toEqual([]);
+    expect(log.error).toHaveBeenCalledWith(expect.stringContaining("Invalid command definition"));
   });
 });

@@ -85,14 +85,13 @@ describe("setupEvents", () => {
 
   it("logs import, missing-client, and handler errors; ignores non-functions", async () => {
     const log = logger();
-    const rejected = jest.fn().mockRejectedValue(new Error("handler failed"));
     const imports = [
       async () => ({ default: "not a function" }),
       async () => {
         throw new Error("import failed");
       },
       async () => ({ default: jest.fn() }),
-      async () => ({ default: rejected }),
+      async () => ({ default: jest.fn().mockRejectedValue(new Error("handler failed")) }),
     ];
     const fsLib = {
       readdirSync: () => ["ignored.mjs", "broken.mjs", "missing-client.mjs", "bad-handler.mjs"],
@@ -155,26 +154,6 @@ describe("setupEvents", () => {
     expect(msg("en-US", "key")).toBe("An error occurred.");
     expect(msg("en-US", "key", "fallback")).toBe("fallback");
   });
-  it("catches synchronous handler failures", async () => {
-    const client = { on: jest.fn() };
-    const log = logger();
-    const handler = jest.fn(() => {
-      throw new Error("sync failed");
-    });
-    const onHandlerError = jest.fn();
-    await setupEvents({
-      client,
-      eventsDir: "/events",
-      log,
-      onHandlerError,
-      fsLib: { readdirSync: () => ["ready.mjs"] },
-      importFn: async () => ({ default: handler }),
-    });
-    client.on.mock.calls[0][1]("arg");
-    await new Promise((resolve) => setImmediate(resolve));
-    expect(onHandlerError).toHaveBeenCalledWith(expect.any(Error), "ready");
-  });
-
   it("removes listeners attached before setup fails", async () => {
     const off = jest.fn();
     const on = jest

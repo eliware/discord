@@ -1,7 +1,7 @@
 import type { Client, ClientOptions } from "discord.js";
 import type { Logger } from "@eliware/log";
 
-export type { PurgeCommandsOptions } from "./command-registration.d.ts";
+export type { PurgeCommandsOptions } from "./command-purge.d.ts";
 
 export type DiscordClient = Client & { shutdown: () => Promise<void> };
 export type CommandHandler = (
@@ -94,5 +94,4 @@ export function shutdownDiscord(
   client: Client,
   options?: { cleanupEvents?: () => void; clearLocalesFn?: () => void },
 ): Promise<void>;
-export function purgeCommands(options?: PurgeCommandsOptions): Promise<void>;
 export function splitMsg(message: string, maxLength?: number): string[];

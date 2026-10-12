@@ -11,14 +11,4 @@ export interface RegisterCommandsOptions {
   routes?: Record<string, (...args: string[]) => unknown>;
 }
 
-export interface PurgeCommandsOptions {
-  clientId?: string;
-  token?: string;
-  guildId?: string | null;
-  log?: Logger;
-  restClass?: RegisterCommandsOptions["restClass"];
-  routes?: RegisterCommandsOptions["routes"];
-}
-
 export function registerCommands(options: RegisterCommandsOptions): Promise<boolean>;
-export function purgeCommands(options?: PurgeCommandsOptions): Promise<void>;

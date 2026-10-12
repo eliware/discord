@@ -1,6 +1,6 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
-import { validateLocale } from "./validation.mjs";
+import { validateLocale } from "./locale-validation.mjs";
 import { readdirSync, readFileSync } from "fs";
 
 /**

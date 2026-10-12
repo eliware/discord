@@ -1,5 +1,5 @@
 import { GatewayIntentBits, Partials } from "discord.js";
-import { validateBooleanMap } from "./validation.mjs";
+import { validateBooleanMap } from "./option-validation.mjs";
 
 const DEFAULT_INTENTS = {
   Guilds: false,

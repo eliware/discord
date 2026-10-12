@@ -42,16 +42,12 @@ describe("initializeDiscord", () => {
     });
   });
 
-  it("warns when no command definitions exist", async () => {
-    await initializeDiscord({
+  it("warns when no commands exist and returns default event cleanup", async () => {
+    const cleanup = await initializeDiscord({
       ...base,
       setupCommandsFn: async () => ({ commandHandlers: {} }),
     });
     expect(log.warn).toHaveBeenCalledWith("No commands to register.");
-  });
-
-  it("returns a cleanup function when event setup has no cleanup hook", async () => {
-    const cleanup = await initializeDiscord({ ...base });
     expect(cleanup).toEqual(expect.any(Function));
     cleanup();
   });

@@ -151,21 +151,6 @@ describe("setupCommands", () => {
     );
   });
 });
-describe("command validation", () => {
-  it("skips invalid command descriptions", async () => {
-    mockFs.readdirSync.mockReturnValue(["bad.json"]);
-    mockFs.readFileSync.mockReturnValue(
-      JSON.stringify({ name: "bad", description: "x".repeat(101) }),
-    );
-    mockFs.existsSync.mockReturnValue(true);
-    const result = await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger });
-    expect(result.commandDefs).toEqual([]);
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining("Invalid command definition"),
-    );
-  });
-});
-
 describe("remaining command loader branch", () => {
   it("warns when a command handler file is absent", async () => {
     mockFs.readdirSync.mockReturnValue(["help.json"]);
@@ -176,14 +161,11 @@ describe("remaining command loader branch", () => {
   });
 });
 describe("default logger branches", () => {
-  it("uses default setupCommands options", async () => {
+  it("returns empty results for default and missing folders", async () => {
     await expect(setupCommands({ log: mockLogger })).resolves.toEqual({
       commandDefs: [],
       commandHandlers: {},
     });
-  });
-
-  it("uses the default logger in setupCommands", async () => {
     await expect(
       setupCommands({ commandsDir: "/definitely-missing-commands", log: mockLogger }),
     ).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
