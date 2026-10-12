@@ -29,10 +29,12 @@ describe("createClientOptions", () => {
     expect(() => createClientOptions(undefined, { User: "yes" })).toThrow("must be a boolean");
   });
 
-  it("accepts array input as the current validator defines", () => {
-    expect(createClientOptions([], [], {})).toEqual({
-      intents: [],
-      partials: [Partials.Message, Partials.Channel, Partials.Reaction],
-    });
+  it("rejects array input for intents and partials", () => {
+    expect(() => createClientOptions(["Guilds"], undefined)).toThrow(
+      "intents must be an object of boolean values.",
+    );
+    expect(() => createClientOptions(undefined, ["User"])).toThrow(
+      "partials must be an object of boolean values.",
+    );
   });
 });

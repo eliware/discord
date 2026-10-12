@@ -156,12 +156,13 @@ describe("setupEvents", () => {
   });
   it("removes listeners attached before setup fails", async () => {
     const off = jest.fn();
-    const on = jest
-      .fn()
-      .mockImplementationOnce(() => {})
-      .mockImplementationOnce(() => {
+    const attached = [];
+    const on = jest.fn((eventName, listener) => {
+      attached.push([eventName, listener]);
+      if (attached.length === 2) {
         throw new Error("attach failed");
-      });
+      }
+    });
     const client = { on, off };
     await expect(
       setupEvents({
@@ -171,6 +172,7 @@ describe("setupEvents", () => {
         importFn: async () => ({ default: jest.fn() }),
       }),
     ).rejects.toThrow("attach failed");
-    expect(off).toHaveBeenCalledTimes(1);
+    expect(off).toHaveBeenCalledTimes(2);
+    expect(off).toHaveBeenCalledWith(...attached[1]);
   });
 });

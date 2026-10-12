@@ -5,7 +5,9 @@ describe("validateBooleanMap", () => {
     const keys = new Set(["enabled"]);
     expect(() => validateBooleanMap({ enabled: true }, keys, "options")).not.toThrow();
     expect(() => validateBooleanMap(undefined, keys, "options")).not.toThrow();
-    expect(() => validateBooleanMap([], keys, "options")).not.toThrow();
+    expect(() => validateBooleanMap([], keys, "options")).toThrow(
+      "options must be an object of boolean values.",
+    );
     expect(() => validateBooleanMap({ other: true }, keys, "options")).toThrow(
       "Unknown options key: other",
     );

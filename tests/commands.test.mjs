@@ -60,6 +60,22 @@ describe("setupCommands", () => {
     expect(importFn).toHaveBeenCalled();
   });
 
+  it("keys handlers by the registered command name", async () => {
+    const definition = { name: "start", description: "Start the app" };
+    mockFs.readdirSync.mockReturnValue(["start-file.json"]);
+    mockFs.readFileSync.mockReturnValue(JSON.stringify(definition));
+    mockFs.existsSync.mockReturnValue(true);
+    const handler = jest.fn();
+    const result = await setupCommands({
+      fsLib: mockFs,
+      commandsDir: testDir,
+      log: mockLogger,
+      importFn: jest.fn().mockResolvedValue({ default: handler }),
+    });
+    expect(result.commandHandlers.start).toBe(handler);
+    expect(result.commandHandlers["start-file"]).toBeUndefined();
+  });
+
   it("uses the default dynamic import", async () => {
     mockFs.readdirSync.mockReturnValue(["help.json"]);
     mockFs.readFileSync.mockReturnValue(testJson);

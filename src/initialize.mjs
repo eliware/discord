@@ -43,11 +43,11 @@ export const initializeDiscord = async ({
     commandHandlers: commandResult.commandHandlers,
     context,
   });
-  if (!eventResult || !Array.isArray(eventResult.loadedEvents)) {
-    throw new TypeError("setupEventsFn must return { loadedEvents, cleanup }.");
-  }
-  const cleanupEvents = typeof eventResult.cleanup === "function" ? eventResult.cleanup : () => {};
+  const cleanupEvents = typeof eventResult?.cleanup === "function" ? eventResult.cleanup : () => {};
   try {
+    if (!eventResult || !Array.isArray(eventResult.loadedEvents)) {
+      throw new TypeError("setupEventsFn must return { loadedEvents, cleanup }.");
+    }
     if (commandDefs.length > 0) {
       const success = await registerCommandsFn({ commandDefs, clientId, token, log });
       if (!success)

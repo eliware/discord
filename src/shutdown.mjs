@@ -2,6 +2,8 @@ import { clearLocales } from "./locales.mjs";
 
 const shutdownClients = new WeakSet();
 
+export const resetShutdownState = (client) => shutdownClients.delete(client);
+
 export const shutdownDiscord = async (
   client,
   {

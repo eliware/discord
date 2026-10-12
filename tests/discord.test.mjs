@@ -158,4 +158,17 @@ describe("createDiscord", () => {
     ).rejects.toThrow("setupLocalesFn must return");
     expect(destroy).toHaveBeenCalledTimes(1);
   });
+
+  it("shuts down a reused client in each lifecycle", async () => {
+    const client = { login: jest.fn().mockResolvedValue("ok"), destroy: jest.fn() };
+    const options = {
+      clientId: "cid",
+      token: "token",
+      ClientClass: jest.fn(() => client),
+      ...setup,
+    };
+    await (await createDiscord(options)).shutdown();
+    await (await createDiscord(options)).shutdown();
+    expect(client.destroy).toHaveBeenCalledTimes(2);
+  });
 });

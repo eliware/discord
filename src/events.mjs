@@ -63,13 +63,13 @@ export const setupEvents = async ({
             handler: handler.default,
             onHandlerError,
           });
+          listeners.push([eventName, listener]);
           try {
             client.on(eventName, listener);
           } catch (error) {
             error.eventListenerAttach = true;
             throw error;
           }
-          listeners.push([eventName, listener]);
         }
         loadedEvents.push(eventName);
       } catch (err) {

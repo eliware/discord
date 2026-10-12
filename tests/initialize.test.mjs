@@ -81,6 +81,17 @@ describe("initializeDiscord", () => {
     expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
+  it("cleans event handlers when the setup result is invalid", async () => {
+    const cleanup = jest.fn();
+    await expect(
+      initializeDiscord({
+        ...base,
+        setupEventsFn: async () => ({ loadedEvents: "bad", cleanup }),
+      }),
+    ).rejects.toThrow("setupEventsFn must return");
+    expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+
   it("uses the default loaders for missing app folders", async () => {
     await expect(
       initializeDiscord({

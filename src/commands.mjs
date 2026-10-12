@@ -44,7 +44,7 @@ export const setupCommands = async ({
           continue;
         }
         commandDefs.push(definition);
-        commandHandlers[name] = module.default;
+        commandHandlers[definition.name] = module.default;
       } catch (error) {
         log.warn(`Failed to load handler for ${name}:`, error);
       }
