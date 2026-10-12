@@ -92,6 +92,93 @@ describe("initializeDiscord", () => {
     expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
+  it("cleans custom event listeners when registration fails without a cleanup callback", async () => {
+    const listeners = new Map();
+    const off = jest.fn((name, listener) => {
+      listeners.set(
+        name,
+        listeners.get(name).filter((item) => item !== listener),
+      );
+    });
+    const client = {
+      eventNames: () => [...listeners.keys()],
+      listeners: (name) => listeners.get(name) ?? [],
+      on: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
+      off,
+    };
+    await expect(
+      initializeDiscord({
+        ...base,
+        client,
+        setupCommandsFn: async () => ({ commandDefs: [{ name: "help" }], commandHandlers: {} }),
+        setupEventsFn: async ({ client: target }) => {
+          target.on("ready", jest.fn());
+          return { loadedEvents: ["ready"] };
+        },
+        registerCommandsFn: async () => false,
+      }),
+    ).rejects.toThrow("Failed to register commands");
+    expect(off).toHaveBeenCalledTimes(1);
+    expect(listeners.get("ready")).toEqual([]);
+  });
+
+  it("removes new custom listeners and keeps existing listeners", async () => {
+    const existingListener = jest.fn();
+    const addedListener = jest.fn();
+    const listeners = new Map([["ready", [existingListener]]]);
+    const removeListener = jest.fn((name, listener) => {
+      listeners.set(
+        name,
+        listeners.get(name).filter((item) => item !== listener),
+      );
+    });
+    const client = {
+      eventNames: () => [...listeners.keys()],
+      listeners: (name) => listeners.get(name) ?? [],
+      on: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
+      removeListener,
+    };
+    const cleanup = await initializeDiscord({
+      ...base,
+      client,
+      setupEventsFn: async ({ client: target }) => {
+        target.on("ready", addedListener);
+        return { loadedEvents: ["ready"] };
+      },
+    });
+    cleanup();
+    expect(removeListener).toHaveBeenCalledWith("ready", addedListener);
+    expect(listeners.get("ready")).toEqual([existingListener]);
+  });
+
+  it("cleans custom listeners when event setup throws", async () => {
+    const listeners = new Map();
+    const off = jest.fn((name, listener) => {
+      listeners.set(
+        name,
+        listeners.get(name).filter((item) => item !== listener),
+      );
+    });
+    const client = {
+      eventNames: () => [...listeners.keys()],
+      listeners: (name) => listeners.get(name) ?? [],
+      on: (name, listener) => listeners.set(name, [...(listeners.get(name) ?? []), listener]),
+      off,
+    };
+    await expect(
+      initializeDiscord({
+        ...base,
+        client,
+        setupEventsFn: async ({ client: target }) => {
+          target.on("ready", jest.fn());
+          throw new Error("setup failed");
+        },
+      }),
+    ).rejects.toThrow("setup failed");
+    expect(off).toHaveBeenCalledTimes(1);
+    expect(listeners.get("ready")).toEqual([]);
+  });
+
   it("uses the default loaders for missing app folders", async () => {
     await expect(
       initializeDiscord({

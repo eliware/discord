@@ -39,12 +39,18 @@ export const setupEvents = async ({
   const loadedEvents = [];
   const listeners = [];
   const cleanup = () => {
+    let cleanupError;
     for (const [eventName, listener] of listeners) {
-      if (typeof client.off === "function") client.off(eventName, listener);
-      else if (typeof client.removeListener === "function")
-        client.removeListener(eventName, listener);
+      try {
+        if (typeof client.off === "function") client.off(eventName, listener);
+        else if (typeof client.removeListener === "function")
+          client.removeListener(eventName, listener);
+      } catch (error) {
+        cleanupError ??= error;
+      }
     }
     listeners.length = 0;
+    if (cleanupError) throw cleanupError;
   };
   try {
     for (const file of files) {
@@ -80,7 +86,11 @@ export const setupEvents = async ({
       }
     }
   } catch (error) {
-    cleanup();
+    try {
+      cleanup();
+    } catch (cleanupError) {
+      log.error("Failed to clean up event listeners:", cleanupError);
+    }
     throw error;
   }
   return { loadedEvents, cleanup };

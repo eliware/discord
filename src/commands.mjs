@@ -26,12 +26,14 @@ export const setupCommands = async ({
   for (const file of files) {
     try {
       const definition = JSON.parse(fsLib.readFileSync(path(commandsDir, file), "utf8"));
+      const name = file.replace(/\.json$/, "");
       const validationError = validateCommandDefinition(definition);
-      if (validationError) {
-        log.error(`Invalid command definition for ${file}: ${validationError}`);
+      if (validationError || definition.name !== name) {
+        log.error(
+          `Invalid command definition for ${file}: ${validationError ?? "name must match file name"}`,
+        );
         continue;
       }
-      const name = file.replace(/\.json$/, "");
       const handlerPath = path(commandsDir, `${name}.mjs`);
       if (!fsLib.existsSync(handlerPath)) {
         log.warn(`No handler found for command ${name}`);

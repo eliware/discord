@@ -6,6 +6,7 @@ describe("splitMsg", () => {
     expect(() => splitMsg("hello", 0)).toThrow(RangeError);
     expect(() => splitMsg("hello", Number.NaN)).toThrow(RangeError);
     expect(() => splitMsg("hello", Infinity)).toThrow(RangeError);
+    expect(() => splitMsg("hello", 2.5)).toThrow("maxLength must be a positive integer.");
   });
 
   it("returns empty or unchanged text when it fits", () => {

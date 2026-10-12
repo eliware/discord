@@ -3,6 +3,26 @@ import { setupCommands } from "./commands.mjs";
 import { registerCommands } from "./command-registration.mjs";
 import { setupLocales } from "./locales.mjs";
 
+const createEventCleanup = (client) => {
+  if (
+    typeof client?.eventNames !== "function" ||
+    typeof client.listeners !== "function" ||
+    (typeof client.off !== "function" && typeof client.removeListener !== "function")
+  ) {
+    return () => {};
+  }
+  const existing = new Map(client.eventNames().map((name) => [name, client.listeners(name)]));
+  return () => {
+    for (const name of client.eventNames()) {
+      for (const listener of client.listeners(name)) {
+        if (existing.get(name)?.includes(listener)) continue;
+        if (typeof client.off === "function") client.off(name, listener);
+        else client.removeListener(name, listener);
+      }
+    }
+  };
+};
+
 export const initializeDiscord = async ({
   client,
   clientId,
@@ -35,15 +55,23 @@ export const initializeDiscord = async ({
     throw new TypeError("setupCommandsFn must return { commandDefs, commandHandlers }.");
   }
   const commandDefs = commandResult.commandDefs ?? [];
-  const eventResult = await setupEventsFn({
-    client,
-    eventsDir,
-    log,
-    msg: localeResult.msg,
-    commandHandlers: commandResult.commandHandlers,
-    context,
-  });
-  const cleanupEvents = typeof eventResult?.cleanup === "function" ? eventResult.cleanup : () => {};
+  const fallbackCleanup = createEventCleanup(client);
+  let eventResult;
+  try {
+    eventResult = await setupEventsFn({
+      client,
+      eventsDir,
+      log,
+      msg: localeResult.msg,
+      commandHandlers: commandResult.commandHandlers,
+      context,
+    });
+  } catch (error) {
+    fallbackCleanup();
+    throw error;
+  }
+  const cleanupEvents =
+    typeof eventResult?.cleanup === "function" ? eventResult.cleanup : fallbackCleanup;
   try {
     if (!eventResult || !Array.isArray(eventResult.loadedEvents)) {
       throw new TypeError("setupEventsFn must return { loadedEvents, cleanup }.");

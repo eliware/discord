@@ -158,7 +158,9 @@ describe("setupEvents", () => {
     expect(msg("en-US", "key", "fallback")).toBe("fallback");
   });
   it("removes listeners attached before setup fails", async () => {
-    const off = jest.fn();
+    const off = jest.fn().mockImplementationOnce(() => {
+      throw new Error("remove failed");
+    });
     const attached = [];
     const on = jest.fn((eventName, listener) => {
       attached.push([eventName, listener]);
@@ -167,9 +169,11 @@ describe("setupEvents", () => {
       }
     });
     const client = { on, off };
+    const log = { error: jest.fn(), warn: jest.fn() };
     await expect(
       setupEvents({
         client,
+        log,
         eventsDir: "/events",
         fsLib: { readdirSync: () => ["ready.mjs", "error.mjs"] },
         importFn: async () => ({ default: jest.fn() }),
@@ -177,5 +181,9 @@ describe("setupEvents", () => {
     ).rejects.toThrow("attach failed");
     expect(off).toHaveBeenCalledTimes(2);
     expect(off).toHaveBeenCalledWith(...attached[1]);
+    expect(log.error).toHaveBeenCalledWith(
+      "Failed to clean up event listeners:",
+      expect.any(Error),
+    );
   });
 });

@@ -1,7 +1,7 @@
 export function splitMsg(message, maxLength = 2000) {
   if (typeof message !== "string") throw new TypeError("msg must be a string.");
-  if (!Number.isFinite(maxLength) || maxLength < 1) {
-    throw new RangeError("maxLength must be a positive finite number.");
+  if (!Number.isInteger(maxLength) || maxLength < 1) {
+    throw new RangeError("maxLength must be a positive integer.");
   }
   let remaining = message.trim();
   if (!remaining) return [];

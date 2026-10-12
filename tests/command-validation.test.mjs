@@ -36,4 +36,24 @@ describe("validateCommandDefinition", () => {
     expect(result.commandDefs).toEqual([]);
     expect(log.error).toHaveBeenCalledWith(expect.stringContaining("Invalid command definition"));
   });
+
+  it("skips definitions whose names do not match their files", async () => {
+    const log = { error: jest.fn() };
+    const result = await setupCommands({
+      commandsDir: "/commands",
+      log,
+      fsLib: {
+        readdirSync: () => ["start.json", "stop.json"],
+        readFileSync: () => JSON.stringify({ name: "shared", description: "Start" }),
+        existsSync: () => true,
+      },
+      importFn: jest.fn(),
+    });
+    expect(result.commandDefs).toEqual([]);
+    expect(result.commandHandlers).toEqual({});
+    expect(log.error).toHaveBeenCalledTimes(2);
+    expect(log.error).toHaveBeenCalledWith(
+      "Invalid command definition for start.json: name must match file name",
+    );
+  });
 });
