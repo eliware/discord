@@ -5,7 +5,7 @@ import { registerSignals } from "@eliware/signals";
 import { Client } from "discord.js";
 import { createClientOptions } from "./client-options.mjs";
 import { initializeDiscord } from "./initialize.mjs";
-import { resetShutdownState, shutdownDiscord } from "./shutdown.mjs";
+import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
 
 export const createDiscord = async ({
@@ -37,11 +37,7 @@ export const createDiscord = async ({
   validateContext(context);
 
   const client = new ClientClass(createClientOptions(intents, partials, clientOptions));
-  resetShutdownState(client);
-  const appLog =
-    typeof log.child === "function"
-      ? (log.child({ component: "discord", clientId: resolvedClientId }) ?? log)
-      : log;
+  const appLog = log.child({ component: "discord", clientId: resolvedClientId });
   let signalRegistration;
   let processHandlerRegistration;
   let cleanupEvents = () => {};

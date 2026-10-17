@@ -8,8 +8,11 @@ export const log = {
   warn: jest.fn(),
 };
 
+const setupLog = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+setupLog.child = jest.fn(() => setupLog);
+
 export const setup = {
-  log: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
+  log: setupLog,
   setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
   setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
   setupEventsFn: async () => ({ loadedEvents: [], cleanup: jest.fn() }),

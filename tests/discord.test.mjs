@@ -138,7 +138,7 @@ describe("createDiscord", () => {
     expect(child.info).toHaveBeenCalled();
   });
 
-  it("uses a logger without a child method and accepts signals without a user hook", async () => {
+  it("accepts signals without a user hook", async () => {
     const processObj = { on: jest.fn(), once: jest.fn(), off: jest.fn(), exit: jest.fn() };
     const client = { login: jest.fn().mockResolvedValue("ok"), destroy: jest.fn() };
     await createDiscord({
@@ -155,19 +155,6 @@ describe("createDiscord", () => {
     expect(client.destroy).toHaveBeenCalledTimes(1);
   });
 
-  it("uses the parent logger when child returns no logger", async () => {
-    const client = { login: jest.fn().mockResolvedValue("ok") };
-    const parent = { ...setup.log, child: jest.fn(() => undefined) };
-    await createDiscord({
-      ...setup,
-      clientId: "cid",
-      token: "token",
-      log: parent,
-      ClientClass: jest.fn(() => client),
-    });
-    expect(parent.info).toHaveBeenCalledWith("Discord app initialized", expect.any(Object));
-  });
-
   it("cleans up when app setup fails before event setup", async () => {
     const destroy = jest.fn().mockResolvedValue(undefined);
     await expect(
@@ -180,18 +167,5 @@ describe("createDiscord", () => {
       }),
     ).rejects.toThrow("setupLocalesFn must return");
     expect(destroy).toHaveBeenCalledTimes(1);
-  });
-
-  it("shuts down a reused client in each lifecycle", async () => {
-    const client = { login: jest.fn().mockResolvedValue("ok"), destroy: jest.fn() };
-    const options = {
-      clientId: "cid",
-      token: "token",
-      ClientClass: jest.fn(() => client),
-      ...setup,
-    };
-    await (await createDiscord(options)).shutdown();
-    await (await createDiscord(options)).shutdown();
-    expect(client.destroy).toHaveBeenCalledTimes(2);
   });
 });
