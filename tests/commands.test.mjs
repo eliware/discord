@@ -2,7 +2,7 @@ import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
 
 import { setupCommands } from "../src/commands.mjs";
-import fs from "fs";
+import { fileURLToPath } from "node:url";
 
 const withSilentDefaultLog = async (fn) => {
   const transports = sharedLog.transports ?? [];
@@ -25,21 +25,10 @@ const mockFs = {
   readFileSync: jest.fn(),
   existsSync: jest.fn(),
 };
-const testDir = "test-fixtures/mock-commands";
+const testDir = fileURLToPath(new URL("../test-fixtures/commands", import.meta.url));
 const testJson = '{"name":"help","description":"Help command"}';
 const testHandler = { default: jest.fn() };
 
-beforeAll(() => {
-  if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
-  fs.writeFileSync(`${testDir}/help.json`, testJson);
-  fs.writeFileSync(
-    `${testDir}/help.mjs`,
-    "const handler = () => {}; handler(); export default handler",
-  );
-});
-afterAll(() => {
-  fs.rmSync(testDir, { recursive: true, force: true });
-});
 afterEach(() => {
   jest.clearAllMocks();
 });
@@ -182,7 +171,11 @@ describe("default logger branches", () => {
       commandHandlers: {},
     });
     await expect(
-      setupCommands({ commandsDir: "/definitely-missing-commands", log: mockLogger }),
+      setupCommands({
+        commandsDir: "/definitely-missing-commands",
+        fsLib: { existsSync: jest.fn().mockReturnValue(false) },
+        log: mockLogger,
+      }),
     ).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
   });
 });

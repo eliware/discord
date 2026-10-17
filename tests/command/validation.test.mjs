@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
-import { validateCommandDefinition } from "../src/command-validation.mjs";
-import { setupCommands } from "../src/commands.mjs";
+import { validateCommandDefinition } from "../../src/command/validation.mjs";
+import { setupCommands } from "../../src/commands.mjs";
 
 describe("validateCommandDefinition", () => {
   it.each([

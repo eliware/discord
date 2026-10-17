@@ -4,7 +4,7 @@
 
 Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
 You can also pass `clientId` and `token` to `createDiscord`.
-Do not include quotes unless they are part of the credential value.
+Omit quotation marks unless they belong to the credential value.
 
 ## Client login fails
 
@@ -15,16 +15,16 @@ Read the `cause` field on the login error for the Discord.js error.
 
 ## An intent error occurs
 
-Enable the required intent in the Discord Developer Portal.
+Enable the intent that Discord requires in the Discord Developer Portal.
 Set that intent to `true` in the `intents` option.
-Privileged intents may need approval from Discord.
+Discord may require approval for privileged intents.
 
 ## A command does not appear
 
 Check that each command JSON file has a valid `name` and `description`.
 Check that a matching `.mjs` file has a default function.
 Check the application ID and bot token.
-Global commands can take time to appear in Discord.
+Global commands may require time to appear in Discord.
 
 ## An event does not run
 
@@ -33,12 +33,12 @@ Use the Discord event name as the file name.
 Export a default function from the file.
 Check the logs for import or handler errors.
 
-## A locale message falls back
+## A locale message uses its default text
 
 Check that the file name matches the locale name.
 Use a flat JSON object with string values.
 Check that the requested key exists.
-Set a default value in the `msg` call when needed.
+Set a default value in the `msg` call when the key is missing.
 
 ## A cleanup step fails
 

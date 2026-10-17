@@ -114,7 +114,7 @@ describe("setupEvents", () => {
       expect.any(Error),
     );
     client.on.mock.calls[1][1]();
-    await new Promise((resolve) => setImmediate(resolve));
+    for (let turn = 0; turn < 5; turn += 1) await Promise.resolve();
     expect(log.error).toHaveBeenCalledWith(
       "Event handler failed for bad-handler:",
       expect.any(Error),

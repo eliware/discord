@@ -4,16 +4,9 @@ import { readdirSync } from "fs";
 import { createEventListener } from "./event-listener.mjs";
 
 /**
- * Loads and attaches all event handlers from the events directory to the Discord client.
- * @param {Object} options - Options for setting up events
- * @param {import('discord.js').Client} options.client - The Discord client instance
- * @param {string} options.eventsDir - Directory path for events
- * @param {import('@eliware/log').Logger} [options.log] - Logger instance
- * @param {Function} [options.msg] - Localization function (locale, key, defaultMsg?) => string (optional)
- * @param {Object} [options.commandHandlers] - Map of command handlers (optional)
- * @param {Object} [options.fsLib] - File system library (for testing)
- * @param {Function} [options.importFn] - Function to import handlers (for testing)
- * @returns {Promise<{ loadedEvents: string[] }>} Object with loadedEvents array
+ * Load event handlers from a folder and attach them to a client.
+ * @param {Object} options Setup values include the client, folder, message function, handlers, file methods, and module loader.
+ * @returns {Promise<{ loadedEvents: string[] }>} Loaded event names and cleanup function.
  */
 export const setupEvents = async ({
   client,

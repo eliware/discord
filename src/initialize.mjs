@@ -1,6 +1,6 @@
 import { setupEvents } from "./events.mjs";
 import { setupCommands } from "./commands.mjs";
-import { registerCommands } from "./command-registration.mjs";
+import { registerCommands } from "./command/registration.mjs";
 import { setupLocales } from "./locales.mjs";
 
 const createEventCleanup = (client) => {
@@ -80,10 +80,10 @@ export const initializeDiscord = async ({
       const success = await registerCommandsFn({ commandDefs, clientId, token, log });
       if (!success)
         throw new Error(
-          "Failed to register commands with Discord API. Please check your command definitions and token.",
+          "Discord did not accept the commands. Check the command definitions and token.",
         );
     } else {
-      log.warn("No commands to register.");
+      log.warn("No commands are available to send.");
     }
     log.info("Discord app initialized", {
       eventCount: eventResult.loadedEvents.length,

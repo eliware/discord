@@ -2,8 +2,6 @@ import { log as sharedLog } from "@eliware/log";
 import { locales, setupLocales, clearLocales, msg } from "../src/locales.mjs";
 
 const defaultMockLogger = { error: jest.fn(), warn: jest.fn(), info: jest.fn() };
-import fs from "fs";
-import path from "path";
 import { jest } from "@jest/globals";
 
 const withSilentDefaultLog = async (fn) => {
@@ -31,18 +29,10 @@ describe("locales.mjs", () => {
     readdirSync: jest.fn(),
     readFileSync: jest.fn(),
   };
-  const testDir = path.join(process.cwd(), "test-fixtures", "mock-locales");
+  const testDir = "test-fixtures/mock-locales";
   const enJson = '{"help":"Help text"}';
   const esJson = '{"help":"Texto de ayuda"}';
 
-  beforeAll(() => {
-    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true });
-    fs.writeFileSync(path.join(testDir, "en-US.json"), enJson);
-    fs.writeFileSync(path.join(testDir, "es-ES.json"), esJson);
-  });
-  afterAll(() => {
-    fs.rmSync(testDir, { recursive: true, force: true });
-  });
   afterEach(() => {
     clearLocales();
     jest.clearAllMocks();
@@ -136,16 +126,16 @@ describe("locales.mjs", () => {
     locales["en-US"] = { help: "Help text" };
     expect(msg("fr-FR", "help", "fallback", defaultMockLogger)).toBe("Help text");
     expect(defaultMockLogger.warn).toHaveBeenCalledWith(
-      'Locale "fr-FR" not found, falling back to default.',
+      'Locale "fr-FR" does not exist. Use the default locale.',
     );
     expect(msg("en-US", "missing", "fallback", defaultMockLogger)).toBe("fallback");
     expect(defaultMockLogger.warn).toHaveBeenCalledWith(
-      'Key "missing" not found in locale "en-US", returning default value.',
+      'Key "missing" is missing from locale "en-US". Return the supplied text.',
     );
     clearLocales();
     expect(msg("fr-FR", "help", "fallback", defaultMockLogger)).toBe("fallback");
     expect(defaultMockLogger.error).toHaveBeenCalledWith(
-      'Default locale "en-US" not found. Returning default value.',
+      'Default locale "en-US" does not exist. Return the supplied text.',
     );
   });
 
@@ -180,7 +170,7 @@ describe("default locale API branches", () => {
   it("uses default msg arguments", async () => {
     locales["en-US"] = { hello: "Hello" };
     expect(await withSilentDefaultLog(() => msg("en-US", "missing"))).toBe(
-      "A serious error occurred.",
+      "An important error occurred.",
     );
   });
 

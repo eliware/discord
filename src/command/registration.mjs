@@ -11,30 +11,30 @@ export const registerCommands = async ({
   routes = Routes,
 }) => {
   if (!token) {
-    log.warn("DISCORD_TOKEN is not set. Skipping command registration.");
+    log.warn("DISCORD_TOKEN is not set. Skip command setup.");
     return false;
   }
   if (!clientId) {
-    log.warn("DISCORD_CLIENT_ID is not set. Skipping command registration.");
+    log.warn("DISCORD_CLIENT_ID is not set. Skip command setup.");
     return false;
   }
   if (!commandDefs.length) {
-    log.warn("No commands to register.");
+    log.warn("No commands are available to send.");
     return false;
   }
   try {
     const rest = new restClass({ version: "10" }).setToken(token);
     await rest.put(routes.applicationCommands(clientId), { body: commandDefs });
-    log.debug(`Registered ${commandDefs.length} commands successfully.`);
+    log.debug(`Discord accepted ${commandDefs.length} commands.`);
     return true;
   } catch (error) {
     const messages = {
-      401: "Unauthorized (401). Please check your Discord token and client ID.",
-      403: "Forbidden (403). The bot may lack permissions.",
+      401: "Discord rejected the request (401). Check the token and client ID.",
+      403: "Discord denied access (403). Check the bot permissions.",
     };
     const message = messages[error?.status];
-    if (message) log.error(`Failed to register commands: ${message}`);
-    else log.error("Failed to register commands:", error?.message || error);
+    if (message) log.error(`Discord did not accept the commands: ${message}`);
+    else log.error("Discord command request failed:", error?.message || error);
     return false;
   }
 };

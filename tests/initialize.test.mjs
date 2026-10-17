@@ -47,7 +47,7 @@ describe("initializeDiscord", () => {
       ...base,
       setupCommandsFn: async () => ({ commandHandlers: {} }),
     });
-    expect(log.warn).toHaveBeenCalledWith("No commands to register.");
+    expect(log.warn).toHaveBeenCalledWith("No commands are available to send.");
     expect(cleanup).toEqual(expect.any(Function));
     cleanup();
   });
@@ -77,7 +77,7 @@ describe("initializeDiscord", () => {
         setupEventsFn: async () => ({ loadedEvents: [], cleanup }),
         registerCommandsFn: async () => false,
       }),
-    ).rejects.toThrow("Failed to register commands");
+    ).rejects.toThrow("Discord did not accept the commands");
     expect(cleanup).toHaveBeenCalledTimes(1);
   });
 
@@ -117,7 +117,7 @@ describe("initializeDiscord", () => {
         },
         registerCommandsFn: async () => false,
       }),
-    ).rejects.toThrow("Failed to register commands");
+    ).rejects.toThrow("Discord did not accept the commands");
     expect(off).toHaveBeenCalledTimes(1);
     expect(listeners.get("ready")).toEqual([]);
   });

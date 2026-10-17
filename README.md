@@ -25,7 +25,7 @@ A modular, extensible Discord app framework for Node.js with slash command, loca
 
 - Create and stop a Discord.js client.
 - Load app commands, events, and locale files.
-- Register slash commands and optional process handlers.
+- Send slash commands and add optional process handlers.
 
 ## Requirements
 

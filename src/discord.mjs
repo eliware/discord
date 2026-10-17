@@ -80,7 +80,7 @@ export const createDiscord = async ({
     try {
       await client.login(token);
     } catch (error) {
-      throw new Error(`Failed to log in to Discord: ${error.message}`, { cause: error });
+      throw new Error(`Discord sign-in failed: ${error.message}`, { cause: error });
     }
     return client;
   } catch (error) {

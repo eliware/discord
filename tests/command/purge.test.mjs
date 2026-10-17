@@ -1,6 +1,6 @@
 import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
-import { purgeCommands } from "../src/command-purge.mjs";
+import { purgeCommands } from "../../src/command/purge.mjs";
 
 const log = { error: jest.fn(), info: jest.fn() };
 const routes = {

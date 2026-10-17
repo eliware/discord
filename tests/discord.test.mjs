@@ -87,7 +87,7 @@ describe("createDiscord", () => {
         ...setup,
         setupEventsFn: async () => ({ loadedEvents: [], cleanup }),
       }),
-    ).rejects.toThrow("Failed to log in to Discord: login failed");
+    ).rejects.toThrow("Discord sign-in failed: login failed");
     expect(cleanup).toHaveBeenCalledTimes(1);
     expect(destroy).toHaveBeenCalledTimes(1);
   });

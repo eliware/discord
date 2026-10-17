@@ -1,7 +1,5 @@
 version: "12.0"
 description: Defines requirements for the @eliware/discord package.
-requires: []
-conflicts: []
 directives:
   - id: E-200.0
     dos:
@@ -9,5 +7,5 @@ directives:
       - Keep app command, event, and locale files in the consuming app.
       - Disable gateway intents by default.
     donts:
-      - Do not log in when the package module loads.
+      - Do not connect to Discord when the package module loads.
       - Do not delete commands automatically.

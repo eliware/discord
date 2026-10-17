@@ -1,6 +1,6 @@
 import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
-import { registerCommands } from "../src/command-registration.mjs";
+import { registerCommands } from "../../src/command/registration.mjs";
 
 const log = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 const routes = {

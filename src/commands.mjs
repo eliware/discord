@@ -1,7 +1,7 @@
 import { log as logger } from "@eliware/log";
 import { path, pathUrl } from "@eliware/path";
 import { existsSync, readFileSync, readdirSync } from "fs";
-import { validateCommandDefinition } from "./command-validation.mjs";
+import { validateCommandDefinition } from "./command/validation.mjs";
 
 export const setupCommands = async ({
   commandsDir,

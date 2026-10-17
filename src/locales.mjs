@@ -3,46 +3,42 @@ import { path } from "@eliware/path";
 import { validateLocale } from "./locale-validation.mjs";
 import { readdirSync, readFileSync } from "fs";
 
-/**
- * In-memory object containing all loaded locales.
- * @type {Object.<string, Object.<string, string>>}
- */
+/** Store loaded locale maps. @type {Object.<string, Object.<string, string>>} */
 export const locales = {};
 
 const hasOwn = (value, key) => Object.hasOwn(value, key);
 
 /**
- * Retrieves a localized message for a given locale and key.
- * @param {string} locale - The locale code (e.g., 'en-US')
- * @param {string} key - The message key
- * @param {string} [defaultValue='A serious error occurred.'] - Default value if not found
- * @param {import('@eliware/log').Logger} [log=logger] - Logger instance
- * @returns {string} The localized message or default value
+ * Return the message for a locale and key.
+ * @param {string} locale Locale name, such as `en-US`
+ * @param {string} key Message key
+ * @param {string} [defaultValue='An important error occurred.'] Text for a missing key
+ * @returns {string} Message text or the supplied text
  */
-export const msg = (locale, key, defaultValue = "A serious error occurred.", log = logger) => {
+export const msg = (locale, key, defaultValue = "An important error occurred.", log = logger) => {
   if (!hasOwn(locales, locale) || !locales[locale]) {
-    log.warn(`Locale "${locale}" not found, falling back to default.`);
+    log.warn(`Locale "${locale}" does not exist. Use the default locale.`);
     locale = "en-US";
   }
   if (!hasOwn(locales, locale) || !locales[locale]) {
-    log.error(`Default locale "en-US" not found. Returning default value.`);
+    log.error(`Default locale "en-US" does not exist. Return the supplied text.`);
     return defaultValue;
   }
   const messageMap = locales[locale];
   if (!hasOwn(messageMap, key)) {
-    log.warn(`Key "${key}" not found in locale "${locale}", returning default value.`);
+    log.warn(`Key "${key}" is missing from locale "${locale}". Return the supplied text.`);
     return defaultValue;
   }
   return messageMap[key];
 };
 
 /**
- * Loads all locale files from the specified directory into memory.
- * @param {Object} [options] - Options for loading locales
- * @param {string} [options.localesDir] - Directory path for locale files
- * @param {import('@eliware/log').Logger} [options.log] - Logger instance
- * @param {Object} [options.fsLib] - File system library (for testing)
- * @returns {{ msg: typeof msg, loadedLocales: string[] }} Object with msg function and loadedLocales array
+ * Load locale JSON files from a folder.
+ * @param {Object} [options] Locale setup options.
+ * @param {string} [options.localesDir] Locale folder path.
+
+ * @param {Object} [options.fsLib] File methods for tests.
+ * @returns {{ msg: typeof msg, loadedLocales: string[] }} Message function and locale names.
  */
 export const setupLocales = ({
   localesDir = path(import.meta, "..", "locales"),
@@ -53,14 +49,11 @@ export const setupLocales = ({
   let loadedLocales = [];
   let files = [];
   try {
-    // Check if directory exists before reading
     if (fsLib.existsSync && !fsLib.existsSync(localesDir)) {
-      //log.warn(`Locales directory does not exist: ${localesDir}`);
       return { msg, loadedLocales };
     }
     files = fsLib.readdirSync(localesDir).filter((f) => f.endsWith(".json"));
   } catch {
-    //log.warn(`Locales directory missing or unreadable: ${localesDir}`);
     return { msg, loadedLocales };
   }
   for (const file of files) {
@@ -85,7 +78,7 @@ export const setupLocales = ({
 };
 
 /**
- * Clears all loaded locales from memory.
+ * Remove all loaded locales from memory.
  * @returns {void}
  */
 export const clearLocales = () => {

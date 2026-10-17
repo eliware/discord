@@ -23,7 +23,7 @@ describe("createEventListener", () => {
       onHandlerError,
     });
     listener();
-    await new Promise((resolve) => setImmediate(resolve));
+    for (let turn = 0; turn < 5; turn += 1) await Promise.resolve();
     expect(onHandlerError).toHaveBeenCalledWith(new Error(message), "ready");
   });
 });

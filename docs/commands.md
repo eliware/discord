@@ -15,7 +15,7 @@ Create `commands/ping.json`:
 ```
 
 The package requires a `name` from 1 to 32 characters and a `description` from 1 to 100 characters.
-Add other Discord application command fields as needed. Discord validates those fields during registration.
+Add other Discord application command fields when required. Discord checks those fields when it sends the command.
 
 ## Handler
 
@@ -29,7 +29,7 @@ export default async function ping(context, interaction) {
 
 The package maps each handler to its command file name. It passes `context` first, then the event arguments.
 The context contains `client`, `log`, and `msg`. It also contains values from the `context` option.
-Use the same base name for the JSON definition, the handler file, and the command name.
+Use one name for the JSON file, the handler file, and the command.
 
 ## Registration
 
@@ -38,9 +38,9 @@ It skips a definition when validation fails or its handler file is missing.
 It logs a warning when the command folder is missing or unreadable.
 
 The package registers commands only when it has at least one valid definition.
-It uses the application command endpoint, so Discord treats these as global commands.
+It uses the application command endpoint, so Discord marks these as global commands.
 The package does not delete commands automatically.
-Use `purgeCommands` when you need to delete global commands or commands for one guild.
+Use `purgeCommands` to delete global commands or commands for one guild.
 
 The package provides handlers to the app's `interactionCreate` event context.
 Add an event handler that reads the interaction command name and calls the matching handler.
