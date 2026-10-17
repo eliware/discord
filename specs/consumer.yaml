@@ -1,0 +1,18 @@
+version: "13.0"
+description: Defines the consumer setup and app file requirements.
+directives:
+  - id: E-200.2
+    dos:
+      - Keep createDiscord as the main client setup API.
+      - Keep commands, events, and locales in the consuming app.
+      - Load command definitions from commands/<name>.json.
+      - Load command adapters from commands/<name>.mjs.
+      - Load event adapters from events/<event>.mjs.
+      - Load locale records from locales/<locale>.json.
+      - Pass app dependencies through the context option.
+      - Pass client, logger, locale lookup, and app context to handlers.
+      - Keep gateway intents disabled unless the app enables them.
+      - Keep command and event adapters focused on app-owned handlers.
+    donts:
+      - Do not put app business logic in the library.
+      - Do not require a builder or configuration DSL.

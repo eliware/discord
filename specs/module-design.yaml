@@ -1,0 +1,17 @@
+version: "13.0"
+description: Defines source, test, and module responsibility requirements.
+directives:
+  - id: E-200.3
+    dos:
+      - Give each source and test module one cohesive responsibility.
+      - Keep related functions in one module when they support one responsibility.
+      - Limit each source module to 100 physical lines or less.
+      - Limit each test module to 200 physical lines or less.
+      - Pass replaceable dependencies when this improves isolated tests.
+      - Keep a coordinator responsible for its workflow.
+      - Keep integration tests with their workflow coordinator.
+      - Split modules when behavior or causes for change show distinct responsibilities.
+    donts:
+      - Do not require a separate file for each function.
+      - Do not combine separate responsibilities for convenience.
+      - Do not keep large monolithic business modules.

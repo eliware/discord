@@ -1,7 +1,8 @@
 # Commands
 
-Store slash command files in the app command folder. Set `commandsDir` to change that folder.
-Each command uses a JSON definition and a matching native ESM handler.
+Store slash command definitions and adapters in the app command folder.
+Set `commandsDir` to use a custom folder.
+Keep command behavior in a focused source module.
 
 ## Definition
 
@@ -19,7 +20,7 @@ Add other Discord application command fields when required. Discord checks those
 
 ## Handler
 
-Create `commands/ping.mjs` with a default function:
+Create `src/commands/ping.mjs` with the command behavior:
 
 ```js
 export default async function ping(context, interaction) {
@@ -27,9 +28,16 @@ export default async function ping(context, interaction) {
 }
 ```
 
-The package maps each handler to its command file name. It passes `context` first, then the event arguments.
-The context contains `client`, `log`, and `msg`. It also contains values from the `context` option.
-Use one name for the JSON file, the handler file, and the command.
+Create `commands/ping.mjs` as an adapter that exports the source handler:
+
+```js
+export { default } from "../src/commands/ping.mjs";
+```
+
+The package loads the adapter that matches the JSON file name.
+It passes `context` first, then the event arguments.
+The context contains `client`, `log`, `msg`, and values from the `context` option.
+Use the command name for the JSON definition, adapter, and handler.
 
 ## Registration
 
@@ -46,7 +54,7 @@ The package provides handlers to the app's `interactionCreate` event context.
 Add an event handler that reads the interaction command name and calls the matching handler.
 The package does not reply to command interactions for the app.
 
-Create `events/interactionCreate.mjs`:
+Create `src/events/interactionCreate.mjs`:
 
 ```js
 export default async function interactionCreate(context, interaction) {
@@ -54,6 +62,12 @@ export default async function interactionCreate(context, interaction) {
   const handler = context.commandHandlers[interaction.commandName];
   if (handler) await handler(context, interaction);
 }
+```
+
+Create `events/interactionCreate.mjs` as an adapter:
+
+```js
+export { default } from "../src/events/interactionCreate.mjs";
 ```
 
 Read the [events guide](events.md) and [API guide](api.md) for handler details.

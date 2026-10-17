@@ -12,7 +12,7 @@ export const createDiscord = async ({
   clientId,
   token = process.env.DISCORD_TOKEN,
   log = logger,
-  rootDir = path(import.meta, ".."),
+  rootDir = process.cwd(),
   localesDir = path(rootDir, "locales"),
   commandsDir = path(rootDir, "commands"),
   eventsDir = path(rootDir, "events"),

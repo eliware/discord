@@ -1,0 +1,17 @@
+version: "13.0"
+description: Defines Discord client lifecycle requirements.
+directives:
+  - id: E-200.1
+    dos:
+      - Make client.shutdown idempotent.
+      - Remove library event listeners and handlers during shutdown.
+      - Remove loaded locale data during shutdown.
+      - Call `client.destroy()` during shutdown.
+      - Run available cleanup when setup or login fails.
+      - Keep signal and process handlers optional.
+      - When an app owns other services, let the app manage their shutdown.
+      - When an app handles shutdown, call client.shutdown from its coordinator.
+      - When an app handles signals and manual shutdown, use the same coordinator.
+    donts:
+      - Do not require consumers to call `client.destroy()` directly.
+      - Do not make the library own app services.

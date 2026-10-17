@@ -1,24 +1,15 @@
 import { jest } from "@jest/globals";
+import { path } from "@eliware/path";
 import { createDiscord } from "../src/discord.mjs";
+import { log, setup } from "../test-fixtures/discord-setup.mjs";
 
-const log = {
-  child: jest.fn(),
-  debug: jest.fn(),
-  error: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-};
-const setup = {
-  log: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
-  setupLocalesFn: () => ({ msg: jest.fn(), loadedLocales: [] }),
-  setupCommandsFn: async () => ({ commandDefs: [], commandHandlers: {} }),
-  setupEventsFn: async () => ({ loadedEvents: [], cleanup: jest.fn() }),
-};
-
-afterEach(() => jest.clearAllMocks());
+afterEach(() => {
+  jest.clearAllMocks();
+  jest.restoreAllMocks();
+});
 
 describe("createDiscord", () => {
-  it("requires a client ID and token", async () => {
+  it("requires both client identifiers", async () => {
     const oldId = process.env.DISCORD_CLIENT_ID;
     const oldToken = process.env.DISCORD_TOKEN;
     delete process.env.DISCORD_CLIENT_ID;
@@ -35,8 +26,12 @@ describe("createDiscord", () => {
   });
 
   it("sets up the client and logs in", async () => {
+    const appRoot = "C:/consumer-app";
+    jest.spyOn(process, "cwd").mockReturnValue(appRoot);
     const client = { login: jest.fn().mockResolvedValue("ok") };
     const ClientClass = jest.fn(() => client);
+    const localeSetup = jest.fn(() => ({ msg: jest.fn(), loadedLocales: [] }));
+    const commandSetup = jest.fn(async () => ({ commandDefs: [], commandHandlers: {} }));
     const eventSetup = jest.fn(async ({ client: target }) => ({
       loadedEvents: ["ready"],
       cleanup: jest.fn(() => (target.done = true)),
@@ -47,13 +42,28 @@ describe("createDiscord", () => {
       token: "token",
       log: { ...log, child: jest.fn(() => log) },
       ClientClass,
+      setupLocalesFn: localeSetup,
+      setupCommandsFn: commandSetup,
       setupEventsFn: eventSetup,
       intents: { Guilds: true },
       context: { appValue: true },
     });
     expect(ClientClass.mock.calls[0][0].intents.length).toBe(1);
     expect(eventSetup).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { appValue: true } }),
+      expect.objectContaining({
+        context: { appValue: true },
+        eventsDir: path(appRoot, "events"),
+      }),
+    );
+    expect(localeSetup).toHaveBeenCalledWith(
+      expect.objectContaining({
+        localesDir: path(appRoot, "locales"),
+      }),
+    );
+    expect(commandSetup).toHaveBeenCalledWith(
+      expect.objectContaining({
+        commandsDir: path(appRoot, "commands"),
+      }),
     );
     expect(client.login).toHaveBeenCalledWith("token");
   });

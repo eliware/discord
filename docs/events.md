@@ -1,17 +1,24 @@
 # Events
 
-Store one event handler in each `.mjs` file in the app event folder.
+Store one event adapter in each `.mjs` file in the app event folder.
 The file name without `.mjs` is the Discord event name.
-Set `eventsDir` to change the folder.
+Set `eventsDir` to use a custom folder.
+Keep event behavior in focused modules under `src/events/`.
 
 ## Handler
 
-Create a default function in each event file:
+Create `src/events/clientReady.mjs` with a default function:
 
 ```js
 export default async function ready(context) {
   context.log.info("Discord client is ready");
 }
+```
+
+Create `events/clientReady.mjs` as an adapter:
+
+```js
+export { default } from "../src/events/clientReady.mjs";
 ```
 
 The package calls the handler with `context` first, then the Discord event arguments.

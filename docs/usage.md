@@ -18,7 +18,7 @@ You can also pass these values to `createDiscord`. The package does not read `.e
 
 ## Start a client
 
-Create an application entry file. This example enables the `Guilds` intent:
+Create an application entry file in the app root. This example enables the `Guilds` intent:
 
 ```js
 import { createDiscord } from "@eliware/discord";
@@ -30,13 +30,16 @@ const client = await createDiscord({
 console.log(`Connected as ${client.user.tag}`);
 ```
 
-Run the entry file with Node.js. `createDiscord` loads app files, then logs in to Discord.
+Run the entry file from the app root. `createDiscord` reads app files from the current working
+directory, then logs in to Discord.
 Read [configuration](configuration.md) to set options and folder paths.
 
 ## Add app files
 
-Create `commands/`, `events/`, and `locales/` folders in the app root.
-The package reads JSON command definitions and locale maps. It reads event handlers as `.mjs` files.
+Create `commands/`, `events/`, `locales/`, and `src/` folders in the app root.
+Store command definitions and adapters in `commands/`. Store event adapters in `events/`.
+Keep command and event logic in focused modules under `src/commands/` and `src/events/`.
+Store locale maps in `locales/`.
 Read the [command](commands.md), [event](events.md), and [locale](localization.md) guides.
 
 ## Stop the client

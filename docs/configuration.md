@@ -13,7 +13,7 @@ This value does not change the command request. The package sends commands to th
 
 ## Folders
 
-Set `rootDir` to the app root. It defaults to the package root.
+Set `rootDir` to the app root. It defaults to the current working directory.
 By default, the package reads `rootDir/commands`, `rootDir/events`, and `rootDir/locales`.
 Set `commandsDir`, `eventsDir`, or `localesDir` to use a different folder.
 
