@@ -23,11 +23,12 @@
 - The guides use ASD-STE100 wording and cover setup, commands, events, lifecycle, migration, and troubleshooting.
 - The migration guide documents the logger and client lifecycle requirements.
 - The package updates its development instructions and specification indexes.
+- Move command cleanup, registration, and validation modules under `src/command/`.
 
 ### Breaking changes
 
 - `createDiscord` requires a logger with a `child()` method that returns a logger.
-- The package does not support a second lifecycle for the same client instance.
+- Create a new client for each `createDiscord` call. The package does not support a second lifecycle for one client instance.
 
 ### Fixed
 
