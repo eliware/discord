@@ -25,6 +25,8 @@ const text = context.msg("en-US", "welcome", "Welcome");
 The lookup uses the requested locale first. If that locale is missing, it tries `en-US`.
 If the key is missing, it returns `defaultValue`.
 If no `en-US` map exists, it returns `defaultValue`.
+When you omit `defaultValue`, the function returns `An important error occurred.`.
 
 `createDiscord` loads locale files during setup and clears them during shutdown.
 Direct calls to `setupLocales` replace all locale data in memory.
+The package logs an error and skips a locale file when its JSON or values are invalid.

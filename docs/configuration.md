@@ -24,7 +24,7 @@ All intents default to `false`. Enable only the intents required by the app.
 Discord may require portal approval for privileged intents.
 
 Set `partials` to an object of Discord data names and Boolean values.
-`Message`, `Channel`, and `Reaction` default to `true`. Set every other entry to `false` by default.
+`Message`, `Channel`, and `Reaction` default to `true`. Other partials default to `false`.
 
 Set `clientOptions` to supported Discord.js options.
 These values are applied after the package sets intents and partials.
@@ -32,6 +32,11 @@ Use `clientOptions` to override generated client options.
 
 Set `context` to a plain object for app values passed to each event handler.
 Do not set `client`, `log`, `msg`, or `commandHandlers` in this object.
+
+## Logger
+
+The package uses the default `@eliware/log` logger when `log` is not set.
+If you pass `log`, provide a logger with a `child()` method that returns a logger.
 
 ## Optional handlers
 
@@ -41,8 +46,7 @@ Both options default to `false`. The package removes these handlers during clien
 Set `signalOptions` or `processHandlerOptions` to pass options to the matching Eliware package.
 The Discord package supplies its logger and controls signal exit behavior.
 
-## Custom functions
+## Custom setup functions
 
 Set `setupLocalesFn`, `setupCommandsFn`, `setupEventsFn`, or `registerCommandsFn` to replace a setup step.
-Use these options for tests or custom app loading. Each function must return the documented result shape.
-Read the [API guide](api.md) for result fields.
+Use these options for tests or custom app loading. Read the [API guide](api.md) for result fields.

@@ -21,6 +21,7 @@
 - The CI and npm workflows fetch full Git history and use `actions/checkout@v7`.
 - The Knit workflow uses `/eliware/discord` and pulls repository updates before deployment.
 - The guides use ASD-STE100 wording and cover setup, commands, events, lifecycle, migration, and troubleshooting.
+- The migration guide documents the logger and client lifecycle requirements.
 - The package updates its development instructions and specification indexes.
 
 ### Breaking changes

@@ -6,6 +6,12 @@ Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
 You can also pass `clientId` and `token` to `createDiscord`.
 Omit quotation marks unless they belong to the credential value.
 
+## Logger setup fails
+
+If the app passes `log`, provide a logger with a `child()` method.
+Make sure `child()` returns a logger.
+Use the default logger when custom logger settings are not necessary.
+
 ## Client login fails
 
 Check that the token belongs to the bot and remains valid.

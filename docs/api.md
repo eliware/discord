@@ -8,7 +8,8 @@ The package exports TypeScript declarations from its package root.
 Create a client and connect it to Discord.
 Pass credentials, folder paths, intents, partials, app context, or optional handler settings.
 Read [configuration](configuration.md) for option details.
-The function returns a Discord client with an added `shutdown()` method.
+Pass a logger that has a `child()` method and returns a logger when you set `log`.
+The function returns a new Discord client with an added `shutdown()` method.
 
 ## `shutdownDiscord(client, options)`
 
@@ -35,7 +36,23 @@ When no line or period fits, it uses the maximum length.
 It returns an empty array when the input is blank.
 It rejects non-string input and invalid maximum lengths.
 
+## Custom setup functions
+
+Use setup functions only when the app must replace a package setup step.
+The package passes the options in this table.
+
+| Option               | Input                                                             | Required result                           |
+| -------------------- | ----------------------------------------------------------------- | ----------------------------------------- |
+| `setupLocalesFn`     | `localesDir`, `log`                                               | `msg`, `loadedLocales`                    |
+| `setupCommandsFn`    | `commandsDir`, `log`                                              | `commandHandlers`, optional `commandDefs` |
+| `setupEventsFn`      | `client`, `eventsDir`, `log`, `msg`, `commandHandlers`, `context` | `loadedEvents`, optional `cleanup`        |
+| `registerCommandsFn` | `commandDefs`, `clientId`, `token`, `log`                         | `true` when registration succeeds         |
+
+The package skips command registration when no command definitions exist.
+A false result from `registerCommandsFn` makes startup fail.
+The package calls an event cleanup function during shutdown and startup rollback.
+
 ## Types
 
-The package exports `CreateDiscordOptions`, `DiscordClient`, `EventHandlerContext`, `CommandDefinition`, and `CommandHandler`.
+The package exports `CreateDiscordOptions`, `DiscordClient`, `EventHandlerContext`, `CommandDefinition`, `CommandHandler`, and `PurgeCommandsOptions`.
 Import these types from `@eliware/discord` in TypeScript files.

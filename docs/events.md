@@ -23,12 +23,12 @@ export { default } from "../src/events/clientReady.mjs";
 
 The package calls the handler with `context` first, then the Discord event arguments.
 The context contains `client`, `log`, `msg`, and values from the `context` option.
-For `interactionCreate`, it also contains the `commandHandlers` map.
+The `commandHandlers` map contains handlers for registered slash commands.
+Use this map in the `interactionCreate` handler to call the matching command.
 
 ## Errors and cleanup
 
 The package catches rejected handler promises and sends errors to its logger.
-It continues to run other event handlers. Set a custom `onHandlerError` only when you call `setupEvents` directly.
+It continues to run other event handlers.
 
 `createDiscord` removes its event listeners during `client.shutdown()`.
-When you call `setupEvents` directly, call its returned `cleanup` function when the listeners are no longer needed.

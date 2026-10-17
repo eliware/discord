@@ -4,7 +4,7 @@ Use this guide to update an app from an earlier `@eliware/discord` version.
 
 ## Update the package
 
-After version 13 becomes available, install it with this command:
+When version 13 is available, install it with this command:
 
 ```sh
 npm install @eliware/discord@13
@@ -15,6 +15,17 @@ npm install @eliware/discord@13
 Version 13 uses the current working directory as the default `rootDir`.
 Run the app from its root folder to use the default command, event, and locale folders.
 If the process starts from a different folder, pass `rootDir` to `createDiscord`.
+
+## Update the logger
+
+If the app passes `log`, make sure the logger has a `child()` method.
+Make sure `child()` returns a logger.
+The default `@eliware/log` logger meets this requirement.
+
+## Create a new client for each app lifecycle
+
+Create a new client for each call to `createDiscord`.
+Do not return the same client instance from a custom `ClientClass`.
 
 ## Move command logic
 
