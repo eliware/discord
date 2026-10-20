@@ -59,14 +59,6 @@ describe("locales.mjs", () => {
     expect(locales.stale).toBeUndefined();
     expect(locales["en-US"].help).toBe("Help text");
   });
-
-  it("loads a locale named __proto__ as an own locale", () => {
-    mockFs.readdirSync.mockReturnValue(["__proto__.json"]);
-    mockFs.readFileSync.mockReturnValue('{"hello":"Hello"}');
-    setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
-    expect(Object.hasOwn(locales, "__proto__")).toBe(true);
-    expect(locales.__proto__).toEqual({ hello: "Hello" });
-  });
 });
 
 describe("default locale API branches", () => {

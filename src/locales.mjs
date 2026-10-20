@@ -1,11 +1,8 @@
-import { createLocaleLookup } from "./locale/lookup.mjs";
 import { setupLocaleStore } from "./locale/setup.mjs";
-import { clearLocales, locales } from "./locale/store.mjs";
+import { clearLocales, locales, msg } from "./locale/api.mjs";
 
 export { clearLocales, locales };
-
-/** Return a message for a locale and key. */
-export const msg = createLocaleLookup(locales);
+export { msg };
 
 /**
  * Load locale JSON files from a folder.

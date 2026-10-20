@@ -1,4 +1,4 @@
-import { clearLocales } from "./locales.mjs";
+import { clearLocales } from "./locale/store.mjs";
 import { cleanupShutdownClient } from "./shutdown/client-cleanup.mjs";
 
 const shutdownPromises = new WeakMap();

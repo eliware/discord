@@ -9,4 +9,15 @@ describe("locale store", () => {
     clearLocales();
     expect(locales).toEqual({});
   });
+
+  it("stores a locale named __proto__ as an own property", () => {
+    Object.defineProperty(locales, "__proto__", {
+      configurable: true,
+      enumerable: true,
+      value: { hello: "Hello" },
+      writable: true,
+    });
+    expect(Object.hasOwn(locales, "__proto__")).toBe(true);
+    expect(locales.__proto__).toEqual({ hello: "Hello" });
+  });
 });

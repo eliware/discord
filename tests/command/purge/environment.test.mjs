@@ -1,4 +1,4 @@
-import { resolvePurgeConfig } from "../../src/command/purge-environment.mjs";
+import { resolvePurgeConfig } from "../../../src/command/purge/environment.mjs";
 
 it("uses the environment guild when no guild is supplied", () => {
   expect(resolvePurgeConfig({}, { DISCORD_GUILD_ID: "environment-guild" }).guildId).toBe(

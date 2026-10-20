@@ -28,12 +28,6 @@ describe("purgeCommands", () => {
     expect(put).toHaveBeenLastCalledWith("/guild-commands", { body: [] });
   });
 
-  it("rejects missing credentials", async () => {
-    await expect(purgeCommands({ clientId: undefined, token: undefined, log })).rejects.toThrow(
-      "Missing credentials",
-    );
-  });
-
   it("uses default options and rejects when environment credentials are absent", async () => {
     const oldId = process.env.DISCORD_CLIENT_ID;
     const oldToken = process.env.DISCORD_TOKEN;

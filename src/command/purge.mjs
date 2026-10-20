@@ -1,11 +1,12 @@
 import { log as logger } from "@eliware/log";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
-import { resolvePurgeConfig } from "./purge-environment.mjs";
+import { resolvePurgeConfig } from "./purge/environment.mjs";
+import { hasPurgeCredentials } from "./purge/validation.mjs";
 
 export const purgeCommands = async ({ clientId, token, guildId, log = logger } = {}) => {
   ({ clientId, token, guildId } = resolvePurgeConfig({ clientId, token, guildId }));
-  if (!token || !clientId) {
+  if (!hasPurgeCredentials({ clientId, token })) {
     log.error("DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment.");
     throw new Error("Missing credentials");
   }
