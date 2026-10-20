@@ -1,4 +1,4 @@
-import { validateLocale } from "../locale-validation.mjs";
+import { validateLocale } from "./validation.mjs";
 
 /** Parse and validate locale file contents. */
 export const loadLocaleDefinitions = ({ files, log }) => {

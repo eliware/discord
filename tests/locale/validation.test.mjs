@@ -1,4 +1,4 @@
-import { validateLocale } from "../src/locale-validation.mjs";
+import { validateLocale } from "../../src/locale/validation.mjs";
 
 describe("validateLocale", () => {
   it("accepts flat string maps and rejects other values", () => {
