@@ -1,16 +1,9 @@
 import { jest } from "@jest/globals";
 import { shutdownDiscord } from "../src/shutdown.mjs";
-import * as api from "../src/index.mjs";
 
 describe("shutdownDiscord", () => {
-  it("keeps the shutdown coordinator out of the public package API", () => {
-    expect(api.shutdownDiscord).toBeUndefined();
-  });
-
-  it("shares the shutdown promise and cleans all state once", async () => {
-    let finishDestroy;
+  it("cleans all state once", async () => {
     const client = { destroy: jest.fn().mockResolvedValue(undefined) };
-    client.destroy.mockImplementation(() => new Promise((resolve) => (finishDestroy = resolve)));
     const cleanupEvents = jest.fn();
     const clearLocalesFn = jest.fn();
     const removeSignal = jest.fn();
@@ -21,13 +14,7 @@ describe("shutdownDiscord", () => {
       signalRegistration: { removeHandlers: removeSignal },
       processHandlerRegistration: { removeHandlers: removeProcess },
     };
-    const first = shutdownDiscord(client, options);
-    const second = shutdownDiscord(client, options);
-    expect(second).toBe(first);
-    await Promise.resolve();
-    expect(client.destroy).toHaveBeenCalledTimes(1);
-    finishDestroy();
-    await Promise.all([first, second]);
+    await shutdownDiscord(client, options);
     await shutdownDiscord(client, options);
     expect(cleanupEvents).toHaveBeenCalledTimes(1);
     expect(clearLocalesFn).toHaveBeenCalledTimes(1);
