@@ -1,34 +1,31 @@
 import { jest } from "@jest/globals";
-import { purgeCommands } from "../../src/command/purge.mjs";
 import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const log = { error: jest.fn(), info: jest.fn() };
-const routes = {
+const Routes = {
   applicationCommands: jest.fn(() => "/commands"),
   applicationGuildCommands: jest.fn(() => "/guild-commands"),
 };
-const restClass = jest.fn(() => ({
-  setToken: jest.fn().mockReturnThis(),
-  put: jest.fn().mockResolvedValue({}),
-}));
+const put = jest.fn().mockResolvedValue({});
+const setToken = jest.fn().mockReturnThis();
+const REST = jest.fn(() => ({ setToken, put }));
+jest.unstable_mockModule("@discordjs/rest", () => ({ REST }));
+jest.unstable_mockModule("discord.js", () => ({ Routes }));
+const { purgeCommands } = await import("../../src/command/purge.mjs");
 
 afterEach(() => jest.clearAllMocks());
 
 describe("purgeCommands", () => {
   it("deletes global and guild commands", async () => {
-    await purgeCommands({ clientId: "cid", token: "token", log, restClass, routes });
-    expect(restClass.mock.results[0].value.put).toHaveBeenCalledWith("/commands", { body: [] });
+    await purgeCommands({ clientId: "cid", token: "token", log });
+    expect(put).toHaveBeenCalledWith("/commands", { body: [] });
     await purgeCommands({
       clientId: "cid",
       token: "token",
       guildId: "gid",
       log,
-      restClass,
-      routes,
     });
-    expect(restClass.mock.results[1].value.put).toHaveBeenCalledWith("/guild-commands", {
-      body: [],
-    });
+    expect(put).toHaveBeenLastCalledWith("/guild-commands", { body: [] });
   });
 
   it("rejects missing credentials", async () => {

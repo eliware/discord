@@ -8,18 +8,16 @@ export const purgeCommands = async ({
   token = process.env.DISCORD_TOKEN,
   guildId,
   log = logger,
-  restClass = REST,
-  routes = Routes,
 } = {}) => {
   guildId = resolvePurgeGuildId(guildId);
   if (!token || !clientId) {
     log.error("DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment.");
     throw new Error("Missing credentials");
   }
-  const rest = new restClass({ version: "10" }).setToken(token);
+  const rest = new REST({ version: "10" }).setToken(token);
   const route = guildId
-    ? routes.applicationGuildCommands(clientId, guildId)
-    : routes.applicationCommands(clientId);
+    ? Routes.applicationGuildCommands(clientId, guildId)
+    : Routes.applicationCommands(clientId);
   await rest.put(route, { body: [] });
   log.info(
     guildId

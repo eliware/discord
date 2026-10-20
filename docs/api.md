@@ -58,10 +58,6 @@ The promise rejects when credentials are missing or the Discord request fails.
 await purgeCommands({ clientId, token, guildId });
 ```
 
-Use `restClass` to set a custom `REST` client class.
-Use `routes` to set custom Discord route functions.
-Most apps can omit these advanced options.
-
 ## `splitMsg(message, maxLength)`
 
 Split a string into trimmed chunks with a default limit of 2,000 characters.

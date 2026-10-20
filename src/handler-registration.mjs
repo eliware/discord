@@ -1,6 +1,5 @@
-import { registerHandlers } from "@eliware/errors";
-import { registerSignals } from "@eliware/signals";
-import { createSignalCleanupHook } from "./signal-cleanup.mjs";
+import { registerSignalHandlers } from "./handler/signal-registration.mjs";
+import { registerProcessHandlers } from "./handler/process-registration.mjs";
 
 export const registerOptionalHandlers = ({
   signals,
@@ -11,15 +10,11 @@ export const registerOptionalHandlers = ({
   cleanup,
   registrations,
 }) => {
-  if (signals) {
-    registrations.signalRegistration = registerSignals({
-      ...signalOptions,
+  if (signals)
+    registrations.signalRegistration = registerSignalHandlers({ signalOptions, log, cleanup });
+  if (processHandlers)
+    registrations.processHandlerRegistration = registerProcessHandlers({
+      processHandlerOptions,
       log,
-      exit: false,
-      shutdownHook: createSignalCleanupHook(cleanup, signalOptions.shutdownHook),
     });
-  }
-  if (processHandlers) {
-    registrations.processHandlerRegistration = registerHandlers({ ...processHandlerOptions, log });
-  }
 };
