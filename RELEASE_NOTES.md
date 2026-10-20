@@ -1,39 +1,47 @@
 # Release Notes
 
-## 13.0.0 — 2026-10-17
+## 13.0.0 — 2026-10-19
 
 ### Added
 
 - The package adds consumer, lifecycle, module responsibility, and workflow specifications.
-- The package adds a guide to migrate apps to version 13.
-- The guides show how apps use command and event adapters with focused source modules.
-- The lifecycle guide shows how apps stop services and the Discord client.
+- The package adds a migration guide for version 13.
+- The guides cover app setup, commands, events, locales, lifecycle, and common problems.
+- The examples show that apps can use command and event adapters with app logic in focused source modules.
 
 ### Changed
 
-- The package version changes to 13.0.0 in `package.json` and `package-lock.json`.
-- The default app root is the current working directory.
-- Apps keep command definitions and adapters in `commands/` and event adapters in `events/`.
+- The package version changes to 13.0.0. The Eliware runtime packages and `@eliware/test` change to version 13.
+- The default app root changes to the current working directory.
+- Apps keep command definitions and adapters in `commands/`. Apps keep event adapters in `events/`.
 - Apps keep command and event logic in focused modules under `src/`.
 - Apps own their business logic and manage shutdown for their services.
-- Command helpers and tests use focused `command/` folders.
-- The npm workflow uses the canonical name and checks that the release tag matches the package version.
-- The CI and npm workflows fetch full Git history and use `actions/checkout@v7`.
+- `enabled: false` makes `createDiscord` return `null` without starting Discord.
+- Each Discord client gets its own locale store. Client shutdown clears only that client's locale data.
+- The package separates command, event, locale, client option, handler registration, and shutdown code into focused modules.
+- Tests use focused suites and shared test fixtures for command, event, locale, and shutdown behavior.
+- The CI and npm workflows use `actions/checkout@v7` and fetch full Git history where required.
+- The npm workflow uses the canonical `npm.yaml` name and checks that the release tag matches the package version.
 - The Knit workflow uses `/eliware/discord` and pulls repository updates before deployment.
-- The guides use ASD-STE100 wording and cover setup, commands, events, lifecycle, migration, and troubleshooting.
-- The migration guide documents the logger and client lifecycle requirements.
-- The package updates its development instructions and specification indexes.
-- Move command cleanup, registration, and validation modules under `src/command/`.
+- The guides use ASD-STE100 wording. The migration guide documents logger and client lifecycle requirements.
+- The package updates development instructions and specification indexes.
+- The TypeScript declarations match the package exports and version 13 options.
 
 ### Breaking changes
 
 - `createDiscord` requires a logger with a `child()` method that returns a logger.
-- Create a new client for each `createDiscord` call. The package does not support a second lifecycle for one client instance.
+- `createDiscord` can return `null` when `enabled` is `false`. Check the result before using the client.
+- The package removes `shutdownDiscord` from the root exports. Call and await `client.shutdown()`.
+- The package removes internal setup hooks and `ClientClass` from `createDiscord` options.
+- Apps must use the version 13 command, event, locale, and module layout.
 
 ### Fixed
 
-- The package resolves default command, event, and locale folders from the app root.
-- The package updates command and event examples to use the adapter layout.
+- The package resolves command, event, and locale folders from the app root.
+- The package removes obsolete compatibility paths.
+- The package cleans up event listeners and optional handlers after setup, registration, and login errors.
+- The package preserves available process-handler cleanup when handler setup fails.
+- The package removes an invalid TypeScript declaration import and keeps `splitMsg` in the root type API.
 - Locale, event, and command messages use direct wording.
 
 ## 12.0.0 — 2026-10-12
