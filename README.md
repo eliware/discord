@@ -23,40 +23,42 @@ A modular, extensible Discord app framework for Node.js with slash command, loca
 
 ## Features
 
-- Create and stop a Discord.js client.
-- Load app commands, events, and locale files.
-- Send slash commands and add optional signal or process handlers.
+Create Discord.js clients and load app commands, events, and locale files.
 
 ## Requirements
 
-Use Node.js 26 or newer. Use native ECMAScript modules.
+Use Node.js 26 or later and native ESM.
 
 ## Setup
 
-Install `@eliware/discord`. Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
+Install the package with `npm install @eliware/discord`.
+Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
+The package does not read `.env` files.
 Read [usage](docs/usage.md) to start a client.
 
 ## Usage
 
 Import `createDiscord` from `@eliware/discord` and pass an options object.
-Call `client.shutdown()` to stop the client. When Discord is optional, set `enabled: false` and check the returned value before you use the client.
-Read the [docs index](docs/README.md), [usage](docs/usage.md), [configuration](docs/configuration.md), and [release notes](RELEASE_NOTES.md).
+Call and await `client.shutdown()` to stop a client.
+When the app does not use Discord, set `enabled: false` and check the returned value.
+Read the [docs index](docs/README.md) for user guides and the [release notes](RELEASE_NOTES.md) for changes.
 
 ## Development
 
-Use Node.js 26 and native ESM. Read [specifications](specs/README.md) and [examples](examples/README.md).
+Read [specifications](specs/README.md) before you change source or tests.
 
 ## Testing
 
-Run `npm test` for repository validation.
+Run `npm test` for aggregate validation.
 
 ## Troubleshooting
 
-Read the [troubleshooting guide](docs/troubleshooting.md).
+Read the [troubleshooting guide](docs/troubleshooting.md) for common problems.
 
 ## Security
 
-Keep bot tokens out of source control. Enable only the intents and permissions that the app needs.
+Keep bot tokens out of source control.
+Enable only the intents and permissions that the app needs.
 
 ## API
 
@@ -65,7 +67,11 @@ Read the [API guide](docs/api.md).
 
 ## Packaging
 
-The npm package includes `src/`, `docs/`, `examples/`, and `specs/`.
+The `files` field in `package.json` includes `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, `RELEASE_NOTES.md`, `examples/`, `specs/`, and `.env.example`.
+Use numeric `MAJOR.MINOR.PATCH` versions and matching `v<version>` tags.
+The npm workflow validates tagged releases and checks that each tag matches `package.json.version` before it publishes.
+Run `npm run pack` to check package contents.
+Follow the approved Eliware Operations release process.
 
 ## Examples
 
