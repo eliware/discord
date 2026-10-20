@@ -1,36 +1,14 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
 import { validateLocale } from "./locale-validation.mjs";
+import { createLocaleLookup } from "./locale/lookup.mjs";
 import { readdirSync, readFileSync } from "fs";
 
 /** Store loaded locale maps. @type {Object.<string, Object.<string, string>>} */
 export const locales = {};
 
-const hasOwn = (value, key) => Object.hasOwn(value, key);
-
-/**
- * Return the message for a locale and key.
- * @param {string} locale Locale name, such as `en-US`
- * @param {string} key Message key
- * @param {string} [defaultValue='An important error occurred.'] Text for a missing key
- * @returns {string} Message text or the supplied text
- */
-export const msg = (locale, key, defaultValue = "An important error occurred.", log = logger) => {
-  if (!hasOwn(locales, locale) || !locales[locale]) {
-    log.warn(`Locale "${locale}" does not exist. Use the default locale.`);
-    locale = "en-US";
-  }
-  if (!hasOwn(locales, locale) || !locales[locale]) {
-    log.error(`Default locale "en-US" does not exist. Return the supplied text.`);
-    return defaultValue;
-  }
-  const messageMap = locales[locale];
-  if (!hasOwn(messageMap, key)) {
-    log.warn(`Key "${key}" is missing from locale "${locale}". Return the supplied text.`);
-    return defaultValue;
-  }
-  return messageMap[key];
-};
+/** Return a message for a locale and key. */
+export const msg = createLocaleLookup(locales);
 
 /**
  * Load locale JSON files from a folder.

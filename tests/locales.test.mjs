@@ -1,7 +1,6 @@
 import { log as sharedLog } from "@eliware/log";
 import { locales, setupLocales, clearLocales, msg } from "../src/locales.mjs";
 
-const defaultMockLogger = { error: jest.fn(), warn: jest.fn(), info: jest.fn() };
 import { jest } from "@jest/globals";
 
 const withSilentDefaultLog = async (fn) => {
@@ -100,43 +99,12 @@ describe("locales.mjs", () => {
     expect(locales["en-US"].help).toBe("Help text");
   });
 
-  it("msg returns correct message and falls back", () => {
-    locales["en-US"] = { help: "Help text" };
-    delete locales["es-ES"];
-    expect(msg("en-US", "help", undefined, defaultMockLogger)).toBe("Help text");
-    delete locales["en-US"];
-    expect(msg("es-ES", "help", "default", defaultMockLogger)).toBe("default");
-  });
-
-  it("treats inherited locale and message names as missing", () => {
-    locales["en-US"] = { help: "Help text" };
-    expect(msg("constructor", "help", "fallback", defaultMockLogger)).toBe("Help text");
-    expect(msg("en-US", "constructor", "fallback", defaultMockLogger)).toBe("fallback");
-    expect(msg("en-US", "toString", "fallback", defaultMockLogger)).toBe("fallback");
-  });
-
   it("loads a locale named __proto__ as an own locale", () => {
     mockFs.readdirSync.mockReturnValue(["__proto__.json"]);
     mockFs.readFileSync.mockReturnValue('{"hello":"Hello"}');
     setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
     expect(Object.hasOwn(locales, "__proto__")).toBe(true);
-    expect(msg("__proto__", "hello", "fallback", defaultMockLogger)).toBe("Hello");
-  });
-  it("covers missing locale, missing key, and default locale branches", () => {
-    locales["en-US"] = { help: "Help text" };
-    expect(msg("fr-FR", "help", "fallback", defaultMockLogger)).toBe("Help text");
-    expect(defaultMockLogger.warn).toHaveBeenCalledWith(
-      'Locale "fr-FR" does not exist. Use the default locale.',
-    );
-    expect(msg("en-US", "missing", "fallback", defaultMockLogger)).toBe("fallback");
-    expect(defaultMockLogger.warn).toHaveBeenCalledWith(
-      'Key "missing" is missing from locale "en-US". Return the supplied text.',
-    );
-    clearLocales();
-    expect(msg("fr-FR", "help", "fallback", defaultMockLogger)).toBe("fallback");
-    expect(defaultMockLogger.error).toHaveBeenCalledWith(
-      'Default locale "en-US" does not exist. Return the supplied text.',
-    );
+    expect(locales.__proto__).toEqual({ hello: "Hello" });
   });
 
   it("handles missing directories and failed file reads", () => {
@@ -167,13 +135,6 @@ describe("locales.mjs", () => {
 });
 
 describe("default locale API branches", () => {
-  it("uses default msg arguments", async () => {
-    locales["en-US"] = { hello: "Hello" };
-    expect(await withSilentDefaultLog(() => msg("en-US", "missing"))).toBe(
-      "An important error occurred.",
-    );
-  });
-
   it("uses default setupLocales options", async () => {
     expect(await withSilentDefaultLog(() => setupLocales())).toEqual({ msg, loadedLocales: [] });
   });

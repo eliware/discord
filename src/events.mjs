@@ -2,6 +2,7 @@ import { log as logger } from "@eliware/log";
 import { pathUrl } from "@eliware/path";
 import { readdirSync } from "fs";
 import { createEventListener } from "./event-listener.mjs";
+import { cleanupEventListeners } from "./event/listener-cleanup.mjs";
 
 /**
  * Load event handlers from a folder and attach them to a client.
@@ -31,18 +32,7 @@ export const setupEvents = async ({
   }
   const loadedEvents = [];
   const listeners = [];
-  const cleanup = () => {
-    let cleanupError;
-    for (const [eventName, listener] of listeners) {
-      try {
-        client.off?.(eventName, listener);
-      } catch (error) {
-        cleanupError ??= error;
-      }
-    }
-    listeners.length = 0;
-    if (cleanupError) throw cleanupError;
-  };
+  const cleanup = () => cleanupEventListeners(client, listeners);
   try {
     for (const file of files) {
       const eventName = file.replace(/\.mjs$/, "");

@@ -1,36 +1,21 @@
-import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
 
 import { setupCommands } from "../src/commands.mjs";
-import { fileURLToPath } from "node:url";
+import {
+  mockLogger,
+  mockFs,
+  testDir,
+  testJson,
+  testHandler,
+  withSilentDefaultLog,
+  resetMocks,
+} from "../test-fixtures/commands/test-support.mjs";
 
-const withSilentDefaultLog = async (fn) => {
-  const transports = sharedLog.transports ?? [];
-  const previous = transports.map((transport) => transport.silent);
-  transports.forEach((transport) => {
-    transport.silent = true;
-  });
-  try {
-    return await fn();
-  } finally {
-    transports.forEach((transport, index) => {
-      transport.silent = previous[index];
-    });
-  }
-};
-
-const mockLogger = { debug: jest.fn(), error: jest.fn(), warn: jest.fn(), info: jest.fn() };
-const mockFs = {
-  readdirSync: jest.fn(),
-  readFileSync: jest.fn(),
-  existsSync: jest.fn(),
-};
-const testDir = fileURLToPath(new URL("../test-fixtures/commands", import.meta.url));
-const testJson = '{"name":"help","description":"Help command"}';
-const testHandler = { default: jest.fn() };
+const setupMockCommands = (options = {}) =>
+  setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger, ...options });
 
 afterEach(() => {
-  jest.clearAllMocks();
+  resetMocks();
 });
 describe("setupCommands", () => {
   it("loads and registers commands and handlers", async () => {
@@ -38,12 +23,7 @@ describe("setupCommands", () => {
     mockFs.readFileSync.mockReturnValue(testJson);
     mockFs.existsSync.mockReturnValue(true);
     const importFn = jest.fn().mockResolvedValue(testHandler);
-    const { commandDefs, commandHandlers } = await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
-      importFn,
-    });
+    const { commandDefs, commandHandlers } = await setupMockCommands({ importFn });
     expect(commandHandlers.help).toBe(testHandler.default);
     expect(commandDefs[0].name).toBe("help");
     expect(importFn).toHaveBeenCalled();
@@ -55,10 +35,7 @@ describe("setupCommands", () => {
     mockFs.readFileSync.mockReturnValue(JSON.stringify(definition));
     mockFs.existsSync.mockReturnValue(true);
     const handler = jest.fn();
-    const result = await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
+    const result = await setupMockCommands({
       importFn: jest.fn().mockResolvedValue({ default: handler }),
     });
     expect(result.commandHandlers.start).toBe(handler);
@@ -68,11 +45,7 @@ describe("setupCommands", () => {
     mockFs.readdirSync.mockReturnValue(["help.json"]);
     mockFs.readFileSync.mockReturnValue(testJson);
     mockFs.existsSync.mockReturnValue(true);
-    const result = await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
-    });
+    const result = await setupMockCommands();
     expect(result.commandDefs).toEqual([JSON.parse(testJson)]);
     expect(result.commandHandlers.help).toEqual(expect.any(Function));
   });
@@ -154,7 +127,43 @@ describe("setupCommands", () => {
       expect.any(Error),
     );
   });
+
+  it("skips invalid definitions during command loading", async () => {
+    const log = { error: jest.fn() };
+    const result = await setupCommands({
+      commandsDir: "/commands",
+      log,
+      fsLib: {
+        readdirSync: () => ["bad.json"],
+        readFileSync: () => JSON.stringify({ name: "bad", description: "x".repeat(101) }),
+        existsSync: () => true,
+      },
+    });
+    expect(result.commandDefs).toEqual([]);
+    expect(log.error).toHaveBeenCalledWith(expect.stringContaining("Invalid command definition"));
+  });
+
+  it("skips definitions whose names do not match their files", async () => {
+    const log = { error: jest.fn() };
+    const result = await setupCommands({
+      commandsDir: "/commands",
+      log,
+      fsLib: {
+        readdirSync: () => ["start.json", "stop.json"],
+        readFileSync: () => JSON.stringify({ name: "shared", description: "Start" }),
+        existsSync: () => true,
+      },
+      importFn: jest.fn(),
+    });
+    expect(result.commandDefs).toEqual([]);
+    expect(result.commandHandlers).toEqual({});
+    expect(log.error).toHaveBeenCalledTimes(2);
+    expect(log.error).toHaveBeenCalledWith(
+      "Invalid command definition for start.json: name must match file name",
+    );
+  });
 });
+
 describe("remaining command loader branch", () => {
   it("warns when a command handler file is absent", async () => {
     mockFs.readdirSync.mockReturnValue(["help.json"]);
@@ -164,6 +173,7 @@ describe("remaining command loader branch", () => {
     expect(mockLogger.warn).toHaveBeenCalledWith("No handler found for command help");
   });
 });
+
 describe("default logger branches", () => {
   it("returns empty results for default and missing folders", async () => {
     await expect(setupCommands({ log: mockLogger })).resolves.toEqual({
@@ -179,6 +189,7 @@ describe("default logger branches", () => {
     ).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
   });
 });
+
 describe("default argument coverage", () => {
   it("covers setupCommands defaults", async () => {
     await withSilentDefaultLog(async () => {
