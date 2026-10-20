@@ -10,6 +10,7 @@ directives:
       - Default rootDir to the process working directory.
       - Resolve app command, event, and locale folders from rootDir.
       - Keep app behavior outside the library.
+      - Preserve global commands that the app does not provide during startup.
     donts:
       - Do not connect to Discord when the package module loads.
       - Do not delete commands automatically.

@@ -5,24 +5,66 @@ import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 const log = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 const routes = {
   applicationCommands: jest.fn(() => "/commands"),
+  applicationCommand: jest.fn((clientId, commandId) => `/commands/${clientId}/${commandId}`),
   applicationGuildCommands: jest.fn(() => "/guild-commands"),
 };
+const get = jest.fn().mockResolvedValue([]);
+const post = jest.fn().mockResolvedValue({});
+const put = jest.fn().mockResolvedValue({});
 const restClass = jest.fn(() => ({
   setToken: jest.fn().mockReturnThis(),
-  put: jest.fn().mockResolvedValue({}),
+  get,
+  post,
+  put,
 }));
 
 afterEach(() => jest.clearAllMocks());
 
 describe("registerCommands", () => {
-  it("sends command definitions to Discord", async () => {
+  it("creates new command definitions without replacing the global command list", async () => {
     const commandDefs = [{ name: "help", description: "Help" }];
     await expect(
       registerCommands({ commandDefs, clientId: "cid", token: "token", log, restClass, routes }),
     ).resolves.toBe(true);
-    expect(restClass.mock.results[0].value.put).toHaveBeenCalledWith("/commands", {
-      body: commandDefs,
+    expect(get).toHaveBeenCalledWith("/commands");
+    expect(post).toHaveBeenCalledWith("/commands", {
+      body: commandDefs[0],
     });
+    expect(put).not.toHaveBeenCalled();
+  });
+
+  it("updates app commands and preserves unrelated or skipped commands", async () => {
+    const existingCommands = [
+      { id: "managed-id", name: "managed", description: "Old definition" },
+      { id: "unrelated-id", name: "unrelated", description: "Other app" },
+      { id: "skipped-id", name: "skipped", description: "Missing local handler" },
+    ];
+    get.mockResolvedValueOnce(existingCommands);
+    const commandDefs = [
+      { name: "managed", description: "Updated definition" },
+      { name: "new", description: "New definition" },
+    ];
+
+    await expect(
+      registerCommands({ commandDefs, clientId: "cid", token: "token", log, restClass, routes }),
+    ).resolves.toBe(true);
+
+    expect(put).toHaveBeenCalledWith("/commands/cid/managed-id", { body: commandDefs[0] });
+    expect(post).toHaveBeenCalledWith("/commands", { body: commandDefs[1] });
+    expect(put).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it("creates a command when its name exists with a different type", async () => {
+    get.mockResolvedValueOnce([{ id: "user-id", name: "help", type: 2 }]);
+    const commandDefs = [{ name: "help", description: "Help" }];
+
+    await expect(
+      registerCommands({ commandDefs, clientId: "cid", token: "token", log, restClass, routes }),
+    ).resolves.toBe(true);
+
+    expect(post).toHaveBeenCalledWith("/commands", { body: commandDefs[0] });
+    expect(put).not.toHaveBeenCalled();
   });
 
   it("returns false when credentials or definitions are absent", async () => {
@@ -41,7 +83,9 @@ describe("registerCommands", () => {
   it("returns false when the REST request fails", async () => {
     const failedRest = jest.fn(() => ({
       setToken: jest.fn().mockReturnThis(),
-      put: jest.fn().mockRejectedValue(new Error("network failed")),
+      get: jest.fn().mockRejectedValue(new Error("network failed")),
+      post: jest.fn(),
+      put: jest.fn(),
     }));
     await expect(
       registerCommands({

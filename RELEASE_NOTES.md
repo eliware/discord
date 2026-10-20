@@ -18,6 +18,7 @@
 - Apps own their business logic and manage shutdown for their services.
 - `enabled: false` makes `createDiscord` return `null` without starting Discord.
 - Each Discord client gets its own locale store. Client shutdown clears only that client's locale data.
+- Startup creates or updates each valid command individually and preserves unrelated global commands.
 - The package separates command, event, locale, client option, handler registration, and shutdown code into focused modules.
 - Tests use focused suites and shared test fixtures for command, event, locale, and shutdown behavior.
 - The CI and npm workflows use `actions/checkout@v7` and fetch full Git history where required.

@@ -34,8 +34,11 @@ Check that each command JSON file has a valid `name` and `description`.
 Check that a matching `.mjs` file has a default function.
 Check that the application ID belongs to the bot token.
 Global commands may require time to appear in Discord.
-Each startup replaces the global command list with the valid definitions in the app command folder.
-Keep all commands for the application in that folder.
+
+Each startup updates matching commands and creates new commands one at a time.
+The package keeps commands that the app does not provide.
+The package also keeps remote commands after the app removes their local definitions or handlers.
+Use `purgeCommands` to delete all global commands or all commands for one guild.
 
 ## An event does not run
 

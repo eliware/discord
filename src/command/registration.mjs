@@ -25,7 +25,19 @@ export const registerCommands = async ({
   }
   try {
     const rest = new restClass({ version: "10" }).setToken(token);
-    await rest.put(routes.applicationCommands(clientId), { body: commandDefs });
+    const commandRoute = routes.applicationCommands(clientId);
+    const existingCommands = await rest.get(commandRoute);
+    for (const commandDef of commandDefs) {
+      const existing = existingCommands.find(
+        (command) =>
+          command.name === commandDef.name && (command.type ?? 1) === (commandDef.type ?? 1),
+      );
+      if (existing) {
+        await rest.put(routes.applicationCommand(clientId, existing.id), { body: commandDef });
+      } else {
+        await rest.post(commandRoute, { body: commandDef });
+      }
+    }
     log.debug(`Discord accepted ${commandDefs.length} commands.`);
     return true;
   } catch (error) {
