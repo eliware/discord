@@ -1,4 +1,5 @@
 import { log as logger } from "@eliware/log";
+import { resolveLocaleFallback } from "./fallback.mjs";
 
 const hasOwn = (value, key) => Object.hasOwn(value, key);
 
@@ -10,10 +11,11 @@ const hasOwn = (value, key) => Object.hasOwn(value, key);
 export const createLocaleLookup =
   (locales) =>
   (locale, key, defaultValue = "An important error occurred.", log = logger) => {
-    if (!hasOwn(locales, locale) || !locales[locale]) {
+    const fallback = resolveLocaleFallback(locales, locale);
+    if (fallback.usedFallback) {
       log.warn(`Locale "${locale}" does not exist. Use the default locale.`);
-      locale = "en-US";
     }
+    locale = fallback.locale;
     if (!hasOwn(locales, locale) || !locales[locale]) {
       log.error(`Default locale "en-US" does not exist. Return the supplied text.`);
       return defaultValue;

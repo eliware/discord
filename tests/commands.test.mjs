@@ -59,11 +59,11 @@ describe("setupCommands", () => {
   });
 });
 
-describe("default logger branches", () => {
+describe("empty command directory", () => {
   it("returns empty results when discovery finds no command files", async () => {
-    await expect(
-      setupCommands({ log: mockLogger, discoverFiles: jest.fn(() => []) }),
-    ).resolves.toEqual({
+    mockFs.existsSync.mockReturnValue(true);
+    mockFs.readdirSync.mockReturnValue([]);
+    await expect(setupMockCommands()).resolves.toEqual({
       commandDefs: [],
       commandHandlers: {},
     });

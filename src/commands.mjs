@@ -9,9 +9,8 @@ export const setupCommands = async ({
   log = logger,
   fsLib = { readdirSync, readFileSync, existsSync },
   importFn = (url) => import(url),
-  discoverFiles = discoverCommandFiles,
 } = {}) => {
-  const files = discoverFiles({ commandsDir, fsLib, log });
+  const files = discoverCommandFiles({ commandsDir, fsLib, log });
   const commandHandlers = {};
   const commandDefs = [];
   for (const { name, definition } of loadCommandDefinitions({ files, commandsDir, fsLib, log })) {
