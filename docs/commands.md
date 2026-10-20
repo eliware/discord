@@ -46,7 +46,12 @@ It skips a definition when validation fails or its handler file is missing.
 It logs a warning when the command folder is missing or unreadable.
 
 The package registers commands only when it has at least one valid definition.
-It uses the application command endpoint, so Discord marks these as global commands.
+It sends the full valid definition list to the global application command endpoint on every startup.
+This request replaces the application's existing global command list.
+Keep all global command definitions in the same app folder.
+If Discord rejects the list, `createDiscord` rejects and cleans up the client.
+
+If no valid definitions exist, the package skips registration and logs a warning.
 The package does not delete commands automatically.
 Use `purgeCommands` to delete global commands or commands for one guild.
 

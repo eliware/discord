@@ -25,17 +25,32 @@ Set `commandsDir`, `eventsDir`, or `localesDir` to use a different folder.
 
 Set `intents` to an object of Discord gateway intent names and Boolean values.
 All intents default to `false`. Enable only the intents required by the app.
+The package accepts these names:
+
+```text
+Guilds, GuildMembers, GuildModeration, GuildExpressions, GuildIntegrations,
+GuildWebhooks, GuildInvites, GuildVoiceStates, GuildPresences, GuildMessages,
+GuildMessageReactions, GuildMessageTyping, DirectMessages,
+DirectMessageReactions, DirectMessageTyping, MessageContent,
+GuildScheduledEvents, AutoModerationConfiguration, AutoModerationExecution,
+GuildMessagePolls, DirectMessagePolls
+```
+
 Discord may require portal approval for privileged intents.
 
 Set `partials` to an object of Discord data names and Boolean values.
+The package accepts `Message`, `Channel`, `Reaction`, `GuildMember`, `User`,
+`ThreadMember`, and `GuildScheduledEvent`.
 `Message`, `Channel`, and `Reaction` default to `true`. Other partials default to `false`.
 
 Set `clientOptions` to supported Discord.js options.
-These values are applied after the package sets intents and partials.
-Use `clientOptions` to override generated client options.
+The package applies these values after it sets intents and partials.
+Use this option to replace generated client option values.
 
 Set `context` to a plain object for app values passed to each event handler.
-Do not set `client`, `log`, `msg`, or `commandHandlers` in this object.
+The package adds `client`, `log`, and `msg` to handler context.
+It adds `commandHandlers` to `interactionCreate` context.
+Do not set these reserved keys in `context`.
 
 ## Logger
 

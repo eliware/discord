@@ -5,6 +5,10 @@
 Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
 You can also pass `clientId` and `token` to `createDiscord`.
 Omit quotation marks unless they belong to the credential value.
+The package does not read `.env` files. Load them in the app before you call `createDiscord`.
+
+When Discord is optional, set `enabled: false` to skip credential checks.
+When Discord is enabled, missing credentials stop startup.
 
 ## Logger setup fails
 
@@ -15,7 +19,6 @@ Use the default logger when custom logger settings are not necessary.
 ## Client login fails
 
 Check that the token belongs to the bot and remains valid.
-Check that the application ID matches the bot.
 Check network access to Discord.
 Read the `cause` field on the login error for the Discord.js error.
 
@@ -29,8 +32,10 @@ Discord may require approval for privileged intents.
 
 Check that each command JSON file has a valid `name` and `description`.
 Check that a matching `.mjs` file has a default function.
-Check the application ID and bot token.
+Check that the application ID belongs to the bot token.
 Global commands may require time to appear in Discord.
+Each startup replaces the global command list with the valid definitions in the app command folder.
+Keep all commands for the application in that folder.
 
 ## An event does not run
 
@@ -48,6 +53,6 @@ Set a default value in the `msg` call when the key is missing.
 
 ## A cleanup step fails
 
-Call and await `client.shutdown()` once.
+Call and await `client.shutdown()` from the app cleanup path.
 Check the error from each app cleanup function.
 Read the [lifecycle guide](lifecycle.md) for shutdown order.

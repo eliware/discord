@@ -37,7 +37,8 @@ Read [configuration](configuration.md) to set options and folder paths.
 When Discord is optional, set `enabled` from the app configuration and check the result:
 
 ```js
-const client = await createDiscord({ enabled: config.discordEnabled });
+const discordEnabled = process.env.DISCORD_ENABLED === "true";
+const client = await createDiscord({ enabled: discordEnabled });
 if (client) console.log(`Connected as ${client.user.tag}`);
 ```
 

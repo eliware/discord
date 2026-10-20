@@ -4,6 +4,7 @@ Store one event adapter in each `.mjs` file in the app event folder.
 The file name without `.mjs` is the Discord event name.
 Set `eventsDir` to use a custom folder.
 Keep event behavior in focused modules under `src/events/`.
+The package logs a warning when the event folder is missing or unreadable.
 
 ## Handler
 

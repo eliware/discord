@@ -57,6 +57,7 @@ before you access the client or call its `shutdown()` method.
 
 Remove `setupLocalesFn`, `setupCommandsFn`, `setupEventsFn`, and `registerCommandsFn` options.
 Version 13 does not expose internal setup replacement hooks. Use the supported app folders.
+Remove the `ClientClass` option. Version 13 creates the supported Discord.js client directly.
 
 Remove imports of `shutdownDiscord`. Call and await `client.shutdown()`.
 Version 13 returns `null` when Discord is disabled, so check the result before you use the client.

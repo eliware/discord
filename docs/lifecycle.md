@@ -1,8 +1,9 @@
 # Lifecycle
 
 `createDiscord` checks credentials and options, creates a Discord.js client, and loads app files.
-It sends slash commands when valid definitions exist. It then connects to Discord.
+It sends slash commands when valid definitions exist, then connects to Discord.
 The function returns the connected client.
+When `enabled` is `false`, it returns `null` before it checks credentials or loads app files.
 
 ## Startup errors
 
@@ -33,7 +34,7 @@ function shutdownApp() {
     try {
       await stopAppServices();
     } finally {
-      await client.shutdown();
+      if (client) await client.shutdown();
     }
   })();
   return shutdownPromise;
@@ -48,6 +49,7 @@ Call `shutdownApp` for manual shutdown too.
 Set `signals: true` to add signal handlers from `@eliware/signals`.
 The package runs client cleanup before it calls a custom `signalOptions.shutdownHook`.
 It sets `exit: false`, so the signal handler does not exit the process.
+The package does not add signal handlers when Discord is disabled.
 
 Use this option when the app only needs Discord cleanup.
 When the app manages other services, keep signal handling in the app and call its shutdown
