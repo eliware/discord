@@ -1,11 +1,9 @@
-import { removeSignalHandlers } from "./signal-handler-removal.mjs";
-import { removeProcessHandlers } from "./process-handler-removal.mjs";
+import { cleanupShutdownHandlers } from "./handler-cleanup.mjs";
 
 export const cleanupShutdownClient = async (
   client,
   { signalRegistration, processHandlerRegistration },
 ) => {
-  removeSignalHandlers(signalRegistration);
-  removeProcessHandlers(processHandlerRegistration);
+  cleanupShutdownHandlers({ signalRegistration, processHandlerRegistration });
   if (typeof client.destroy === "function") await client.destroy();
 };

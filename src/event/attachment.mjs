@@ -1,4 +1,5 @@
 import { createEventListener } from "../event-listener.mjs";
+import { markEventListenerAttachError } from "./attach-error.mjs";
 
 export const attachEventHandler = async ({
   client,
@@ -28,8 +29,7 @@ export const attachEventHandler = async ({
     try {
       client.on(eventName, listener);
     } catch (error) {
-      error.eventListenerAttach = true;
-      throw error;
+      throw markEventListenerAttachError(error);
     }
     loadedEvents.push(eventName);
   } catch (error) {

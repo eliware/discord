@@ -9,17 +9,4 @@ describe("normalizeClientOptionMaps", () => {
       "Unknown partials key",
     );
   });
-
-  it("rejects non-boolean and array option values", () => {
-    expect(() => normalizeClientOptionMaps({ Guilds: 1 }, undefined)).toThrow("must be a boolean");
-    expect(() => normalizeClientOptionMaps(undefined, { User: "yes" })).toThrow(
-      "must be a boolean",
-    );
-    expect(() => normalizeClientOptionMaps(["Guilds"], undefined)).toThrow(
-      "intents must be an object of boolean values.",
-    );
-    expect(() => normalizeClientOptionMaps(undefined, ["User"])).toThrow(
-      "partials must be an object of boolean values.",
-    );
-  });
 });

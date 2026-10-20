@@ -7,8 +7,10 @@ describe("shutdownDiscord", () => {
     expect(api.shutdownDiscord).toBeUndefined();
   });
 
-  it("cleans event, locale, signal, process, and client state once", async () => {
+  it("shares the shutdown promise and cleans all state once", async () => {
+    let finishDestroy;
     const client = { destroy: jest.fn().mockResolvedValue(undefined) };
+    client.destroy.mockImplementation(() => new Promise((resolve) => (finishDestroy = resolve)));
     const cleanupEvents = jest.fn();
     const clearLocalesFn = jest.fn();
     const removeSignal = jest.fn();
@@ -19,7 +21,13 @@ describe("shutdownDiscord", () => {
       signalRegistration: { removeHandlers: removeSignal },
       processHandlerRegistration: { removeHandlers: removeProcess },
     };
-    await shutdownDiscord(client, options);
+    const first = shutdownDiscord(client, options);
+    const second = shutdownDiscord(client, options);
+    expect(second).toBe(first);
+    await Promise.resolve();
+    expect(client.destroy).toHaveBeenCalledTimes(1);
+    finishDestroy();
+    await Promise.all([first, second]);
     await shutdownDiscord(client, options);
     expect(cleanupEvents).toHaveBeenCalledTimes(1);
     expect(clearLocalesFn).toHaveBeenCalledTimes(1);
@@ -31,20 +39,6 @@ describe("shutdownDiscord", () => {
   it("handles empty clients and clients without a destroy method", async () => {
     await expect(shutdownDiscord()).resolves.toBeUndefined();
     await expect(shutdownDiscord({})).resolves.toBeUndefined();
-  });
-
-  it("returns the same promise while shutdown is in progress", async () => {
-    let finishDestroy;
-    const client = {
-      destroy: jest.fn(() => new Promise((resolve) => (finishDestroy = resolve))),
-    };
-    const first = shutdownDiscord(client);
-    const second = shutdownDiscord(client);
-    expect(second).toBe(first);
-    await Promise.resolve();
-    expect(client.destroy).toHaveBeenCalledTimes(1);
-    finishDestroy();
-    await expect(Promise.all([first, second])).resolves.toEqual([undefined, undefined]);
   });
 
   it("runs later cleanup when event cleanup throws", async () => {
