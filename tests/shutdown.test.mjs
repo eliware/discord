@@ -1,7 +1,12 @@
 import { jest } from "@jest/globals";
 import { shutdownDiscord } from "../src/shutdown.mjs";
+import * as api from "../src/index.mjs";
 
 describe("shutdownDiscord", () => {
+  it("keeps the shutdown coordinator out of the public package API", () => {
+    expect(api.shutdownDiscord).toBeUndefined();
+  });
+
   it("cleans event, locale, signal, process, and client state once", async () => {
     const client = { destroy: jest.fn().mockResolvedValue(undefined) };
     const cleanupEvents = jest.fn();

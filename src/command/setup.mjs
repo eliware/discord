@@ -1,15 +1,13 @@
 import { log as logger } from "@eliware/log";
-import { existsSync, readFileSync, readdirSync } from "fs";
+import { createCommandDependencies } from "./dependencies.mjs";
 import { loadCommandDefinitions } from "./definition-loader.mjs";
 import { loadCommandHandler } from "./handler-loader.mjs";
 import { discoverCommandFiles } from "./discovery.mjs";
 
-export const setupCommands = async ({
-  commandsDir,
-  log = logger,
-  fsLib = { readdirSync, readFileSync, existsSync },
-  importFn = (url) => import(url),
-} = {}) => {
+export const setupCommands = async ({ commandsDir, log = logger, fsLib, importFn } = {}) => {
+  const dependencies = createCommandDependencies({ fsLib, importFn });
+  fsLib = dependencies.fsLib;
+  importFn = dependencies.importFn;
   const files = discoverCommandFiles({ commandsDir, fsLib, log });
   const commandHandlers = {};
   const commandDefs = [];

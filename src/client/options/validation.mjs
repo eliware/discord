@@ -1,5 +1,6 @@
 import { validateBooleanMap } from "../../option-validation.mjs";
-import { INTENT_MAP, PARTIALS_MAP, mapClientOptionMaps } from "./mapping.mjs";
+import { INTENT_MAP, PARTIALS_MAP } from "./maps.mjs";
+import { mapClientOptionMaps } from "./mapping.mjs";
 
 export const normalizeClientOptionMaps = (intents, partials) => {
   validateBooleanMap(intents, new Set(Object.keys(INTENT_MAP)), "intents");
