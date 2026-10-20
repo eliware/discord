@@ -1,6 +1,6 @@
 import { log as logger } from "@eliware/log";
-import { validateLocale } from "../locale-validation.mjs";
 import { readLocaleFiles } from "./files.mjs";
+import { loadLocaleDefinitions } from "./definition-loader.mjs";
 
 /**
  * Parse and validate locale file contents.
@@ -13,17 +13,5 @@ export const loadLocales = ({
   fsLib,
   readFiles = readLocaleFiles,
 } = {}) => {
-  const loaded = [];
-  for (const { file, content } of readFiles({ localesDir, fsLib, log })) {
-    try {
-      const locale = JSON.parse(content);
-      if (!validateLocale(locale)) {
-        throw new TypeError("locale must be a flat object containing only string values");
-      }
-      loaded.push([file.replace(/\.json$/, ""), locale]);
-    } catch (error) {
-      log.error(`Failed to load or parse locale file ${file}:`, error);
-    }
-  }
-  return loaded;
+  return loadLocaleDefinitions({ files: readFiles({ localesDir, fsLib, log }), log });
 };

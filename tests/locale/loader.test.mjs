@@ -7,23 +7,10 @@ describe("loadLocales", () => {
 
   afterEach(() => jest.clearAllMocks());
 
-  it("parses valid locale file contents", () => {
+  it("combines file reading with locale parsing", () => {
     const readFiles = jest.fn(() => [{ file: "en-US.json", content: '{"hello":"Hello"}' }]);
     expect(loadLocales({ localesDir, readFiles, log })).toEqual([["en-US", { hello: "Hello" }]]);
     expect(readFiles).toHaveBeenCalledWith({ localesDir, fsLib: undefined, log });
-  });
-
-  it("logs invalid JSON and invalid maps", () => {
-    const readFiles = () => [
-      { file: "syntax.json", content: "{" },
-      { file: "nested.json", content: '{"nested":{"key":"value"}}' },
-    ];
-    expect(loadLocales({ localesDir, readFiles, log })).toEqual([]);
-    expect(log.error).toHaveBeenCalledTimes(2);
-    expect(log.error).toHaveBeenCalledWith(
-      "Failed to load or parse locale file nested.json:",
-      expect.any(TypeError),
-    );
   });
 
   it("uses default options when the default folder is absent", () => {

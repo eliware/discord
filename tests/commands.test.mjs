@@ -50,6 +50,14 @@ describe("setupCommands", () => {
     expect(result.commandHandlers.help).toEqual(expect.any(Function));
   });
 
+  it("omits definitions when a handler file is missing", async () => {
+    mockFs.readdirSync.mockReturnValue(["help.json"]);
+    mockFs.readFileSync.mockReturnValue(testJson);
+    mockFs.existsSync.mockImplementation((file) => file === testDir);
+    await expect(setupMockCommands()).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
+    expect(mockLogger.warn).toHaveBeenCalledWith("No handler found for command help");
+  });
+
   it("returns empty when directory does not exist", async () => {
     mockFs.existsSync.mockReturnValue(false);
     expect(await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger })).toEqual({
@@ -72,105 +80,12 @@ describe("setupCommands", () => {
     );
   });
 
-  it("warns when handler has no default function", async () => {
-    mockFs.readdirSync.mockReturnValue(["help.json"]);
-    mockFs.readFileSync.mockReturnValue(testJson);
-    mockFs.existsSync.mockReturnValue(true);
-    await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
-      importFn: jest.fn().mockResolvedValue({ default: "nope" }),
-    });
-    expect(mockLogger.warn).toHaveBeenCalledWith(
-      "Handler for help does not export a default function.",
-    );
-  });
-
-  it("warns when handler import fails", async () => {
-    mockFs.readdirSync.mockReturnValue(["help.json"]);
-    mockFs.readFileSync.mockReturnValue(testJson);
-    mockFs.existsSync.mockReturnValue(true);
-    const error = new Error("import fail");
-    await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
-      importFn: jest.fn().mockRejectedValue(error),
-    });
-    expect(mockLogger.warn).toHaveBeenCalledWith("Failed to load handler for help:", error);
-  });
-
   it("skips non-json files", async () => {
     mockFs.readdirSync.mockReturnValue(["readme.txt"]);
     expect(await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger })).toEqual({
       commandDefs: [],
       commandHandlers: {},
     });
-  });
-
-  it("logs error if command definition fails", async () => {
-    mockFs.readdirSync.mockReturnValue(["bad.json"]);
-    mockFs.readFileSync.mockImplementation(() => {
-      throw new Error("fail");
-    });
-    mockFs.existsSync.mockReturnValue(true);
-    const importFn = jest.fn();
-    await setupCommands({
-      fsLib: mockFs,
-      commandsDir: testDir,
-      log: mockLogger,
-      importFn,
-    });
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining("Failed to load command definition for bad.json:"),
-      expect.any(Error),
-    );
-  });
-
-  it("skips invalid definitions during command loading", async () => {
-    const log = { error: jest.fn() };
-    const result = await setupCommands({
-      commandsDir: "/commands",
-      log,
-      fsLib: {
-        readdirSync: () => ["bad.json"],
-        readFileSync: () => JSON.stringify({ name: "bad", description: "x".repeat(101) }),
-        existsSync: () => true,
-      },
-    });
-    expect(result.commandDefs).toEqual([]);
-    expect(log.error).toHaveBeenCalledWith(expect.stringContaining("Invalid command definition"));
-  });
-
-  it("skips definitions whose names do not match their files", async () => {
-    const log = { error: jest.fn() };
-    const result = await setupCommands({
-      commandsDir: "/commands",
-      log,
-      fsLib: {
-        readdirSync: () => ["start.json", "stop.json"],
-        readFileSync: () => JSON.stringify({ name: "shared", description: "Start" }),
-        existsSync: () => true,
-      },
-      importFn: jest.fn(),
-    });
-    expect(result.commandDefs).toEqual([]);
-    expect(result.commandHandlers).toEqual({});
-    expect(log.error).toHaveBeenCalledTimes(2);
-    expect(log.error).toHaveBeenCalledWith(
-      "Invalid command definition for start.json: name must match file name",
-    );
-  });
-});
-
-describe("remaining command loader branch", () => {
-  it("warns when a command handler file is absent", async () => {
-    mockFs.readdirSync.mockReturnValue(["help.json"]);
-    mockFs.readFileSync.mockReturnValue(testJson);
-    mockFs.existsSync.mockImplementation((file) => file === testDir);
-    await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger });
-    expect(mockLogger.warn).toHaveBeenCalledWith("No handler found for command help");
   });
 });
 

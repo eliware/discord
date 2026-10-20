@@ -1,7 +1,7 @@
 import { log as logger } from "@eliware/log";
-import { path, pathUrl } from "@eliware/path";
 import { existsSync, readFileSync, readdirSync } from "fs";
-import { validateCommandDefinition } from "./command/validation.mjs";
+import { loadCommandDefinitions } from "./command/definition-loader.mjs";
+import { loadCommandHandler } from "./command/handler-loader.mjs";
 
 export const setupCommands = async ({
   commandsDir,
@@ -23,36 +23,11 @@ export const setupCommands = async ({
 
   const commandHandlers = {};
   const commandDefs = [];
-  for (const file of files) {
-    try {
-      const definition = JSON.parse(fsLib.readFileSync(path(commandsDir, file), "utf8"));
-      const name = file.replace(/\.json$/, "");
-      const validationError = validateCommandDefinition(definition);
-      if (validationError || definition.name !== name) {
-        log.error(
-          `Invalid command definition for ${file}: ${validationError ?? "name must match file name"}`,
-        );
-        continue;
-      }
-      const handlerPath = path(commandsDir, `${name}.mjs`);
-      if (!fsLib.existsSync(handlerPath)) {
-        log.warn(`No handler found for command ${name}`);
-        continue;
-      }
-      try {
-        const module = await importFn(pathUrl(handlerPath));
-        if (typeof module.default !== "function") {
-          log.warn(`Handler for ${name} does not export a default function.`);
-          continue;
-        }
-        commandDefs.push(definition);
-        commandHandlers[definition.name] = module.default;
-      } catch (error) {
-        log.warn(`Failed to load handler for ${name}:`, error);
-      }
-    } catch (error) {
-      log.error(`Failed to load command definition for ${file}:`, error);
-    }
+  for (const { name, definition } of loadCommandDefinitions({ files, commandsDir, fsLib, log })) {
+    const handler = await loadCommandHandler({ name, commandsDir, fsLib, importFn, log });
+    if (!handler) continue;
+    commandDefs.push(definition);
+    commandHandlers[name] = handler;
   }
   return { commandDefs, commandHandlers };
 };
