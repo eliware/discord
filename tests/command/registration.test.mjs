@@ -1,6 +1,6 @@
-import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
 import { registerCommands } from "../../src/command/registration.mjs";
+import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const log = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 const routes = {
@@ -11,21 +11,6 @@ const restClass = jest.fn(() => ({
   setToken: jest.fn().mockReturnThis(),
   put: jest.fn().mockResolvedValue({}),
 }));
-
-const withSilentDefaultLog = async (fn) => {
-  const transports = sharedLog.transports ?? [];
-  const prior = transports.map((transport) => transport.silent);
-  transports.forEach((transport) => {
-    transport.silent = true;
-  });
-  try {
-    return await fn();
-  } finally {
-    transports.forEach((transport, index) => {
-      transport.silent = prior[index];
-    });
-  }
-};
 
 afterEach(() => jest.clearAllMocks());
 

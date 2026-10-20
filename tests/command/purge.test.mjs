@@ -1,6 +1,6 @@
-import { log as sharedLog } from "@eliware/log";
 import { jest } from "@jest/globals";
 import { purgeCommands } from "../../src/command/purge.mjs";
+import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const log = { error: jest.fn(), info: jest.fn() };
 const routes = {
@@ -11,21 +11,6 @@ const restClass = jest.fn(() => ({
   setToken: jest.fn().mockReturnThis(),
   put: jest.fn().mockResolvedValue({}),
 }));
-
-const withSilentDefaultLog = async (fn) => {
-  const transports = sharedLog.transports ?? [];
-  const prior = transports.map((transport) => transport.silent);
-  transports.forEach((transport) => {
-    transport.silent = true;
-  });
-  try {
-    return await fn();
-  } finally {
-    transports.forEach((transport, index) => {
-      transport.silent = prior[index];
-    });
-  }
-};
 
 afterEach(() => jest.clearAllMocks());
 
@@ -50,6 +35,21 @@ describe("purgeCommands", () => {
     await expect(purgeCommands({ clientId: undefined, token: undefined, log })).rejects.toThrow(
       "Missing credentials",
     );
+  });
+
+  it("uses the environment guild when no guild is supplied", async () => {
+    const oldGuildId = process.env.DISCORD_GUILD_ID;
+    process.env.DISCORD_GUILD_ID = "environment-guild";
+    try {
+      await purgeCommands({ clientId: "cid", token: "token", log, restClass, routes });
+      expect(routes.applicationGuildCommands).toHaveBeenCalledWith("cid", "environment-guild");
+      expect(restClass.mock.results[0].value.put).toHaveBeenCalledWith("/guild-commands", {
+        body: [],
+      });
+    } finally {
+      if (oldGuildId === undefined) delete process.env.DISCORD_GUILD_ID;
+      else process.env.DISCORD_GUILD_ID = oldGuildId;
+    }
   });
 
   it("uses default options and rejects when environment credentials are absent", async () => {

@@ -1,8 +1,8 @@
 import { log as logger } from "@eliware/log";
-import { pathUrl } from "@eliware/path";
 import { readdirSync } from "fs";
 import { createEventListener } from "./event-listener.mjs";
 import { cleanupEventListeners } from "./event/listener-cleanup.mjs";
+import { loadEventHandler } from "./event/handler-loader.mjs";
 
 /**
  * Load event handlers from a folder and attach them to a client.
@@ -37,12 +37,9 @@ export const setupEvents = async ({
     for (const file of files) {
       const eventName = file.replace(/\.mjs$/, "");
       try {
-        const handler = await importFn(pathUrl(eventsDir, file));
+        const handler = await loadEventHandler({ eventName, eventsDir, importFn, log });
+        if (!handler) continue;
         if (!client) throw new Error("Discord client is undefined");
-        if (typeof handler?.default !== "function") {
-          log.warn(`Event handler for ${eventName} does not export a default function.`);
-          continue;
-        }
         const listener = createEventListener({
           client,
           context,
@@ -50,7 +47,7 @@ export const setupEvents = async ({
           msg,
           eventName,
           commandHandlers,
-          handler: handler.default,
+          handler,
           onHandlerError,
         });
         listeners.push([eventName, listener]);

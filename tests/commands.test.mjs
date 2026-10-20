@@ -7,9 +7,9 @@ import {
   testDir,
   testJson,
   testHandler,
-  withSilentDefaultLog,
   resetMocks,
 } from "../test-fixtures/commands/test-support.mjs";
+import { withSilentDefaultLog } from "../test-fixtures/test-support.mjs";
 
 const setupMockCommands = (options = {}) =>
   setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger, ...options });

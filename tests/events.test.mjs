@@ -1,21 +1,6 @@
-import { log as sharedLog } from "@eliware/log";
 import { setupEvents } from "../src/events.mjs";
 import { jest } from "@jest/globals";
-
-const withSilentDefaultLog = async (fn) => {
-  const transports = sharedLog.transports ?? [];
-  const previous = transports.map((transport) => transport.silent);
-  transports.forEach((transport) => {
-    transport.silent = true;
-  });
-  try {
-    return await fn();
-  } finally {
-    transports.forEach((transport, index) => {
-      transport.silent = previous[index];
-    });
-  }
-};
+import { withSilentDefaultLog } from "../test-fixtures/test-support.mjs";
 
 describe("setupEvents", () => {
   const logger = () => ({ info: jest.fn(), error: jest.fn(), warn: jest.fn() });
@@ -83,18 +68,14 @@ describe("setupEvents", () => {
     noCleanup.cleanup();
   });
 
-  it("logs import, missing-client, and handler errors; ignores non-functions", async () => {
+  it("logs missing-client and handler errors", async () => {
     const log = logger();
     const imports = [
-      async () => ({ default: "not a function" }),
-      async () => {
-        throw new Error("import failed");
-      },
       async () => ({ default: jest.fn() }),
       async () => ({ default: jest.fn().mockRejectedValue(new Error("handler failed")) }),
     ];
     const fsLib = {
-      readdirSync: () => ["ignored.mjs", "broken.mjs", "missing-client.mjs", "bad-handler.mjs"],
+      readdirSync: () => ["missing-client.mjs", "bad-handler.mjs"],
     };
     const client = { on: jest.fn() };
     const result = await setupEvents({
@@ -105,10 +86,6 @@ describe("setupEvents", () => {
       importFn: () => imports.shift()(),
     });
     expect(result.loadedEvents).toEqual(["missing-client", "bad-handler"]);
-    expect(log.warn).toHaveBeenCalledWith(
-      "Event handler for ignored does not export a default function.",
-    );
-    expect(log.error).toHaveBeenCalledWith("Failed to load event broken:", expect.any(Error));
     expect(log.error).not.toHaveBeenCalledWith(
       "Failed to load event missing-client:",
       expect.any(Error),

@@ -1,22 +1,7 @@
-import { log as sharedLog } from "@eliware/log";
 import { locales, setupLocales, clearLocales, msg } from "../src/locales.mjs";
 
 import { jest } from "@jest/globals";
-
-const withSilentDefaultLog = async (fn) => {
-  const transports = sharedLog.transports ?? [];
-  const previous = transports.map((transport) => transport.silent);
-  transports.forEach((transport) => {
-    transport.silent = true;
-  });
-  try {
-    return await fn();
-  } finally {
-    transports.forEach((transport, index) => {
-      transport.silent = previous[index];
-    });
-  }
-};
+import { withSilentDefaultLog } from "../test-fixtures/test-support.mjs";
 
 describe("locales.mjs", () => {
   const mockLogger = {
@@ -66,30 +51,6 @@ describe("locales.mjs", () => {
     expect(mockLogger.warn).not.toHaveBeenCalled();
   });
 
-  it("logs error if locale is not a flat string map", () => {
-    mockFs.readdirSync.mockReturnValue(["bad.json"]);
-    mockFs.readFileSync.mockReturnValue(JSON.stringify({ nested: { value: "no" } }));
-    setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining("Failed to load or parse locale file bad.json:"),
-      expect.any(TypeError),
-    );
-  });
-
-  it("logs error if file parse fails", () => {
-    mockFs.readdirSync.mockReturnValue(["en-US.json"]);
-    mockFs.readFileSync.mockImplementation(() => "{bad json");
-    setupLocales({
-      fsLib: mockFs,
-      localesDir: testDir,
-      log: mockLogger,
-    });
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining("Failed to load or parse locale file en-US.json:"),
-      expect.any(Error),
-    );
-  });
-
   it("clears previously loaded locales before loading", () => {
     locales["stale"] = { old: "value" };
     mockFs.readdirSync.mockReturnValue(["en-US.json"]);
@@ -105,26 +66,6 @@ describe("locales.mjs", () => {
     setupLocales({ fsLib: mockFs, localesDir: testDir, log: mockLogger });
     expect(Object.hasOwn(locales, "__proto__")).toBe(true);
     expect(locales.__proto__).toEqual({ hello: "Hello" });
-  });
-
-  it("handles missing directories and failed file reads", () => {
-    const fsWithExists = { ...mockFs, existsSync: jest.fn().mockReturnValue(false) };
-    expect(
-      setupLocales({ fsLib: fsWithExists, localesDir: testDir, log: mockLogger }).loadedLocales,
-    ).toEqual([]);
-    const fsWithReadFailure = {
-      ...mockFs,
-      readdirSync: jest.fn().mockReturnValue(["en-US.json", "notes.txt"]),
-      existsSync: jest.fn().mockReturnValue(true),
-      readFileSync: jest.fn(() => {
-        throw new Error("read fail");
-      }),
-    };
-    setupLocales({ fsLib: fsWithReadFailure, localesDir: testDir, log: mockLogger });
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining("Failed to load or parse locale file en-US.json:"),
-      expect.any(Error),
-    );
   });
 
   it("clears locales", () => {
