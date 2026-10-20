@@ -1,13 +1,11 @@
-import { registerHandlers } from "@eliware/errors";
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
-import { registerSignals } from "@eliware/signals";
 import { Client } from "discord.js";
 import { createClientOptions } from "./client-options.mjs";
 import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
-import { createSignalCleanupHook } from "./signal-cleanup.mjs";
+import { registerOptionalHandlers } from "./handler-registration.mjs";
 
 export const createDiscord = async ({
   clientId,
@@ -36,24 +34,21 @@ export const createDiscord = async ({
 
   const client = new Client(createClientOptions(intents, partials, clientOptions));
   const appLog = log.child({ component: "discord", clientId: resolvedClientId });
-  let signalRegistration;
-  let processHandlerRegistration;
+  const registrations = {};
   let cleanupEvents = () => {};
-  const cleanup = () =>
-    shutdownDiscord(client, { cleanupEvents, signalRegistration, processHandlerRegistration });
+  const cleanup = () => shutdownDiscord(client, { cleanupEvents, ...registrations });
   client.shutdown = cleanup;
 
   try {
-    if (signals) {
-      signalRegistration = registerSignals({
-        ...signalOptions,
-        log: appLog,
-        exit: false,
-        shutdownHook: createSignalCleanupHook(cleanup, signalOptions.shutdownHook),
-      });
-    }
-    if (processHandlers)
-      processHandlerRegistration = registerHandlers({ ...processHandlerOptions, log: appLog });
+    registerOptionalHandlers({
+      signals,
+      signalOptions,
+      processHandlers,
+      processHandlerOptions,
+      log: appLog,
+      cleanup,
+      registrations,
+    });
     cleanupEvents = await initializeDiscord({
       client,
       clientId: resolvedClientId,

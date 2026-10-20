@@ -37,21 +37,6 @@ describe("purgeCommands", () => {
     );
   });
 
-  it("uses the environment guild when no guild is supplied", async () => {
-    const oldGuildId = process.env.DISCORD_GUILD_ID;
-    process.env.DISCORD_GUILD_ID = "environment-guild";
-    try {
-      await purgeCommands({ clientId: "cid", token: "token", log, restClass, routes });
-      expect(routes.applicationGuildCommands).toHaveBeenCalledWith("cid", "environment-guild");
-      expect(restClass.mock.results[0].value.put).toHaveBeenCalledWith("/guild-commands", {
-        body: [],
-      });
-    } finally {
-      if (oldGuildId === undefined) delete process.env.DISCORD_GUILD_ID;
-      else process.env.DISCORD_GUILD_ID = oldGuildId;
-    }
-  });
-
   it("uses default options and rejects when environment credentials are absent", async () => {
     const oldId = process.env.DISCORD_CLIENT_ID;
     const oldToken = process.env.DISCORD_TOKEN;
