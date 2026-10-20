@@ -7,7 +7,9 @@ const defaultSetupEventsFn = jest.fn(async () => ({ loadedEvents: [] }));
 const defaultRegisterCommandsFn = jest.fn(async () => true);
 
 jest.unstable_mockModule("../src/locales.mjs", () => ({ setupLocales: defaultSetupLocalesFn }));
-jest.unstable_mockModule("../src/commands.mjs", () => ({ setupCommands: defaultSetupCommandsFn }));
+jest.unstable_mockModule("../src/command/setup.mjs", () => ({
+  setupCommands: defaultSetupCommandsFn,
+}));
 jest.unstable_mockModule("../src/events.mjs", () => ({ setupEvents: defaultSetupEventsFn }));
 jest.unstable_mockModule("../src/command/registration.mjs", () => ({
   registerCommands: defaultRegisterCommandsFn,

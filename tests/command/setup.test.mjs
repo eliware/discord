@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 
-import { setupCommands } from "../src/commands.mjs";
+import { setupCommands } from "../../src/command/setup.mjs";
 import {
   mockLogger,
   mockFs,
@@ -8,8 +8,8 @@ import {
   testJson,
   testHandler,
   resetMocks,
-} from "../test-fixtures/commands/test-support.mjs";
-import { withSilentDefaultLog } from "../test-fixtures/test-support.mjs";
+} from "../../test-fixtures/commands/test-support.mjs";
+import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const setupMockCommands = (options = {}) =>
   setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger, ...options });

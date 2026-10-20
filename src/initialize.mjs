@@ -1,5 +1,5 @@
 import { setupEvents } from "./events.mjs";
-import { setupCommands } from "./commands.mjs";
+import { setupCommands } from "./command/setup.mjs";
 import { registerCommands } from "./command/registration.mjs";
 import { setupLocales } from "./locales.mjs";
 import { createEventCleanup } from "./event/cleanup-snapshot.mjs";

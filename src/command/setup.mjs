@@ -1,8 +1,8 @@
 import { log as logger } from "@eliware/log";
 import { existsSync, readFileSync, readdirSync } from "fs";
-import { loadCommandDefinitions } from "./command/definition-loader.mjs";
-import { loadCommandHandler } from "./command/handler-loader.mjs";
-import { discoverCommandFiles } from "./command/discovery.mjs";
+import { loadCommandDefinitions } from "./definition-loader.mjs";
+import { loadCommandHandler } from "./handler-loader.mjs";
+import { discoverCommandFiles } from "./discovery.mjs";
 
 export const setupCommands = async ({
   commandsDir,
