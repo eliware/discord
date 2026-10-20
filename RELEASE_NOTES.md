@@ -12,6 +12,7 @@
 ### Changed
 
 - The package version changes to 13.0.0. The Eliware runtime packages and `@eliware/test` change to version 13.
+- The package declares the Discord API request client as a direct dependency.
 - The default app root changes to the current working directory.
 - Apps keep command definitions and adapters in `commands/`. Apps keep event adapters in `events/`.
 - Apps keep command and event logic in focused modules under `src/`.
