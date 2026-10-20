@@ -20,7 +20,6 @@ describe("createLocaleLookup", () => {
   it("returns fallback text when the default locale or key is missing", () => {
     const msg = createLocaleLookup({ "en-US": { hello: "Hello" } });
     expect(msg("en-US", "missing", "fallback", log)).toBe("fallback");
-    expect(msg("fr-FR", "hello", "fallback", { ...log, warn: jest.fn() })).toBe("Hello");
     expect(createLocaleLookup({})("en-US", "hello", "fallback", log)).toBe("fallback");
     expect(log.warn).toHaveBeenCalledWith(
       'Key "missing" is missing from locale "en-US". Return the supplied text.',

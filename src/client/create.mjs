@@ -1,5 +1,5 @@
 import { Client } from "discord.js";
-import { createClientOptions } from "../client-options.mjs";
+import { createClientOptions } from "./options.mjs";
 
 export const createDiscordClient = ({
   intents,

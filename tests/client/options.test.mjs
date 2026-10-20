@@ -1,5 +1,5 @@
 import { GatewayIntentBits, Partials } from "discord.js";
-import { createClientOptions } from "../src/client-options.mjs";
+import { createClientOptions } from "../../src/client/options.mjs";
 
 describe("createClientOptions", () => {
   it("keeps intents off and uses default partials", () => {
