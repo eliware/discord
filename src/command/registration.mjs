@@ -1,6 +1,7 @@
 import { log as logger } from "@eliware/log";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
+import { reportRegistrationError } from "./registration-error.mjs";
 
 export const registerCommands = async ({
   commandDefs,
@@ -28,13 +29,7 @@ export const registerCommands = async ({
     log.debug(`Discord accepted ${commandDefs.length} commands.`);
     return true;
   } catch (error) {
-    const messages = {
-      401: "Discord rejected the request (401). Check the token and client ID.",
-      403: "Discord denied access (403). Check the bot permissions.",
-    };
-    const message = messages[error?.status];
-    if (message) log.error(`Discord did not accept the commands: ${message}`);
-    else log.error("Discord command request failed:", error?.message || error);
+    reportRegistrationError(log, error);
     return false;
   }
 };

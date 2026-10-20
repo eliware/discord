@@ -1,8 +1,7 @@
 import { log as logger } from "@eliware/log";
-import { readdirSync } from "fs";
 import { createEventListener } from "./event-listener.mjs";
 import { cleanupEventListeners } from "./event/listener-cleanup.mjs";
-import { loadEventHandler } from "./event/handler-loader.mjs";
+import { discoverEventHandlers } from "./event/discovery.mjs";
 import { createDefaultEventErrorHandler, createDefaultEventMessage } from "./event/defaults.mjs";
 
 /**
@@ -18,49 +17,46 @@ export const setupEvents = async ({
   commandHandlers = {},
   context = {},
   onHandlerError = createDefaultEventErrorHandler(log),
-  fsLib = { readdirSync },
-  importFn = (p) => import(p),
+  fsLib,
+  importFn,
 } = {}) => {
-  let files = [];
-  try {
-    files = fsLib.readdirSync(eventsDir).filter((f) => f.endsWith(".mjs"));
-  } catch {
-    log.warn(`Events directory missing or unreadable: ${eventsDir}`);
-    return { loadedEvents: [] };
-  }
   const loadedEvents = [];
   const listeners = [];
   const cleanup = () => cleanupEventListeners(client, listeners);
   try {
-    for (const file of files) {
-      const eventName = file.replace(/\.mjs$/, "");
-      try {
-        const handler = await loadEventHandler({ eventName, eventsDir, importFn, log });
-        if (!handler) continue;
-        if (!client) throw new Error("Discord client is undefined");
-        const listener = createEventListener({
-          client,
-          context,
-          log,
-          msg,
-          eventName,
-          commandHandlers,
-          handler,
-          onHandlerError,
-        });
-        listeners.push([eventName, listener]);
+    const discovered = await discoverEventHandlers({
+      eventsDir,
+      log,
+      fsLib,
+      importFn,
+      onHandler: async (eventName, handler) => {
         try {
-          client.on(eventName, listener);
-        } catch (error) {
-          error.eventListenerAttach = true;
-          throw error;
+          if (!client) throw new Error("Discord client is undefined");
+          const listener = createEventListener({
+            client,
+            context,
+            log,
+            msg,
+            eventName,
+            commandHandlers,
+            handler,
+            onHandlerError,
+          });
+          listeners.push([eventName, listener]);
+          try {
+            client.on(eventName, listener);
+          } catch (error) {
+            error.eventListenerAttach = true;
+            throw error;
+          }
+          loadedEvents.push(eventName);
+        } catch (err) {
+          if (err?.eventListenerAttach) throw err;
+          log.error(`Failed to load event ${eventName}:`, err);
         }
-        loadedEvents.push(eventName);
-      } catch (err) {
-        if (err?.eventListenerAttach) throw err;
-        log.error(`Failed to load event ${eventName}:`, err);
-      }
-    }
+      },
+    });
+    if (!discovered) return { loadedEvents: [] };
   } catch (error) {
     try {
       cleanup();

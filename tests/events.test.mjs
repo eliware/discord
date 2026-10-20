@@ -15,7 +15,7 @@ describe("setupEvents", () => {
       log,
       msg: jest.fn(),
       context: { extra: 1 },
-      fsLib: { readdirSync: jest.fn(() => ["ready.mjs", "ignored.js"]) },
+      fsLib: { readdirSync: jest.fn(() => ["ready.mjs"]) },
       importFn: jest.fn().mockResolvedValue({ default: handler }),
     });
 

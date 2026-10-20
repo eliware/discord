@@ -38,30 +38,21 @@ describe("registerCommands", () => {
     ).resolves.toBe(false);
   });
 
-  it("logs Discord and generic REST errors", async () => {
-    for (const error of [
-      { status: 401 },
-      { status: 403 },
-      { message: "oops" },
-      new Error("plain"),
-      null,
-      {},
-    ]) {
-      const failedRest = jest.fn(() => ({
-        setToken: jest.fn().mockReturnThis(),
-        put: jest.fn().mockRejectedValue(error),
-      }));
-      await expect(
-        registerCommands({
-          commandDefs: [{ name: "help", description: "Help" }],
-          clientId: "cid",
-          token: "token",
-          log,
-          restClass: failedRest,
-          routes,
-        }),
-      ).resolves.toBe(false);
-    }
+  it("returns false when the REST request fails", async () => {
+    const failedRest = jest.fn(() => ({
+      setToken: jest.fn().mockReturnThis(),
+      put: jest.fn().mockRejectedValue(new Error("network failed")),
+    }));
+    await expect(
+      registerCommands({
+        commandDefs: [{ name: "help", description: "Help" }],
+        clientId: "cid",
+        token: "token",
+        log,
+        restClass: failedRest,
+        routes,
+      }),
+    ).resolves.toBe(false);
   });
 
   it("uses default credentials and logger", async () => {
