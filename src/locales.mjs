@@ -1,7 +1,5 @@
-import { log as logger } from "@eliware/log";
-import { path } from "@eliware/path";
 import { createLocaleLookup } from "./locale/lookup.mjs";
-import { loadLocales } from "./locale/loader.mjs";
+import { setupLocaleStore } from "./locale/setup.mjs";
 import { clearLocales, locales } from "./locale/store.mjs";
 
 export { clearLocales, locales };
@@ -17,21 +15,4 @@ export const msg = createLocaleLookup(locales);
  * @param {Object} [options.fsLib] File methods for tests.
  * @returns {{ msg: typeof msg, loadedLocales: string[] }} Message function and locale names.
  */
-export const setupLocales = ({
-  localesDir = path(import.meta, "..", "locales"),
-  log = logger,
-  fsLib,
-} = {}) => {
-  clearLocales();
-  const loaded = loadLocales({ localesDir, log, fsLib });
-  for (const [name, locale] of loaded) {
-    Object.defineProperty(locales, name, {
-      value: locale,
-      configurable: true,
-      enumerable: true,
-      writable: true,
-    });
-  }
-  const loadedLocales = Object.keys(locales);
-  return { msg, loadedLocales };
-};
+export const setupLocales = (options = {}) => setupLocaleStore({ ...options, msg });

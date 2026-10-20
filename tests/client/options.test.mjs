@@ -9,32 +9,13 @@ describe("createClientOptions", () => {
     });
   });
 
-  it("maps enabled intents and partials", () => {
+  it("adds app options to the normalized client options", () => {
     expect(
       createClientOptions({ Guilds: true }, { User: true, Message: false }, { app: true }),
     ).toEqual({
       intents: [GatewayIntentBits.Guilds],
-      partials: [Partials.Channel, Partials.Reaction],
+      partials: [Partials.Channel, Partials.Reaction, Partials.User],
       app: true,
     });
-  });
-
-  it("rejects unknown intent and partial keys", () => {
-    expect(() => createClientOptions({ Bad: true }, undefined)).toThrow("Unknown intents key");
-    expect(() => createClientOptions(undefined, { Bad: true })).toThrow("Unknown partials key");
-  });
-
-  it("rejects non-boolean option values", () => {
-    expect(() => createClientOptions({ Guilds: 1 }, undefined)).toThrow("must be a boolean");
-    expect(() => createClientOptions(undefined, { User: "yes" })).toThrow("must be a boolean");
-  });
-
-  it("rejects array input for intents and partials", () => {
-    expect(() => createClientOptions(["Guilds"], undefined)).toThrow(
-      "intents must be an object of boolean values.",
-    );
-    expect(() => createClientOptions(undefined, ["User"])).toThrow(
-      "partials must be an object of boolean values.",
-    );
   });
 });

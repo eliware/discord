@@ -1,14 +1,10 @@
 import { path } from "@eliware/path";
-import { readdirSync } from "fs";
+import { readLocaleDirectory } from "./directory-reader.mjs";
 
 export const discoverLocaleFiles = ({
   localesDir = path(import.meta, "..", "..", "locales"),
-  fsLib = { readdirSync },
+  fsLib,
+  readDirectory = readLocaleDirectory,
 } = {}) => {
-  try {
-    if (fsLib.existsSync && !fsLib.existsSync(localesDir)) return [];
-    return fsLib.readdirSync(localesDir).filter((file) => file.endsWith(".json"));
-  } catch {
-    return [];
-  }
+  return readDirectory({ localesDir, fsLib }).filter((file) => file.endsWith(".json"));
 };
