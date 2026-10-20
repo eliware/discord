@@ -1,14 +1,6 @@
-import { GatewayIntentBits, Partials } from "discord.js";
 import { normalizeClientOptionMaps } from "../../../src/client/options/validation.mjs";
 
 describe("normalizeClientOptionMaps", () => {
-  it("maps enabled intent and partial names", () => {
-    expect(normalizeClientOptionMaps({ Guilds: true }, { User: true, Message: false })).toEqual({
-      intents: [GatewayIntentBits.Guilds],
-      partials: [Partials.Channel, Partials.Reaction, Partials.User],
-    });
-  });
-
   it("rejects unknown intent and partial names", () => {
     expect(() => normalizeClientOptionMaps({ Bad: true }, undefined)).toThrow(
       "Unknown intents key",

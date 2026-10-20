@@ -15,10 +15,12 @@ describe("loadLocaleDefinitions", () => {
   it("logs invalid JSON and invalid locale maps", () => {
     const files = [
       { file: "syntax.json", content: "{" },
+      { file: "null.json", content: "null" },
       { file: "nested.json", content: '{"nested":{"key":"value"}}' },
+      { file: "count.json", content: '{"count":1}' },
     ];
     expect(loadLocaleDefinitions({ files, log })).toEqual([]);
-    expect(log.error).toHaveBeenCalledTimes(2);
+    expect(log.error).toHaveBeenCalledTimes(4);
     expect(log.error).toHaveBeenCalledWith(
       "Failed to load or parse locale file nested.json:",
       expect.any(TypeError),

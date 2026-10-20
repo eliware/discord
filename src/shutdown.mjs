@@ -1,6 +1,5 @@
 import { clearLocales } from "./locales.mjs";
-import { removeSignalHandlers } from "./shutdown/signal-handler-removal.mjs";
-import { removeProcessHandlers } from "./shutdown/process-handler-removal.mjs";
+import { cleanupShutdownClient } from "./shutdown/client-cleanup.mjs";
 
 const shutdownPromises = new WeakMap();
 
@@ -37,9 +36,7 @@ const shutdownClient = async (
     try {
       clearLocalesFn();
     } finally {
-      removeSignalHandlers(signalRegistration);
-      removeProcessHandlers(processHandlerRegistration);
-      if (typeof client.destroy === "function") await client.destroy();
+      await cleanupShutdownClient(client, { signalRegistration, processHandlerRegistration });
     }
   }
 };
