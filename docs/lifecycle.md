@@ -13,13 +13,13 @@ Login errors include the source error as their cause.
 
 Call and await `client.shutdown()` to stop the client.
 The method removes event listeners, clears locale data, removes optional signal and process handlers, and destroys the client.
-The method runs only once for each client.
+Repeated calls share the same shutdown promise. Cleanup runs once, and every call waits for it to complete.
 
 ## Apps with other services
 
 When an app also owns a database, broker, voice connection, or server, give the app one shutdown
 coordinator. Use that coordinator for signal and manual shutdown. Stop app resources in the required
-order, then call and await `client.shutdown()`.
+order, then call and await `client?.shutdown()` when Discord is enabled.
 
 Do not call `client.destroy()` directly. That call skips the package cleanup.
 

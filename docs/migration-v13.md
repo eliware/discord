@@ -22,11 +22,6 @@ If the app passes `log`, make sure the logger has a `child()` method.
 Make sure `child()` returns a logger.
 The default `@eliware/log` logger meets this requirement.
 
-## Create a new client for each app lifecycle
-
-Create a new client for each call to `createDiscord`.
-Do not return the same client instance from a custom `ClientClass`.
-
 ## Move command logic
 
 Keep each command definition in `commands/<name>.json`.
@@ -55,6 +50,16 @@ Do not call `client.destroy()` directly because it skips package cleanup.
 When the app owns other services, use one app shutdown coordinator.
 Stop app services in their required order, then call and await `client.shutdown()`.
 Connect the same coordinator to signal and manual shutdown.
+
+When Discord is optional, pass `enabled: false` to `createDiscord` when the app disables Discord.
+The function returns `null` without loading Discord files or checking credentials. Check the result
+before you access the client or call its `shutdown()` method.
+
+Remove `setupLocalesFn`, `setupCommandsFn`, `setupEventsFn`, and `registerCommandsFn` options.
+Version 13 does not expose internal setup replacement hooks. Use the supported app folders.
+
+Remove imports of `shutdownDiscord`. Call and await `client.shutdown()`.
+Version 13 returns `null` when Discord is disabled, so check the result before you use the client.
 
 ## Keep app behavior in the app
 

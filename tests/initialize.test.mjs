@@ -134,7 +134,7 @@ it("removes new custom listeners and keeps existing listeners", async () => {
     client,
     listeners,
     remove: removeListener,
-  } = createListenerClient(jest, new Map([["ready", [existingListener]]]), "removeListener");
+  } = createListenerClient(jest, new Map([["ready", [existingListener]]]));
   const cleanup = await initializeDiscord({
     ...base,
     client,

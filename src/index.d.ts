@@ -72,26 +72,12 @@ export interface CreateDiscordOptions {
   >;
   context?: Record<string, unknown>;
   clientOptions?: ClientOptions;
-  ClientClass?: typeof Client;
-  setupEventsFn?: (options: unknown) => Promise<{ loadedEvents: string[]; cleanup?: () => void }>;
-  setupCommandsFn?: (options: unknown) => Promise<{
-    commandDefs?: CommandDefinition[];
-    commandHandlers: Record<string, CommandHandler>;
-  }>;
-  registerCommandsFn?: (options: unknown) => Promise<boolean>;
-  setupLocalesFn?: (options: unknown) => {
-    msg: EventHandlerContext["msg"];
-    loadedLocales: string[];
-  };
+  enabled?: boolean;
   signals?: boolean;
   signalOptions?: Record<string, unknown>;
   processHandlers?: boolean;
   processHandlerOptions?: Record<string, unknown>;
 }
 
-export function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient>;
-export function shutdownDiscord(
-  client: Client,
-  options?: { cleanupEvents?: () => void; clearLocalesFn?: () => void },
-): Promise<void>;
+export function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient | null>;
 export function splitMsg(message: string, maxLength?: number): string[];

@@ -3,9 +3,10 @@ description: Defines requirements for the @eliware/discord package.
 directives:
   - id: E-200.0
     dos:
-      - Export createDiscord, shutdownDiscord, purgeCommands, and splitMsg from the package root.
+      - Export createDiscord, purgeCommands, and splitMsg from the package root.
       - Keep app command, event, and locale files in the consuming app.
       - Disable gateway intents by default.
+      - Return null without side effects when enabled equals false.
       - Default rootDir to the process working directory.
       - Resolve app command, event, and locale folders from rootDir.
       - Keep app behavior outside the library.
@@ -13,3 +14,6 @@ directives:
       - Do not connect to Discord when the package module loads.
       - Do not delete commands automatically.
       - Do not require rootDir when the process starts from the app root.
+      - Do not expose internal setup hooks as public consumer APIs.
+      - Do not expose ClientClass as a public client replacement option.
+      - Do not export shutdownDiscord when client.shutdown provides the cleanup contract.

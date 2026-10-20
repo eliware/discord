@@ -20,23 +20,20 @@ export const createDiscord = async ({
   partials,
   context = {},
   clientOptions = {},
-  ClientClass = Client,
-  setupEventsFn,
-  setupCommandsFn,
-  registerCommandsFn,
-  setupLocalesFn,
+  enabled = true,
   signals = false,
   signalOptions = {},
   processHandlers = false,
   processHandlerOptions = {},
 } = {}) => {
+  if (enabled === false) return null;
   const resolvedClientId = clientId ?? process.env.DISCORD_CLIENT_ID;
   if (!resolvedClientId)
     throw new Error("DISCORD_CLIENT_ID is not set. Please check your .env file.");
   if (!token) throw new Error("DISCORD_TOKEN is not set. Please check your .env file.");
   validateContext(context);
 
-  const client = new ClientClass(createClientOptions(intents, partials, clientOptions));
+  const client = new Client(createClientOptions(intents, partials, clientOptions));
   const appLog = log.child({ component: "discord", clientId: resolvedClientId });
   let signalRegistration;
   let processHandlerRegistration;
@@ -68,10 +65,6 @@ export const createDiscord = async ({
       eventsDir,
       log: appLog,
       context,
-      setupEventsFn,
-      setupCommandsFn,
-      registerCommandsFn,
-      setupLocalesFn,
     });
     try {
       await client.login(token);

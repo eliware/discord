@@ -4,6 +4,8 @@ directives:
   - id: E-200.1
     dos:
       - Make client.shutdown idempotent.
+      - Return the same pending shutdown promise for repeated calls.
+      - Expose client.shutdown as the public client cleanup method.
       - Remove library event listeners and handlers during shutdown.
       - Remove loaded locale data during shutdown.
       - Call `client.destroy()` during shutdown.
@@ -15,3 +17,4 @@ directives:
     donts:
       - Do not require consumers to call `client.destroy()` directly.
       - Do not make the library own app services.
+      - Do not require consumers to import a separate client shutdown function.

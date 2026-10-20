@@ -4,6 +4,8 @@ directives:
   - id: E-200.2
     dos:
       - Keep createDiscord as the main client setup API.
+      - Return null without side effects when enabled equals false.
+      - Require credentials when enabled is true.
       - Keep commands, events, and locales in the consuming app.
       - Load command definitions from commands/<name>.json.
       - Load command adapters from commands/<name>.mjs.
@@ -16,3 +18,5 @@ directives:
     donts:
       - Do not put app business logic in the library.
       - Do not require a builder or configuration DSL.
+      - Do not expose setup replacement functions on createDiscord.
+      - Do not expose ClientClass as a public client replacement option.

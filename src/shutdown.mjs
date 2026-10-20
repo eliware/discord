@@ -1,8 +1,8 @@
 import { clearLocales } from "./locales.mjs";
 
-const shutdownClients = new WeakSet();
+const shutdownPromises = new WeakMap();
 
-export const shutdownDiscord = async (
+export const shutdownDiscord = (
   client,
   {
     cleanupEvents = () => {},
@@ -11,8 +11,24 @@ export const shutdownDiscord = async (
     processHandlerRegistration,
   } = {},
 ) => {
-  if (!client || shutdownClients.has(client)) return;
-  shutdownClients.add(client);
+  if (!client) return Promise.resolve();
+  if (shutdownPromises.has(client)) return shutdownPromises.get(client);
+  const shutdownPromise = Promise.resolve().then(() =>
+    shutdownClient(client, {
+      cleanupEvents,
+      clearLocalesFn,
+      signalRegistration,
+      processHandlerRegistration,
+    }),
+  );
+  shutdownPromises.set(client, shutdownPromise);
+  return shutdownPromise;
+};
+
+const shutdownClient = async (
+  client,
+  { cleanupEvents, clearLocalesFn, signalRegistration, processHandlerRegistration },
+) => {
   try {
     cleanupEvents();
   } finally {

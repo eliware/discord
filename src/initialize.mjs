@@ -7,7 +7,7 @@ const createEventCleanup = (client) => {
   if (
     typeof client?.eventNames !== "function" ||
     typeof client.listeners !== "function" ||
-    (typeof client.off !== "function" && typeof client.removeListener !== "function")
+    typeof client.off !== "function"
   ) {
     return () => {};
   }
@@ -16,8 +16,7 @@ const createEventCleanup = (client) => {
     for (const name of client.eventNames()) {
       for (const listener of client.listeners(name)) {
         if (existing.get(name)?.includes(listener)) continue;
-        if (typeof client.off === "function") client.off(name, listener);
-        else client.removeListener(name, listener);
+        client.off(name, listener);
       }
     }
   };

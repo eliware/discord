@@ -28,6 +28,20 @@ describe("shutdownDiscord", () => {
     await expect(shutdownDiscord({})).resolves.toBeUndefined();
   });
 
+  it("returns the same promise while shutdown is in progress", async () => {
+    let finishDestroy;
+    const client = {
+      destroy: jest.fn(() => new Promise((resolve) => (finishDestroy = resolve))),
+    };
+    const first = shutdownDiscord(client);
+    const second = shutdownDiscord(client);
+    expect(second).toBe(first);
+    await Promise.resolve();
+    expect(client.destroy).toHaveBeenCalledTimes(1);
+    finishDestroy();
+    await expect(Promise.all([first, second])).resolves.toEqual([undefined, undefined]);
+  });
+
   it("runs later cleanup when event cleanup throws", async () => {
     const clearLocalesFn = jest.fn();
     const client = { destroy: jest.fn().mockResolvedValue(undefined) };

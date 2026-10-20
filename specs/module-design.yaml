@@ -8,6 +8,7 @@ directives:
       - Limit each source module to 100 physical lines or less.
       - Limit each test module to 200 physical lines or less.
       - Pass replaceable dependencies when this improves isolated tests.
+      - Replace external clients in tests through test mocks.
       - Keep a coordinator responsible for its workflow.
       - Keep integration tests with their workflow coordinator.
       - Split modules when behavior or causes for change show distinct responsibilities.

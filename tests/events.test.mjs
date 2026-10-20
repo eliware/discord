@@ -62,8 +62,8 @@ describe("setupEvents", () => {
     expect(handler.mock.calls[0][0].commandHandlers).toBe(commandHandlers);
   });
 
-  it("uses removeListener when off is unavailable", async () => {
-    const client = { on: jest.fn(), removeListener: jest.fn() };
+  it("does not require cleanup methods on partial client mocks", async () => {
+    const client = { on: jest.fn() };
     const result = await setupEvents({
       client,
       eventsDir: "/events",
@@ -71,7 +71,7 @@ describe("setupEvents", () => {
       importFn: async () => ({ default: jest.fn() }),
     });
     result.cleanup();
-    expect(client.removeListener).toHaveBeenCalledWith("ready", expect.any(Function));
+    expect(client.on).toHaveBeenCalledWith("ready", expect.any(Function));
 
     const noCleanupClient = { on: jest.fn() };
     const noCleanup = await setupEvents({

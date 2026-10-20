@@ -35,9 +35,7 @@ export const setupEvents = async ({
     let cleanupError;
     for (const [eventName, listener] of listeners) {
       try {
-        if (typeof client.off === "function") client.off(eventName, listener);
-        else if (typeof client.removeListener === "function")
-          client.removeListener(eventName, listener);
+        client.off?.(eventName, listener);
       } catch (error) {
         cleanupError ??= error;
       }

@@ -34,6 +34,16 @@ Run the entry file from the app root. `createDiscord` reads app files from the c
 directory, then logs in to Discord.
 Read [configuration](configuration.md) to set options and folder paths.
 
+When Discord is optional, set `enabled` from the app configuration and check the result:
+
+```js
+const client = await createDiscord({ enabled: config.discordEnabled });
+if (client) console.log(`Connected as ${client.user.tag}`);
+```
+
+When `enabled` is false, the function returns `null` before it checks credentials or starts setup.
+When Discord is enabled, set valid credentials. Missing credentials cause startup to fail.
+
 ## Add app files
 
 Create `commands/`, `events/`, `locales/`, and `src/` folders in the app root.

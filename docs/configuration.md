@@ -3,6 +3,10 @@
 Pass an options object to `createDiscord`. Set `clientId` and `token`, or set their environment values.
 An option value overrides its environment value.
 
+Set `enabled: false` when Discord is optional for the app. The function returns `null` without
+checking credentials, creating a client, loading app files, or adding handlers. Discord is enabled
+by default. When Discord is enabled, the function requires both credentials.
+
 ## Credentials
 
 Set `DISCORD_CLIENT_ID` to the Discord application ID. Set `DISCORD_TOKEN` to the bot token.
@@ -46,7 +50,7 @@ Both options default to `false`. The package removes these handlers during clien
 Set `signalOptions` or `processHandlerOptions` to pass options to the matching Eliware package.
 The Discord package supplies its logger and controls signal exit behavior.
 
-## Custom setup functions
+## App setup
 
-Set `setupLocalesFn`, `setupCommandsFn`, `setupEventsFn`, or `registerCommandsFn` to replace a setup step.
-Use these options for tests or custom app loading. Read the [API guide](api.md) for result fields.
+Keep command, event, and locale files in the app. Use the documented folders and file formats.
+The package does not expose internal setup functions as consumer options.

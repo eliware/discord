@@ -39,7 +39,7 @@ Read [usage](docs/usage.md) to start a client.
 ## Usage
 
 Import `createDiscord` from `@eliware/discord` and pass an options object.
-Call `client.shutdown()` to stop the client.
+Call `client.shutdown()` to stop the client. When Discord is optional, set `enabled: false` and check the returned value before you use the client.
 Read the [docs index](docs/README.md), [usage](docs/usage.md), [configuration](docs/configuration.md), and [release notes](RELEASE_NOTES.md).
 
 ## Development
@@ -60,7 +60,7 @@ Keep bot tokens out of source control. Enable only the intents and permissions t
 
 ## API
 
-The package exports `createDiscord`, `shutdownDiscord`, `purgeCommands`, and `splitMsg`.
+The package exports `createDiscord`, `purgeCommands`, and `splitMsg`.
 Read the [API guide](docs/api.md).
 
 ## Packaging
