@@ -8,8 +8,10 @@ directives:
       - Expose client.shutdown as the public client cleanup method.
       - Remove library event listeners and handlers during shutdown.
       - Remove loaded locale data during shutdown.
+      - Keep locale data separate for each Discord client.
       - Call `client.destroy()` during shutdown.
       - Run available cleanup when setup or login fails.
+      - Preserve available process handler cleanup when process handler setup fails.
       - Keep signal and process handlers optional.
       - When an app owns other services, let the app manage their shutdown.
       - When an app handles shutdown, call client.shutdown from its coordinator.

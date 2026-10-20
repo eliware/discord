@@ -12,9 +12,17 @@ export const registerOptionalHandlers = ({
 }) => {
   if (signals)
     registrations.signalRegistration = registerSignalHandlers({ signalOptions, log, cleanup });
-  if (processHandlers)
-    registrations.processHandlerRegistration = registerProcessHandlers({
-      processHandlerOptions,
-      log,
-    });
+  if (processHandlers) {
+    try {
+      registrations.processHandlerRegistration = registerProcessHandlers({
+        processHandlerOptions,
+        log,
+      });
+    } catch (error) {
+      if (typeof error?.registration?.removeHandlers === "function") {
+        registrations.processHandlerRegistration = error.registration;
+      }
+      throw error;
+    }
+  }
 };

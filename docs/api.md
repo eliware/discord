@@ -42,7 +42,7 @@ Read [configuration](configuration.md) for valid intent and data object names.
 ## `client.shutdown()`
 
 Call and await this method to stop a client created by `createDiscord`.
-It removes event listeners, clears loaded locales, removes optional handlers, and destroys the client.
+It removes event listeners, clears that client's locales, removes optional handlers, and destroys the client.
 Repeated calls share one promise and run cleanup once.
 
 ## `purgeCommands(options)`

@@ -9,11 +9,12 @@ When `enabled` is `false`, it returns `null` before it checks credentials or loa
 
 If setup or login fails, the package calls its cleanup steps and rejects with an error.
 Login errors include the source error as their cause.
+If process handler setup fails after it creates a cleanup function, the package runs that function.
 
 ## Shutdown
 
 Call and await `client.shutdown()` to stop the client.
-The method removes event listeners, clears locale data, removes optional signal and process handlers, and destroys the client.
+The method removes event listeners, clears that client's locale data, removes optional signal and process handlers, and destroys the client.
 Repeated calls share the same shutdown promise. Cleanup runs once, and every call waits for it to complete.
 
 ## Apps with other services

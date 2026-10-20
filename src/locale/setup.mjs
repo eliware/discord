@@ -8,18 +8,19 @@ export const setupLocaleStore = ({
   log = logger,
   fsLib,
   msg,
+  locales: localeMaps = locales,
   loadLocalesFn = loadLocales,
   clearLocalesFn = clearLocales,
 } = {}) => {
   clearLocalesFn();
   const loaded = loadLocalesFn({ localesDir, log, fsLib });
   for (const [name, locale] of loaded) {
-    Object.defineProperty(locales, name, {
+    Object.defineProperty(localeMaps, name, {
       value: locale,
       configurable: true,
       enumerable: true,
       writable: true,
     });
   }
-  return { msg, loadedLocales: Object.keys(locales) };
+  return { msg, loadedLocales: Object.keys(localeMaps) };
 };

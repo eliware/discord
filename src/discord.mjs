@@ -1,6 +1,7 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
 import { createDiscordClient } from "./client/create.mjs";
+import { createClientLocaleStore } from "./client/locale-store.mjs";
 import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
@@ -32,11 +33,17 @@ export const createDiscord = async ({
   if (!token) throw new Error("DISCORD_TOKEN is not set. Please check your .env file.");
   validateContext(context);
 
+  const localeStore = createClientLocaleStore();
   const client = createDiscordClient({ intents, partials, clientOptions });
   const appLog = log.child({ component: "discord", clientId: resolvedClientId });
   const registrations = {};
   let cleanupEvents = () => {};
-  const cleanup = () => shutdownDiscord(client, { cleanupEvents, ...registrations });
+  const cleanup = () =>
+    shutdownDiscord(client, {
+      cleanupEvents,
+      clearLocalesFn: localeStore.clearLocales,
+      ...registrations,
+    });
   client.shutdown = cleanup;
 
   try {
@@ -58,6 +65,7 @@ export const createDiscord = async ({
       eventsDir,
       log: appLog,
       context,
+      setupLocalesFn: localeStore.setupLocales,
     });
     await loginDiscordClient(client, token);
     return client;
