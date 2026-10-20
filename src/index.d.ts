@@ -2,6 +2,7 @@ import type { Client, ClientOptions } from "discord.js";
 import type { Logger } from "@eliware/log";
 
 export type { PurgeCommandsOptions } from "./command/purge.d.ts";
+export { splitMsg } from "./split-msg.js";
 
 export type DiscordClient = Client & { shutdown: () => Promise<void> };
 export type CommandHandler = (
@@ -80,4 +81,3 @@ export interface CreateDiscordOptions {
 }
 
 export function createDiscord(options?: CreateDiscordOptions): Promise<DiscordClient | null>;
-export function splitMsg(message: string, maxLength?: number): string[];

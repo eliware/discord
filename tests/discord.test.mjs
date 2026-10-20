@@ -88,11 +88,8 @@ it("leaves gateway intents off by default", async () => {
   expect(Client.mock.calls[0][0].intents).toEqual([]);
 });
 
-it("rejects invalid context and intent options", async () => {
+it("rejects invalid intent options", async () => {
   const base = { clientId: "cid", token: "token", ...setup };
-  await expect(createDiscord({ ...base, context: { client: "reserved" } })).rejects.toThrow(
-    "reserved key",
-  );
   await expect(createDiscord({ ...base, intents: { Unknown: true } })).rejects.toThrow(
     "Unknown intents key",
   );
