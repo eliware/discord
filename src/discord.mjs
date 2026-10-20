@@ -7,6 +7,7 @@ import { createClientOptions } from "./client-options.mjs";
 import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
+import { createSignalCleanupHook } from "./signal-cleanup.mjs";
 
 export const createDiscord = async ({
   clientId,
@@ -48,10 +49,7 @@ export const createDiscord = async ({
         ...signalOptions,
         log: appLog,
         exit: false,
-        shutdownHook: async (signal) => {
-          await cleanup();
-          await signalOptions.shutdownHook?.(signal);
-        },
+        shutdownHook: createSignalCleanupHook(cleanup, signalOptions.shutdownHook),
       });
     }
     if (processHandlers)

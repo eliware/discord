@@ -3,6 +3,7 @@ import { readdirSync } from "fs";
 import { createEventListener } from "./event-listener.mjs";
 import { cleanupEventListeners } from "./event/listener-cleanup.mjs";
 import { loadEventHandler } from "./event/handler-loader.mjs";
+import { createDefaultEventErrorHandler, createDefaultEventMessage } from "./event/defaults.mjs";
 
 /**
  * Load event handlers from a folder and attach them to a client.
@@ -13,13 +14,10 @@ export const setupEvents = async ({
   client,
   eventsDir,
   log = logger,
-  msg = (locale, key, defaultMsg) => {
-    log.warn(`Localization function not provided. Returning default message for ${key}.`);
-    return defaultMsg || "An error occurred.";
-  },
+  msg = createDefaultEventMessage(log),
   commandHandlers = {},
   context = {},
-  onHandlerError = (error, eventName) => log.error(`Event handler failed for ${eventName}:`, error),
+  onHandlerError = createDefaultEventErrorHandler(log),
   fsLib = { readdirSync },
   importFn = (p) => import(p),
 } = {}) => {

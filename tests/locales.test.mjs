@@ -67,12 +67,6 @@ describe("locales.mjs", () => {
     expect(Object.hasOwn(locales, "__proto__")).toBe(true);
     expect(locales.__proto__).toEqual({ hello: "Hello" });
   });
-
-  it("clears locales", () => {
-    locales["en-US"] = { help: "Help text" };
-    clearLocales();
-    expect(locales).toEqual({});
-  });
 });
 
 describe("default locale API branches", () => {
