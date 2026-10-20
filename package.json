@@ -52,14 +52,14 @@
     "node": ">=26"
   },
   "dependencies": {
-    "@eliware/errors": "^12.0.0",
-    "@eliware/log": "^12.0.0",
-    "@eliware/path": "^12.0.0",
-    "@eliware/signals": "^12.0.0",
+    "@eliware/errors": "^13.0.0",
+    "@eliware/log": "^13.0.0",
+    "@eliware/path": "^13.0.0",
+    "@eliware/signals": "^13.0.0",
     "discord.js": "^14.27.0"
   },
   "devDependencies": {
-    "@eliware/test": "^12.0.0",
+    "@eliware/test": "^13.0.0",
     "typescript": "^7.0.2"
   },
   "jest": {
