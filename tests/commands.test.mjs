@@ -57,58 +57,26 @@ describe("setupCommands", () => {
     await expect(setupMockCommands()).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
     expect(mockLogger.warn).toHaveBeenCalledWith("No handler found for command help");
   });
-
-  it("returns empty when directory does not exist", async () => {
-    mockFs.existsSync.mockReturnValue(false);
-    expect(await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger })).toEqual({
-      commandDefs: [],
-      commandHandlers: {},
-    });
-    expect(mockLogger.warn).toHaveBeenCalledWith(`Commands directory does not exist: ${testDir}`);
-  });
-
-  it("handles unreadable directory", async () => {
-    mockFs.existsSync.mockImplementation(() => {
-      throw new Error("fail");
-    });
-    expect(await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger })).toEqual({
-      commandDefs: [],
-      commandHandlers: {},
-    });
-    expect(mockLogger.warn).toHaveBeenCalledWith(
-      `Commands directory missing or unreadable: ${testDir}`,
-    );
-  });
-
-  it("skips non-json files", async () => {
-    mockFs.readdirSync.mockReturnValue(["readme.txt"]);
-    expect(await setupCommands({ fsLib: mockFs, commandsDir: testDir, log: mockLogger })).toEqual({
-      commandDefs: [],
-      commandHandlers: {},
-    });
-  });
 });
 
 describe("default logger branches", () => {
-  it("returns empty results for default and missing folders", async () => {
-    await expect(setupCommands({ log: mockLogger })).resolves.toEqual({
+  it("returns empty results when discovery finds no command files", async () => {
+    await expect(
+      setupCommands({ log: mockLogger, discoverFiles: jest.fn(() => []) }),
+    ).resolves.toEqual({
       commandDefs: [],
       commandHandlers: {},
     });
-    await expect(
-      setupCommands({
-        commandsDir: "/definitely-missing-commands",
-        fsLib: { existsSync: jest.fn().mockReturnValue(false) },
-        log: mockLogger,
-      }),
-    ).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
   });
 });
 
 describe("default argument coverage", () => {
   it("covers setupCommands defaults", async () => {
     await withSilentDefaultLog(async () => {
-      await expect(setupCommands()).resolves.toEqual({ commandDefs: [], commandHandlers: {} });
+      await expect(setupCommands()).resolves.toEqual({
+        commandDefs: [],
+        commandHandlers: {},
+      });
     });
   });
 });

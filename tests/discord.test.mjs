@@ -98,19 +98,15 @@ it("rejects invalid context and intent options", async () => {
   );
 });
 
-it("wraps login errors and cleans up", async () => {
+it("cleans up the client after login fails", async () => {
   const destroy = jest.fn().mockResolvedValue(undefined);
   const cleanup = jest.fn();
   initialize.mockResolvedValueOnce(cleanup);
   const client = { login: jest.fn().mockRejectedValue(new Error("login failed")), destroy };
   Client.mockImplementation(() => client);
-  await expect(
-    createDiscord({
-      clientId: "cid",
-      token: "token",
-      ...setup,
-    }),
-  ).rejects.toThrow("Discord sign-in failed: login failed");
+  await expect(createDiscord({ clientId: "cid", token: "token", ...setup })).rejects.toThrow(
+    "Discord sign-in failed: login failed",
+  );
   expect(cleanup).toHaveBeenCalledTimes(1);
   expect(destroy).toHaveBeenCalledTimes(1);
 });

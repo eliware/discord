@@ -5,6 +5,7 @@ import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
 import { registerOptionalHandlers } from "./handler-registration.mjs";
+import { loginDiscordClient } from "./lifecycle.mjs";
 
 export const createDiscord = async ({
   clientId,
@@ -58,11 +59,7 @@ export const createDiscord = async ({
       log: appLog,
       context,
     });
-    try {
-      await client.login(token);
-    } catch (error) {
-      throw new Error(`Discord sign-in failed: ${error.message}`, { cause: error });
-    }
+    await loginDiscordClient(client, token);
     return client;
   } catch (error) {
     await cleanup();

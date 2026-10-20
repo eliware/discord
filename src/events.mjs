@@ -1,8 +1,8 @@
 import { log as logger } from "@eliware/log";
-import { createEventListener } from "./event-listener.mjs";
 import { cleanupEventListeners } from "./event/listener-cleanup.mjs";
 import { discoverEventHandlers } from "./event/discovery.mjs";
 import { createDefaultEventErrorHandler, createDefaultEventMessage } from "./event/defaults.mjs";
+import { attachEventHandler } from "./event/attachment.mjs";
 
 /**
  * Load event handlers from a folder and attach them to a client.
@@ -29,32 +29,19 @@ export const setupEvents = async ({
       log,
       fsLib,
       importFn,
-      onHandler: async (eventName, handler) => {
-        try {
-          if (!client) throw new Error("Discord client is undefined");
-          const listener = createEventListener({
-            client,
-            context,
-            log,
-            msg,
-            eventName,
-            commandHandlers,
-            handler,
-            onHandlerError,
-          });
-          listeners.push([eventName, listener]);
-          try {
-            client.on(eventName, listener);
-          } catch (error) {
-            error.eventListenerAttach = true;
-            throw error;
-          }
-          loadedEvents.push(eventName);
-        } catch (err) {
-          if (err?.eventListenerAttach) throw err;
-          log.error(`Failed to load event ${eventName}:`, err);
-        }
-      },
+      onHandler: (eventName, handler) =>
+        attachEventHandler({
+          client,
+          context,
+          log,
+          msg,
+          eventName,
+          commandHandlers,
+          handler,
+          onHandlerError,
+          listeners,
+          loadedEvents,
+        }),
     });
     if (!discovered) return { loadedEvents: [] };
   } catch (error) {

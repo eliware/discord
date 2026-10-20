@@ -85,27 +85,34 @@ it.each([
   await expect(initializeDiscord({ ...base, ...override })).rejects.toThrow(message);
 });
 
-it("cleans event handlers when command registration fails", async () => {
-  const cleanup = jest.fn();
-  await expect(
-    initializeDiscord({
-      ...base,
+it.each([
+  [
+    "command registration fails",
+    {
       setupCommandsFn: async () => ({ commandDefs: [{ name: "help" }], commandHandlers: {} }),
-      setupEventsFn: async () => ({ loadedEvents: [], cleanup }),
+      setupEventsFn: async () => ({ loadedEvents: [], cleanup: jest.fn() }),
       registerCommandsFn: async () => false,
-    }),
-  ).rejects.toThrow("Discord did not accept the commands");
-  expect(cleanup).toHaveBeenCalledTimes(1);
-});
-
-it("cleans event handlers when the setup result is invalid", async () => {
+    },
+    "Discord did not accept the commands",
+  ],
+  [
+    "the event setup result is invalid",
+    { setupEventsFn: async () => ({ loadedEvents: "bad", cleanup: jest.fn() }) },
+    "setupEventsFn must return",
+  ],
+])("cleans event handlers when %s", async (_case, override, message) => {
   const cleanup = jest.fn();
+  const setupEventsFn = override.setupEventsFn ?? base.setupEventsFn;
   await expect(
     initializeDiscord({
       ...base,
-      setupEventsFn: async () => ({ loadedEvents: "bad", cleanup }),
+      ...override,
+      setupEventsFn: async (...args) => {
+        const result = await setupEventsFn(...args);
+        return { ...result, cleanup };
+      },
     }),
-  ).rejects.toThrow("setupEventsFn must return");
+  ).rejects.toThrow(message);
   expect(cleanup).toHaveBeenCalledTimes(1);
 });
 
