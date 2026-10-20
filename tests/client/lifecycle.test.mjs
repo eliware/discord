@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import { loginDiscordClient } from "../src/lifecycle.mjs";
+import { loginDiscordClient } from "../../src/client/lifecycle.mjs";
 
 it("returns the successful Discord login result", async () => {
   const client = { login: jest.fn().mockResolvedValue("connected") };
