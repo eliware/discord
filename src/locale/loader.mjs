@@ -1,5 +1,7 @@
 import { log as logger } from "@eliware/log";
-import { readLocaleFiles } from "./files.mjs";
+import { path } from "@eliware/path";
+import { discoverLocaleFiles } from "./discovery.mjs";
+import { readLocaleFiles } from "./file-reader.mjs";
 import { loadLocaleDefinitions } from "./definition-loader.mjs";
 
 /**
@@ -8,10 +10,14 @@ import { loadLocaleDefinitions } from "./definition-loader.mjs";
  * @returns {Array<[string, Object.<string, string>]>} Valid locale names and maps.
  */
 export const loadLocales = ({
-  localesDir,
+  localesDir = path(import.meta, "..", "..", "locales"),
   log = logger,
   fsLib,
+  discoverFiles = discoverLocaleFiles,
   readFiles = readLocaleFiles,
 } = {}) => {
-  return loadLocaleDefinitions({ files: readFiles({ localesDir, fsLib, log }), log });
+  return loadLocaleDefinitions({
+    files: readFiles({ files: discoverFiles({ localesDir, fsLib }), localesDir, fsLib, log }),
+    log,
+  });
 };

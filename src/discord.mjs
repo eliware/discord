@@ -1,7 +1,6 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
-import { Client } from "discord.js";
-import { createClientOptions } from "./client-options.mjs";
+import { createDiscordClient } from "./client/create.mjs";
 import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
@@ -32,7 +31,7 @@ export const createDiscord = async ({
   if (!token) throw new Error("DISCORD_TOKEN is not set. Please check your .env file.");
   validateContext(context);
 
-  const client = new Client(createClientOptions(intents, partials, clientOptions));
+  const client = createDiscordClient({ intents, partials, clientOptions });
   const appLog = log.child({ component: "discord", clientId: resolvedClientId });
   const registrations = {};
   let cleanupEvents = () => {};
