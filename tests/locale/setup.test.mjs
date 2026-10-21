@@ -4,7 +4,7 @@ const loadLocales = jest.fn(() => []);
 const locales = {};
 const clearLocales = jest.fn(() => Object.keys(locales).forEach((key) => delete locales[key]));
 jest.unstable_mockModule("../../src/locale/loader.mjs", () => ({ loadLocales }));
-jest.unstable_mockModule("../../src/locale/store.mjs", () => ({ clearLocales, locales }));
+jest.unstable_mockModule("../../src/locale/api.mjs", () => ({ clearLocales, locales }));
 const { setupLocaleStore } = await import("../../src/locale/setup.mjs");
 
 describe("setupLocaleStore", () => {

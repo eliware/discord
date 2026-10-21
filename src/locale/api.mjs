@@ -1,7 +1,5 @@
-import { createLocaleLookup } from "./lookup.mjs";
-import { clearLocales, locales } from "./store.mjs";
+import { createLocaleStore } from "./store.mjs";
 
-export { clearLocales, locales };
-
-/** Return a message for a locale and key. */
-export const msg = createLocaleLookup(locales);
+const sharedLocaleStore = createLocaleStore();
+export const locales = sharedLocaleStore.locales;
+export const clearLocales = sharedLocaleStore.clearLocales;

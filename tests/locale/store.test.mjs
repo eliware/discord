@@ -1,4 +1,6 @@
-import { clearLocales, locales } from "../../src/locale/store.mjs";
+import { createLocaleStore } from "../../src/locale/store.mjs";
+
+const { clearLocales, locales } = createLocaleStore();
 
 describe("locale store", () => {
   afterEach(() => clearLocales());

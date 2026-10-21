@@ -1,6 +1,5 @@
-import { cleanupShutdownClient } from "./shutdown/client-cleanup.mjs";
-import { cleanupShutdownLocales } from "./shutdown/locale-cleanup.mjs";
 import { getShutdownPromise } from "./shutdown/promise.mjs";
+import { cleanupDiscordState } from "./shutdown/cleanup.mjs";
 
 export const shutdownDiscord = (
   client,
@@ -9,7 +8,7 @@ export const shutdownDiscord = (
   if (!client) return Promise.resolve();
   return getShutdownPromise(client, () =>
     Promise.resolve().then(() =>
-      shutdownClient(client, {
+      cleanupDiscordState(client, {
         cleanupEvents,
         clearLocalesFn,
         signalRegistration,
@@ -17,19 +16,4 @@ export const shutdownDiscord = (
       }),
     ),
   );
-};
-
-const shutdownClient = async (
-  client,
-  { cleanupEvents, clearLocalesFn, signalRegistration, processHandlerRegistration },
-) => {
-  try {
-    cleanupEvents();
-  } finally {
-    try {
-      cleanupShutdownLocales(clearLocalesFn);
-    } finally {
-      await cleanupShutdownClient(client, { signalRegistration, processHandlerRegistration });
-    }
-  }
 };

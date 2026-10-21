@@ -6,7 +6,7 @@ import { initializeDiscord } from "./initialize.mjs";
 import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
 import { registerOptionalHandlers } from "./handler-registration.mjs";
-import { loginDiscordClient } from "./client/lifecycle.mjs";
+import { loginDiscordClient } from "./client/login.mjs";
 import { createClientLogger } from "./client/logger.mjs";
 
 export const createDiscord = async ({

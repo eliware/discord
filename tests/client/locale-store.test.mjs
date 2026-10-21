@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import { createClientLocaleStore } from "../../src/client/locale-store.mjs";
-import { clearLocales, locales } from "../../src/locale/store.mjs";
+import { clearLocales, locales } from "../../src/locale/api.mjs";
 
 describe("createClientLocaleStore", () => {
   afterEach(() => clearLocales());

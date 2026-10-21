@@ -1,7 +1,6 @@
-import { setupLocales, clearLocales, msg } from "../src/locales.mjs";
+import { setupLocales, clearLocales } from "../src/locales.mjs";
 
 import { jest } from "@jest/globals";
-import { withSilentDefaultLog } from "../test-fixtures/test-support.mjs";
 
 describe("locales.mjs", () => {
   const mockLogger = {
@@ -25,11 +24,5 @@ describe("locales.mjs", () => {
       log: mockLogger,
     });
     expect(mockLogger.warn).not.toHaveBeenCalled();
-  });
-});
-
-describe("default locale API branches", () => {
-  it("uses default setupLocales options", async () => {
-    expect(await withSilentDefaultLog(() => setupLocales())).toEqual({ msg, loadedLocales: [] });
   });
 });

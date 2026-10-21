@@ -1,8 +1,8 @@
 import { setupLocaleStore } from "./locale/setup.mjs";
-import { clearLocales, locales, msg } from "./locale/api.mjs";
+import { msg } from "./locale/lookup-api.mjs";
 
-export { clearLocales, locales };
-export { msg };
+export { clearLocales, locales } from "./locale/api.mjs";
+export { msg } from "./locale/lookup-api.mjs";
 
 /**
  * Load locale JSON files from a folder.
