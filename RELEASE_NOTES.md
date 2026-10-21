@@ -5,7 +5,8 @@
 ### Added
 
 - The package adds focused modules for logger creation, client options, command collection, command registration, event context, login, shutdown, and locale error reporting.
-- The documentation explains Discord OAuth scopes, app folder layout, and migration steps.
+- The guides list credentials, Discord OAuth scopes, app folder layout, and migration steps.
+- The basic example guide gives test bot setup steps, PowerShell and Bash commands, and expected login output.
 
 ### Changed
 
@@ -15,6 +16,7 @@
 - Event setup returns a cleanup function if event discovery fails.
 - The package removes the redundant locale loader and updates tests for the focused modules.
 - The README, contributor instructions, and documentation index remove content that the repository conventions do not require.
+- The API, configuration, and troubleshooting guides state that a guild ID selects the guild route for `purgeCommands`. Without a guild ID, `purgeCommands` uses the global route.
 
 ## 13.0.0 — 2026-10-19
 
