@@ -2,13 +2,19 @@
 
 ## Project
 
+See README.md for the package purpose and public links.
+
 ## Scope and boundaries
 
-Keep requirements in their authoritative specifications.
+Follow the repository specifications.
 
 ## Layout
 
+Use README.md and specs/README.md to find repository content.
+
 ## Development
+
+Keep source and test modules focused.
 
 ## Validation
 
@@ -21,7 +27,11 @@ Run `npm run format:check` to check formatting.
 
 ## Security
 
+Keep credentials and private data out of Git.
+
 ## Changes
+
+Update the nearest index when you add a document.
 
 ## Library
 
@@ -32,3 +42,5 @@ Prevent repeated full-suite runs during development.
 Run the full `npm test` suite for final validation before a commit, milestone, or release.
 
 ## npm publication
+
+Run `npm run pack` to check package contents. Follow approved release steps.

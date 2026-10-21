@@ -31,21 +31,15 @@ Use Node.js 26 or later and native ESM.
 
 ## Setup
 
-Install the package with `npm install @eliware/discord`.
-Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
-The package does not read `.env` files.
-Read [usage](docs/usage.md) to start a client.
+Run `npm install @eliware/discord`. Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the app environment.
 
 ## Usage
 
-Import `createDiscord` from `@eliware/discord` and pass an options object.
-Call and await `client.shutdown()` to stop a client.
-When the app does not use Discord, set `enabled: false` and check the returned value.
-Read the [docs index](docs/README.md) for user guides and the [release notes](RELEASE_NOTES.md) for changes.
+Import `createDiscord` and call `client.shutdown()` when the app stops. Read [the user guides](docs/README.md) and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
-Read [specifications](specs/README.md) before you change source or tests.
+Read [the specifications](specs/README.md) before you change repository files.
 
 ## Testing
 
@@ -53,29 +47,25 @@ Run `npm test` for aggregate validation.
 
 ## Troubleshooting
 
-Read the [troubleshooting guide](docs/troubleshooting.md) for common problems.
+Read [the troubleshooting guide](docs/troubleshooting.md) for common problems.
 
 ## Security
 
-Keep bot tokens out of source control.
-Enable only the intents and permissions that the app needs.
+Keep bot tokens out of source control. Enable only the intents and permissions that the app needs.
 
 ## API
 
-The package exports `createDiscord`, `purgeCommands`, and `splitMsg`.
-Read the [API guide](docs/api.md).
+The package exports `createDiscord`, `purgeCommands`, and `splitMsg`. Read [the API guide](docs/api.md).
 
 ## Packaging
 
-The `files` field in `package.json` includes `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, `RELEASE_NOTES.md`, `examples/`, `specs/`, and `.env.example`.
-Use numeric `MAJOR.MINOR.PATCH` versions and matching `v<version>` tags.
-The npm workflow validates tagged releases and checks that each tag matches `package.json.version` before it publishes.
+The package includes `src/`, `docs/`, `README.md`, `AGENTS.md`, `LICENSE`, `RELEASE_NOTES.md`, `examples/`, `specs/`, and `.env.example`.
+Use numeric `MAJOR.MINOR.PATCH` versions and matching `v<version>` tags. The npm workflow runs `npm test` before publication and checks that the tag matches the package version.
 Run `npm run pack` to check package contents.
-Follow the approved Eliware Operations release process.
 
 ## Examples
 
-Read the [example index](examples/README.md).
+Read [the example index](examples/README.md).
 
 ## Support
 
