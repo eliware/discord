@@ -1,6 +1,7 @@
 import { jest } from "@jest/globals";
 import { registerCommands } from "../../src/command/registration.mjs";
 import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
+import { withEnvironment } from "../../test-fixtures/environment.mjs";
 
 const log = { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() };
 const routes = {
@@ -100,34 +101,16 @@ describe("registerCommands", () => {
   });
 
   it("uses default credentials and logger", async () => {
-    const oldId = process.env.DISCORD_CLIENT_ID;
-    const oldToken = process.env.DISCORD_TOKEN;
-    process.env.DISCORD_CLIENT_ID = "cid";
-    process.env.DISCORD_TOKEN = "token";
-    try {
+    await withEnvironment({ DISCORD_CLIENT_ID: "cid", DISCORD_TOKEN: "token" }, async () => {
       await withSilentDefaultLog(() => registerCommands({ commandDefs: [], restClass, routes }));
-    } finally {
-      if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-      else process.env.DISCORD_CLIENT_ID = oldId;
-      if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-      else process.env.DISCORD_TOKEN = oldToken;
-    }
+    });
   });
 
   it("returns false when called without options or environment credentials", async () => {
-    const oldId = process.env.DISCORD_CLIENT_ID;
-    const oldToken = process.env.DISCORD_TOKEN;
-    delete process.env.DISCORD_CLIENT_ID;
-    delete process.env.DISCORD_TOKEN;
-    try {
+    await withEnvironment({ DISCORD_CLIENT_ID: undefined, DISCORD_TOKEN: undefined }, async () => {
       await withSilentDefaultLog(async () => {
         await expect(registerCommands()).resolves.toBe(false);
       });
-    } finally {
-      if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-      else process.env.DISCORD_CLIENT_ID = oldId;
-      if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-      else process.env.DISCORD_TOKEN = oldToken;
-    }
+    });
   });
 });

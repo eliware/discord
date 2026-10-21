@@ -1,4 +1,5 @@
 import { resolvePurgeConfig } from "../../../src/command/purge/environment.mjs";
+import { withEnvironment } from "../../../test-fixtures/environment.mjs";
 
 it("uses the environment guild when no guild is supplied", () => {
   expect(resolvePurgeConfig({}, { DISCORD_GUILD_ID: "environment-guild" }).guildId).toBe(
@@ -6,27 +7,21 @@ it("uses the environment guild when no guild is supplied", () => {
   );
 });
 
-it("uses process credentials by default", () => {
-  const oldId = process.env.DISCORD_CLIENT_ID;
-  const oldToken = process.env.DISCORD_TOKEN;
-  const oldGuildId = process.env.DISCORD_GUILD_ID;
-  process.env.DISCORD_CLIENT_ID = "process-client";
-  process.env.DISCORD_TOKEN = "process-token";
-  process.env.DISCORD_GUILD_ID = "process-guild";
-  try {
-    expect(resolvePurgeConfig()).toEqual({
-      clientId: "process-client",
-      token: "process-token",
-      guildId: "process-guild",
-    });
-  } finally {
-    if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-    else process.env.DISCORD_CLIENT_ID = oldId;
-    if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-    else process.env.DISCORD_TOKEN = oldToken;
-    if (oldGuildId === undefined) delete process.env.DISCORD_GUILD_ID;
-    else process.env.DISCORD_GUILD_ID = oldGuildId;
-  }
+it("uses process credentials by default", async () => {
+  await withEnvironment(
+    {
+      DISCORD_CLIENT_ID: "process-client",
+      DISCORD_TOKEN: "process-token",
+      DISCORD_GUILD_ID: "process-guild",
+    },
+    async () => {
+      expect(resolvePurgeConfig()).toEqual({
+        clientId: "process-client",
+        token: "process-token",
+        guildId: "process-guild",
+      });
+    },
+  );
 });
 
 it("uses a null guild when the environment has no guild", () => {

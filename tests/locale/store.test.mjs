@@ -1,4 +1,4 @@
-import { createLocaleStore } from "../../src/locale/store.mjs";
+import { createLocaleStore, storeLocaleDefinitions } from "../../src/locale/store.mjs";
 
 const { clearLocales, locales } = createLocaleStore();
 
@@ -10,6 +10,11 @@ describe("locale store", () => {
     locales["es-ES"] = { hello: "Hola" };
     clearLocales();
     expect(locales).toEqual({});
+  });
+
+  it("stores loaded locale definitions", () => {
+    storeLocaleDefinitions({ locales, loaded: [["en-US", { hello: "Hello" }]] });
+    expect(locales).toEqual({ "en-US": { hello: "Hello" } });
   });
 
   it("stores a locale named __proto__ as an own property", () => {

@@ -3,6 +3,7 @@ import { path } from "@eliware/path";
 import { discoverLocaleFiles } from "./discovery.mjs";
 import { readLocaleFiles } from "./file-reader.mjs";
 import { loadLocaleDefinitions } from "./definition-loader.mjs";
+import { storeLocaleDefinitions } from "./store.mjs";
 
 export const setupLocaleStore = ({
   localesDir = path(import.meta, "..", "..", "locales"),
@@ -13,19 +14,13 @@ export const setupLocaleStore = ({
   discoverFiles = discoverLocaleFiles,
   readFiles = readLocaleFiles,
   loadDefinitions = loadLocaleDefinitions,
+  storeDefinitions = storeLocaleDefinitions,
   clearLocalesFn,
 }) => {
   clearLocalesFn();
   const files = discoverFiles({ localesDir, fsLib });
   const contents = readFiles({ files, localesDir, fsLib, log });
   const loaded = loadDefinitions({ files: contents, log });
-  for (const [name, locale] of loaded) {
-    Object.defineProperty(localeMaps, name, {
-      value: locale,
-      configurable: true,
-      enumerable: true,
-      writable: true,
-    });
-  }
+  storeDefinitions({ locales: localeMaps, loaded });
   return { msg, loadedLocales: Object.keys(localeMaps) };
 };

@@ -4,3 +4,14 @@ export const createLocaleStore = () => {
   const clearLocales = () => Object.keys(locales).forEach((key) => delete locales[key]);
   return { locales, clearLocales };
 };
+
+export const storeLocaleDefinitions = ({ locales, loaded }) => {
+  for (const [name, locale] of loaded) {
+    Object.defineProperty(locales, name, {
+      value: locale,
+      configurable: true,
+      enumerable: true,
+      writable: true,
+    });
+  }
+};

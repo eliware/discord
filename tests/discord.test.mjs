@@ -1,6 +1,7 @@
 import { jest } from "@jest/globals";
 import { path } from "@eliware/path";
 import { log, setup } from "../test-fixtures/discord-setup.mjs";
+import { withEnvironment } from "../test-fixtures/environment.mjs";
 
 jest.unstable_mockModule("discord.js", () => ({
   Client: jest.fn(),
@@ -23,19 +24,10 @@ afterEach(() => {
 });
 
 it("requires both client identifiers", async () => {
-  const oldId = process.env.DISCORD_CLIENT_ID;
-  const oldToken = process.env.DISCORD_TOKEN;
-  delete process.env.DISCORD_CLIENT_ID;
-  delete process.env.DISCORD_TOKEN;
-  try {
+  await withEnvironment({ DISCORD_CLIENT_ID: undefined, DISCORD_TOKEN: undefined }, async () => {
     await expect(createDiscord()).rejects.toThrow("DISCORD_CLIENT_ID is not set");
     await expect(createDiscord({ clientId: "cid" })).rejects.toThrow("DISCORD_TOKEN is not set");
-  } finally {
-    if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-    else process.env.DISCORD_CLIENT_ID = oldId;
-    if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-    else process.env.DISCORD_TOKEN = oldToken;
-  }
+  });
 });
 
 it("sets up the client and logs in", async () => {
@@ -65,20 +57,11 @@ it("sets up the client and logs in", async () => {
 });
 
 it("returns null when Discord is disabled without checking credentials", async () => {
-  const oldId = process.env.DISCORD_CLIENT_ID;
-  const oldToken = process.env.DISCORD_TOKEN;
-  delete process.env.DISCORD_CLIENT_ID;
-  delete process.env.DISCORD_TOKEN;
-  try {
+  await withEnvironment({ DISCORD_CLIENT_ID: undefined, DISCORD_TOKEN: undefined }, async () => {
     await expect(createDiscord({ enabled: false })).resolves.toBeNull();
     expect(Client).not.toHaveBeenCalled();
     expect(initialize).not.toHaveBeenCalled();
-  } finally {
-    if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
-    else process.env.DISCORD_CLIENT_ID = oldId;
-    if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
-    else process.env.DISCORD_TOKEN = oldToken;
-  }
+  });
 });
 
 it("leaves gateway intents off by default", async () => {

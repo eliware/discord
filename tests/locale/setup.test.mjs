@@ -1,8 +1,10 @@
 import { jest } from "@jest/globals";
+import { storeLocaleDefinitions } from "../../src/locale/store.mjs";
 
 const discoverFiles = jest.fn(() => []);
 const readFiles = jest.fn(() => []);
 const loadDefinitions = jest.fn(() => []);
+const storeDefinitions = jest.fn(storeLocaleDefinitions);
 jest.unstable_mockModule("../../src/locale/discovery.mjs", () => ({
   discoverLocaleFiles: discoverFiles,
 }));
@@ -20,6 +22,7 @@ describe("setupLocaleStore", () => {
     discoverFiles.mockReset().mockReturnValue([]);
     readFiles.mockReset().mockReturnValue([]);
     loadDefinitions.mockReset().mockReturnValue([]);
+    storeDefinitions.mockReset().mockImplementation(storeLocaleDefinitions);
     clearLocales();
   });
 
@@ -38,6 +41,7 @@ describe("setupLocaleStore", () => {
       msg,
       locales,
       clearLocalesFn: clearLocales,
+      storeDefinitions,
     });
 
     expect(locales).not.toHaveProperty("stale");
@@ -52,12 +56,16 @@ describe("setupLocaleStore", () => {
       files: [{ file: "en-US.json", content: '{"hello":"Hello"}' }],
       log,
     });
+    expect(storeDefinitions).toHaveBeenCalledWith({
+      locales,
+      loaded: [["en-US", { hello: "Hello" }]],
+    });
     expect(locales).toEqual({ "en-US": { hello: "Hello" } });
     expect(result).toEqual({ msg, loadedLocales: ["en-US"] });
   });
 
   it("loads defaults into the shared locale store", () => {
-    expect(setupLocaleStore({ locales, clearLocalesFn: clearLocales })).toEqual({
+    expect(setupLocaleStore({ locales, clearLocalesFn: clearLocales, storeDefinitions })).toEqual({
       msg: undefined,
       loadedLocales: [],
     });
@@ -72,6 +80,7 @@ describe("setupLocaleStore", () => {
       log: expect.any(Object),
     });
     expect(loadDefinitions).toHaveBeenCalledWith({ files: [], log: expect.any(Object) });
+    expect(storeDefinitions).toHaveBeenCalledWith({ locales, loaded: [] });
     expect(locales).toEqual({});
   });
 });
