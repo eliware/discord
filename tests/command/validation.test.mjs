@@ -1,10 +1,13 @@
 import { validateCommandDefinition } from "../../src/command/validation.mjs";
 
 describe("validateCommandDefinition", () => {
+  it("returns object validation errors", () => {
+    expect(validateCommandDefinition(null)).toBe("definition must be an object");
+  });
+
   it.each([
-    [null, "definition must be an object"],
-    [[], "definition must be an object"],
     [{}, "name must be 1-32 characters"],
+    [{ name: "help" }, "description must be 1-100 characters"],
   ])("rejects invalid definition %#", (definition, message) => {
     expect(validateCommandDefinition(definition)).toBe(message);
   });

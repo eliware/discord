@@ -1,28 +1,22 @@
-import { setupLocales, clearLocales } from "../src/locales.mjs";
-
 import { jest } from "@jest/globals";
+import { clearLocales, locales, msg, setupLocales } from "../src/locales.mjs";
 
 describe("locales.mjs", () => {
-  const mockLogger = {
-    error: jest.fn(),
-    warn: jest.fn(),
-    info: jest.fn(),
-  };
-  const mockFs = { readdirSync: jest.fn() };
+  afterEach(() => clearLocales());
 
-  afterEach(() => {
-    clearLocales();
-    jest.clearAllMocks();
-  });
+  it("forwards app folder and file options to locale setup", () => {
+    const localesDir = "/consumer/locales";
+    const fsLib = {
+      existsSync: jest.fn(() => true),
+      readdirSync: jest.fn(() => ["en-US.json"]),
+      readFileSync: jest.fn(() => '{"hello":"Hello"}'),
+    };
+    const result = setupLocales({ localesDir, fsLib });
 
-  it("returns empty and does not warn if directory read fails", () => {
-    mockFs.readdirSync.mockImplementation(() => {
-      throw new Error("fail");
-    });
-    setupLocales({
-      fsLib: mockFs,
-      log: mockLogger,
-    });
-    expect(mockLogger.warn).not.toHaveBeenCalled();
+    expect(fsLib.readdirSync).toHaveBeenCalledWith(localesDir);
+    expect(fsLib.readFileSync).toHaveBeenCalledWith(expect.stringContaining("en-US.json"), "utf8");
+    expect(result).toEqual({ msg, loadedLocales: ["en-US"] });
+    expect(msg("en-US", "hello")).toBe("Hello");
+    expect(locales).toEqual({ "en-US": { hello: "Hello" } });
   });
 });

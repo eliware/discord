@@ -1,10 +1,11 @@
 import { jest } from "@jest/globals";
-import { storeLocaleDefinitions } from "../../src/locale/store.mjs";
+import { readLocaleDirectory } from "../../src/locale/directory-reader.mjs";
+import { replaceLocaleStore } from "../../src/locale/store-setup.mjs";
 
 const discoverFiles = jest.fn(() => []);
 const readFiles = jest.fn(() => []);
 const loadDefinitions = jest.fn(() => []);
-const storeDefinitions = jest.fn(storeLocaleDefinitions);
+const setupStore = jest.fn(replaceLocaleStore);
 jest.unstable_mockModule("../../src/locale/discovery.mjs", () => ({
   discoverLocaleFiles: discoverFiles,
 }));
@@ -22,7 +23,7 @@ describe("setupLocaleStore", () => {
     discoverFiles.mockReset().mockReturnValue([]);
     readFiles.mockReset().mockReturnValue([]);
     loadDefinitions.mockReset().mockReturnValue([]);
-    storeDefinitions.mockReset().mockImplementation(storeLocaleDefinitions);
+    setupStore.mockReset().mockImplementation(replaceLocaleStore);
     clearLocales();
   });
 
@@ -41,7 +42,7 @@ describe("setupLocaleStore", () => {
       msg,
       locales,
       clearLocalesFn: clearLocales,
-      storeDefinitions,
+      setupStore,
     });
 
     expect(locales).not.toHaveProperty("stale");
@@ -56,16 +57,17 @@ describe("setupLocaleStore", () => {
       files: [{ file: "en-US.json", content: '{"hello":"Hello"}' }],
       log,
     });
-    expect(storeDefinitions).toHaveBeenCalledWith({
+    expect(setupStore).toHaveBeenCalledWith({
       locales,
       loaded: [["en-US", { hello: "Hello" }]],
+      clearLocalesFn: clearLocales,
     });
     expect(locales).toEqual({ "en-US": { hello: "Hello" } });
     expect(result).toEqual({ msg, loadedLocales: ["en-US"] });
   });
 
   it("loads defaults into the shared locale store", () => {
-    expect(setupLocaleStore({ locales, clearLocalesFn: clearLocales, storeDefinitions })).toEqual({
+    expect(setupLocaleStore({ locales, clearLocalesFn: clearLocales, setupStore })).toEqual({
       msg: undefined,
       loadedLocales: [],
     });
@@ -80,7 +82,27 @@ describe("setupLocaleStore", () => {
       log: expect.any(Object),
     });
     expect(loadDefinitions).toHaveBeenCalledWith({ files: [], log: expect.any(Object) });
-    expect(storeDefinitions).toHaveBeenCalledWith({ locales, loaded: [] });
+    expect(setupStore).toHaveBeenCalledWith({ locales, loaded: [], clearLocalesFn: clearLocales });
     expect(locales).toEqual({});
+  });
+
+  it("returns no locales when directory reading fails", () => {
+    const log = { warn: jest.fn(), error: jest.fn() };
+    const fsLib = {
+      readdirSync: jest.fn(() => {
+        throw new Error("read failed");
+      }),
+    };
+    const result = setupLocaleStore({
+      localesDir: "/locales",
+      fsLib,
+      log,
+      locales,
+      clearLocalesFn: clearLocales,
+      discoverFiles: ({ localesDir, fsLib }) => readLocaleDirectory({ localesDir, fsLib }),
+    });
+
+    expect(result.loadedLocales).toEqual([]);
+    expect(log.warn).not.toHaveBeenCalled();
   });
 });
