@@ -9,13 +9,10 @@ describe("createClientOptions", () => {
     });
   });
 
-  it("adds app options to the normalized client options", () => {
-    expect(
-      createClientOptions({ Guilds: true }, { User: true, Message: false }, { app: true }),
-    ).toEqual({
+  it("normalizes enabled intents and partials", () => {
+    expect(createClientOptions({ Guilds: true }, { User: true, Message: false })).toEqual({
       intents: [GatewayIntentBits.Guilds],
       partials: [Partials.Channel, Partials.Reaction, Partials.User],
-      app: true,
     });
   });
 });

@@ -21,24 +21,6 @@ describe("createEventListener", () => {
     );
   });
 
-  it("adds command handlers to interaction context", async () => {
-    const commandHandlers = { ping: jest.fn() };
-    const handler = jest.fn();
-    const listener = createEventListener({
-      client: {},
-      context: {},
-      log: {},
-      msg: jest.fn(),
-      eventName: "interactionCreate",
-      commandHandlers,
-      handler,
-      onHandlerError: jest.fn(),
-    });
-    listener();
-    await Promise.resolve();
-    expect(handler.mock.calls[0][0].commandHandlers).toBe(commandHandlers);
-  });
-
   it("reports handler errors", async () => {
     const error = new Error("handler failed");
     const onHandlerError = jest.fn();

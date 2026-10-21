@@ -7,6 +7,7 @@ import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
 import { registerOptionalHandlers } from "./handler-registration.mjs";
 import { loginDiscordClient } from "./client/lifecycle.mjs";
+import { createClientLogger } from "./client/logger.mjs";
 
 export const createDiscord = async ({
   clientId,
@@ -35,7 +36,7 @@ export const createDiscord = async ({
 
   const localeStore = createClientLocaleStore();
   const client = createDiscordClient({ intents, partials, clientOptions });
-  const appLog = log.child({ component: "discord", clientId: resolvedClientId });
+  const appLog = createClientLogger(log, resolvedClientId);
   const registrations = {};
   let cleanupEvents = () => {};
   const cleanup = () =>
