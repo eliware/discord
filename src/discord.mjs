@@ -43,7 +43,7 @@ export const createDiscord = async ({
     shutdownDiscord(client, {
       cleanupEvents,
       clearLocalesFn: localeStore.clearLocales,
-      ...registrations,
+      registrations,
     });
   client.shutdown = cleanup;
 

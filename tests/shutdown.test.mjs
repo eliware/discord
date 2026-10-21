@@ -28,6 +28,18 @@ describe("shutdownDiscord", () => {
     await expect(shutdownDiscord({})).resolves.toBeUndefined();
   });
 
+  it("reads optional handler registrations when cleanup starts", async () => {
+    const client = { destroy: jest.fn().mockResolvedValue(undefined) };
+    const removeSignal = jest.fn();
+    const registrations = {};
+    const shutdown = shutdownDiscord(client, { registrations });
+    registrations.signalRegistration = { removeHandlers: removeSignal };
+
+    await shutdown;
+
+    expect(removeSignal).toHaveBeenCalledTimes(1);
+  });
+
   it("runs later cleanup when event cleanup throws", async () => {
     const clearLocalesFn = jest.fn();
     const client = { destroy: jest.fn().mockResolvedValue(undefined) };
