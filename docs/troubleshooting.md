@@ -38,7 +38,9 @@ Global commands may require time to appear in Discord.
 Each startup updates matching commands and creates new commands one at a time.
 The package keeps commands that the app does not provide.
 The package also keeps remote commands after the app removes their local definitions or handlers.
-Use `purgeCommands` to delete all global commands or all commands for one guild.
+Use `purgeCommands` to delete commands on the selected route.
+Set `guildId` or `DISCORD_GUILD_ID` to select one guild route.
+Omit the guild ID to select the global application route.
 
 ## An event does not run
 

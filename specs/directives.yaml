@@ -1,4 +1,4 @@
-version: "13.0"
+version: "14.0"
 description: Defines requirements for the @eliware/discord package.
 directives:
   - id: E-200.0

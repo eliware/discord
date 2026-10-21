@@ -50,7 +50,9 @@ Repeated calls share one promise and run cleanup once.
 Delete registered commands for an application.
 Pass `clientId` and `token`, or set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN`.
 Set `guildId` or `DISCORD_GUILD_ID` to delete commands for one guild.
-Omit `guildId` to delete global commands.
+The package uses the guild command route when it has a guild ID.
+When no guild ID is set, the package uses the global application command route.
+
 The function does not run automatically.
 The promise rejects when credentials are missing or the Discord request fails.
 

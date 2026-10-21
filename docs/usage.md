@@ -35,7 +35,8 @@ console.log(`Connected as ${client.user.tag}`);
 ```
 
 Run the entry file from the app root. `createDiscord` reads app files from the current working
-directory, then logs in to Discord.
+directory, then logs in to Discord. For a complete setup and run procedure, see the
+[basic example guide](../examples/README.md). Run it only with a test bot that you control.
 Read [configuration](configuration.md) to set options and folder paths.
 
 Use this folder layout when the app uses commands, events, and locales:

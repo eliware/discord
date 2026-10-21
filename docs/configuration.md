@@ -12,8 +12,9 @@ by default. When Discord is enabled, the function requires both credentials.
 Set `DISCORD_CLIENT_ID` to the Discord application ID. Set `DISCORD_TOKEN` to the bot token.
 Pass `clientId` or `token` to replace an environment value. Do not commit credentials.
 
-Set optional `DISCORD_GUILD_ID` to select a guild for `purgeCommands`.
-This value does not change the command request. The package sends commands to the global application route.
+Set `DISCORD_GUILD_ID` or pass `guildId` to select one guild for `purgeCommands`.
+The package uses the guild command route when it has a guild ID.
+When no guild ID is set, the package uses the global application command route.
 
 ## Folders
 

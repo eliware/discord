@@ -1,4 +1,4 @@
-version: "13.0"
+version: "14.0"
 description: Defines Discord client lifecycle requirements.
 directives:
   - id: E-200.1
