@@ -1,6 +1,6 @@
 {
   "name": "@eliware/discord",
-  "version": "14.0.0",
+  "version": "15.0.0",
   "type": "module",
   "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
   "keywords": [
@@ -53,14 +53,14 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.6.3",
-    "@eliware/errors": "^14.0.0",
-    "@eliware/log": "^14.0.0",
-    "@eliware/path": "^14.0.0",
-    "@eliware/signals": "^14.0.0",
+    "@eliware/errors": "^15.0.0",
+    "@eliware/log": "^15.0.0",
+    "@eliware/path": "^15.0.0",
+    "@eliware/signals": "^15.0.0",
     "discord.js": "^14.27.0"
   },
   "devDependencies": {
-    "@eliware/test": "^14.0.0",
+    "@eliware/test": "^15.0.0",
     "typescript": "^7.0.2"
   },
   "jest": {

@@ -1,70 +1,53 @@
-# Migrate to version 13
+# Migrate to version 15.0.0
 
-Use this guide to update an app from an earlier `@eliware/discord` version to version 13.
+Use this guide to update an app from an earlier `@eliware/discord` release.
 
-## Update the package
+## Install the package
 
-Install version 13 with this command:
+Run this command in the app folder:
 
 ```sh
-npm install @eliware/discord@13
+npm install @eliware/discord@15.0.0
 ```
 
-## Set the app root
+## Check the runtime
 
-Version 13 uses the current working directory as the default `rootDir`.
-Run the app from its root folder to use the default command, event, and locale folders.
-If the process starts from a different folder, pass `rootDir` to `createDiscord`.
+Use Node.js 26 or later with native ECMAScript modules.
+Keep the existing public imports for `createDiscord`, `purgeCommands`, and `splitMsg`.
 
-## Update the logger
+## Check the app setup
 
-If the app passes `log`, make sure the logger has a `child()` method.
-Make sure `child()` returns a logger.
+Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the app environment.
+The package does not read `.env` files. Load those values in the app before calling `createDiscord`.
+
+The package reads `commands`, `events`, and `locales` folders from the app root by default.
+Pass `rootDir`, `commandsDir`, `eventsDir`, or `localesDir` when the app uses other folders.
+
+## Check the logger
+
+If the app passes a custom `log` value, make sure that the logger has a `child()` method.
+Make sure that `child()` returns a logger.
 The default `@eliware/log` logger meets this requirement.
 
-## Move command logic
+## Check the bot setup
 
-Keep each command definition in `commands/<name>.json`.
-Move the command logic to `src/commands/<name>.mjs`.
-Keep `commands/<name>.mjs` as an adapter that re-exports the source handler:
+Invite each bot with the `bot` and `applications.commands` OAuth scopes.
+Enable privileged intents in the Discord Developer Portal when the app needs them.
 
-```js
-export { default } from "../src/commands/<name>.mjs";
-```
+## Check command removal
 
-## Move event logic
+Set `guildId` or `DISCORD_GUILD_ID` to remove commands from one guild.
+Omit the guild ID to remove global commands.
+The library does not remove commands automatically.
 
-Keep each event adapter in `events/<event>.mjs`.
-Move event behavior to `src/events/<event>.mjs`.
-Keep the adapter focused on exporting its source handler:
+## Check shutdown
 
-```js
-export { default } from "../src/events/<event>.mjs";
-```
+Call and await `client.shutdown()` to stop a client.
+Do not call `client.destroy()` directly because it skips library cleanup.
 
-## Update shutdown
+When the app owns other services, stop them in their required order before you call `client.shutdown()`.
+Read the [lifecycle guide](lifecycle.md) for shutdown details.
 
-Call and await `client.shutdown()` to stop a client created by the package.
-Do not call `client.destroy()` directly because it skips package cleanup.
+## Check examples
 
-When the app owns other services, use one app shutdown coordinator.
-Stop app services in their required order, then call and await `client.shutdown()`.
-Connect the same coordinator to signal and manual shutdown.
-
-When Discord is optional, pass `enabled: false` to `createDiscord` when the app disables Discord.
-The function returns `null` without loading Discord files or checking credentials. Check the result
-before you access the client or call its `shutdown()` method.
-
-Remove `setupLocalesFn`, `setupCommandsFn`, `setupEventsFn`, and `registerCommandsFn` options.
-Version 13 does not expose internal setup replacement hooks. Use the supported app folders.
-Remove the `ClientClass` option. Version 13 creates the supported Discord.js client directly.
-
-Remove imports of `shutdownDiscord`. Call and await `client.shutdown()`.
-Version 13 returns `null` when Discord is disabled, so check the result before you use the client.
-
-## Keep app behavior in the app
-
-Keep AI, voice, database, broker, health, and other app behavior outside the package.
-Pass app services to event and command handlers through the `context` option.
-Read [usage](usage.md), [commands](commands.md), [events](events.md), and [lifecycle](lifecycle.md)
-for the full setup details.
+Read the [basic example guide](../examples/README.md) to set up and run a test bot.

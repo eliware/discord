@@ -1,5 +1,15 @@
 # Release Notes
 
+## 15.0.0 — 2026-10-21
+
+### Changed
+
+- The package version changes to 15.0.0. The Eliware runtime packages and `@eliware/test` change to version 15.
+- The package updates its installed dependencies to their latest compatible versions.
+- The consumer, directives, lifecycle, and module structure specifications identify version 15.0.
+- The migration guide covers installation, runtime requirements, app configuration, command removal, shutdown, and the runnable example.
+- The documentation index links to the version 15 migration guide.
+
 ## 14.0.0 — 2026-10-21
 
 ### Added
