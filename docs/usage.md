@@ -2,8 +2,10 @@
 
 ## Requirements
 
-Use Node.js 26 or newer. Create a Discord application and bot in the Discord Developer Portal.
-Add the bot to each server where you want to use it. Grant only the permissions it needs.
+Use Node.js 26 or newer with native ECMAScript modules. Create an application and bot in the
+Discord Developer Portal. Invite the bot with the `bot` and `applications.commands` OAuth scopes.
+Grant only the permissions that the app needs. Enable privileged intents in the portal when the app
+needs them.
 
 ## Install
 
@@ -13,12 +15,14 @@ Install the package in your application:
 npm install @eliware/discord
 ```
 
-Use native ECMAScript modules. Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment.
-You can also pass these values to `createDiscord`. The package does not read `.env` files.
+Set `DISCORD_CLIENT_ID` and `DISCORD_TOKEN` in the process environment. You can also pass these
+values to `createDiscord`. The package does not read `.env` files. Load a dotenv file in the app
+before it calls `createDiscord` if the app uses one.
 
 ## Start a client
 
-Create an application entry file in the app root. This example enables the `Guilds` intent:
+Create an application entry file in the app root. This example enables the `Guilds` intent, which
+supports guild command interactions:
 
 ```js
 import { createDiscord } from "@eliware/discord";
@@ -34,7 +38,29 @@ Run the entry file from the app root. `createDiscord` reads app files from the c
 directory, then logs in to Discord.
 Read [configuration](configuration.md) to set options and folder paths.
 
-When Discord is optional, set `enabled` from the app configuration and check the result:
+Use this folder layout when the app uses commands, events, and locales:
+
+```text
+app/
+  commands/
+    ping.json
+    ping.mjs
+  events/
+    interactionCreate.mjs
+  locales/
+    en-US.json
+  src/
+    commands/
+      ping.mjs
+    events/
+      interactionCreate.mjs
+  index.mjs
+```
+
+The JSON command definition and its `.mjs` adapter must use the same base name. Event adapter names
+must match Discord event names. Each adapter can re-export app logic from `src/`.
+
+When Discord is optional, set `enabled` from app configuration and check the result:
 
 ```js
 const discordEnabled = process.env.DISCORD_ENABLED === "true";

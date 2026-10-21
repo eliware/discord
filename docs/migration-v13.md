@@ -1,10 +1,10 @@
 # Migrate to version 13
 
-Use this guide to update an app from an earlier `@eliware/discord` version.
+Use this guide to update an app from an earlier `@eliware/discord` version to version 13.
 
 ## Update the package
 
-When version 13 is available, install it with this command:
+Install version 13 with this command:
 
 ```sh
 npm install @eliware/discord@13
