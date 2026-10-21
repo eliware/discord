@@ -7,8 +7,16 @@
 - The package version changes to 15.0.0. The Eliware runtime packages and `@eliware/test` change to version 15.
 - The package updates its installed dependencies to their latest compatible versions.
 - The consumer, directives, lifecycle, and module structure specifications identify version 15.0.
+- Client option setup checks each option before it maps the settings to Discord.js values.
+- Command definition validation separates object, name, and description checks into focused modules.
+- Locale setup uses a focused helper to remove prior entries before it adds loaded definitions.
+- Test suites use a shared helper to set and restore credential environment variables.
 - The migration guide covers installation, runtime requirements, app configuration, command removal, shutdown, and the runnable example.
 - The documentation index links to the version 15 migration guide.
+
+### Fixed
+
+- Shutdown removes optional signal and process handlers that become active during setup.
 
 ## 14.0.0 — 2026-10-21
 
