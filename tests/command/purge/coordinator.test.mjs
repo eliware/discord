@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { withSilentDefaultLog } from "../../../test-fixtures/test-support.mjs";
 
 const sendPurgeRequest = jest.fn();
 jest.unstable_mockModule("../../../src/command/purge/request.mjs", () => ({ sendPurgeRequest }));
@@ -31,5 +32,24 @@ it("logs and rejects when credentials are missing", async () => {
   expect(log.error).toHaveBeenCalledWith(
     "DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment.",
   );
+  expect(sendPurgeRequest).not.toHaveBeenCalled();
+});
+
+it("uses default options and logger when called without arguments", async () => {
+  const oldId = process.env.DISCORD_CLIENT_ID;
+  const oldToken = process.env.DISCORD_TOKEN;
+  delete process.env.DISCORD_CLIENT_ID;
+  delete process.env.DISCORD_TOKEN;
+
+  try {
+    await withSilentDefaultLog(async () => {
+      await expect(runPurgeCoordinator()).rejects.toThrow("Missing credentials");
+    });
+  } finally {
+    if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
+    else process.env.DISCORD_CLIENT_ID = oldId;
+    if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
+    else process.env.DISCORD_TOKEN = oldToken;
+  }
   expect(sendPurgeRequest).not.toHaveBeenCalled();
 });

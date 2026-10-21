@@ -1,4 +1,5 @@
 import { jest } from "@jest/globals";
+import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const loadEventHandler = jest.fn();
 jest.unstable_mockModule("../../src/event/handler-loader.mjs", () => ({ loadEventHandler }));
@@ -36,6 +37,12 @@ describe("discoverEventHandlers", () => {
     });
     expect(discovered).toBe(false);
     expect(log.warn).toHaveBeenCalledWith("Events directory missing or unreadable: /events");
+  });
+
+  it("uses default dependencies when called without options", async () => {
+    await withSilentDefaultLog(async () => {
+      await expect(discoverEventHandlers()).resolves.toBe(false);
+    });
   });
 
   it("skips files without a default handler", async () => {

@@ -1,5 +1,21 @@
 # Release Notes
 
+## 14.0.0 — 2026-10-21
+
+### Added
+
+- The package adds focused modules for logger creation, client options, command collection, command registration, event context, login, shutdown, and locale error reporting.
+- The documentation explains Discord OAuth scopes, app folder layout, and migration steps.
+
+### Changed
+
+- The package and Eliware runtime dependencies change to version 14. The `@eliware/test` development dependency also changes to version 14.
+- Command registration separates HTTP requests from command reconciliation.
+- Locale setup uses focused discovery, read, parse, and store helpers. Each client keeps an isolated locale store.
+- Event setup returns a cleanup function if event discovery fails.
+- The package removes the redundant locale loader and updates tests for the focused modules.
+- The README, contributor instructions, and documentation index remove content that the repository conventions do not require.
+
 ## 13.0.0 — 2026-10-19
 
 ### Added

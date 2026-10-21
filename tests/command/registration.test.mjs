@@ -113,4 +113,21 @@ describe("registerCommands", () => {
       else process.env.DISCORD_TOKEN = oldToken;
     }
   });
+
+  it("returns false when called without options or environment credentials", async () => {
+    const oldId = process.env.DISCORD_CLIENT_ID;
+    const oldToken = process.env.DISCORD_TOKEN;
+    delete process.env.DISCORD_CLIENT_ID;
+    delete process.env.DISCORD_TOKEN;
+    try {
+      await withSilentDefaultLog(async () => {
+        await expect(registerCommands()).resolves.toBe(false);
+      });
+    } finally {
+      if (oldId === undefined) delete process.env.DISCORD_CLIENT_ID;
+      else process.env.DISCORD_CLIENT_ID = oldId;
+      if (oldToken === undefined) delete process.env.DISCORD_TOKEN;
+      else process.env.DISCORD_TOKEN = oldToken;
+    }
+  });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@eliware/discord",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "type": "module",
   "description": "A modular, extensible Discord app framework for Node.js with slash command, localization, and event-driven support.",
   "keywords": [
