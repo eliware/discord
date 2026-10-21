@@ -33,7 +33,8 @@ describe("setupEvents", () => {
 
   it("uses default setup options", async () => {
     const result = await withSilentDefaultLog(() => setupEvents());
-    expect(result.loadedEvents).toEqual([]);
+    expect(result).toEqual({ loadedEvents: [], cleanup: expect.any(Function) });
+    expect(() => result.cleanup()).not.toThrow();
   });
   it("removes listeners attached before setup fails", async () => {
     const off = jest.fn().mockImplementationOnce(() => {

@@ -43,7 +43,7 @@ export const setupEvents = async ({
           loadedEvents,
         }),
     });
-    if (!discovered) return { loadedEvents: [] };
+    if (!discovered) return { loadedEvents: [], cleanup };
   } catch (error) {
     try {
       cleanup();
