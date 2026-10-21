@@ -1,8 +1,7 @@
 import { setupLocaleStore } from "./locale/setup.mjs";
-import { msg } from "./locale/lookup-api.mjs";
+import { clearLocales, locales, msg } from "./locale/api.mjs";
 
-export { clearLocales, locales } from "./locale/api.mjs";
-export { msg } from "./locale/lookup-api.mjs";
+export { clearLocales, locales, msg } from "./locale/api.mjs";
 
 /**
  * Load locale JSON files from a folder.
@@ -12,4 +11,5 @@ export { msg } from "./locale/lookup-api.mjs";
  * @param {Object} [options.fsLib] File methods for tests.
  * @returns {{ msg: typeof msg, loadedLocales: string[] }} Message function and locale names.
  */
-export const setupLocales = (options = {}) => setupLocaleStore({ ...options, msg });
+export const setupLocales = (options = {}) =>
+  setupLocaleStore({ ...options, clearLocalesFn: clearLocales, locales, msg });

@@ -1,6 +1,7 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
 import { readFileSync } from "fs";
+import { reportLocaleFileFailure } from "./failure-reporting.mjs";
 
 export const readLocaleFiles = ({ files, localesDir, fsLib = { readFileSync }, log = logger }) =>
   files
@@ -8,7 +9,7 @@ export const readLocaleFiles = ({ files, localesDir, fsLib = { readFileSync }, l
       try {
         return { file, content: fsLib.readFileSync(path(localesDir, file), "utf8") };
       } catch (error) {
-        log.error(`Failed to load or parse locale file ${file}:`, error);
+        reportLocaleFileFailure({ file, error, log });
         return undefined;
       }
     })

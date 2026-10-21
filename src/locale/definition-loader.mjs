@@ -1,4 +1,5 @@
 import { validateLocale } from "./validation.mjs";
+import { reportLocaleFileFailure } from "./failure-reporting.mjs";
 
 /** Parse and validate locale file contents. */
 export const loadLocaleDefinitions = ({ files, log }) => {
@@ -11,7 +12,7 @@ export const loadLocaleDefinitions = ({ files, log }) => {
       }
       definitions.push([file.replace(/\.json$/, ""), locale]);
     } catch (error) {
-      log.error(`Failed to load or parse locale file ${file}:`, error);
+      reportLocaleFileFailure({ file, error, log });
     }
   }
   return definitions;

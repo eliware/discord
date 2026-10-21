@@ -1,17 +1,16 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
 import { loadLocales } from "./loader.mjs";
-import { clearLocales, locales } from "./api.mjs";
 
 export const setupLocaleStore = ({
   localesDir = path(import.meta, "..", "..", "locales"),
   log = logger,
   fsLib,
   msg,
-  locales: localeMaps = locales,
+  locales: localeMaps,
   loadLocalesFn = loadLocales,
-  clearLocalesFn = clearLocales,
-} = {}) => {
+  clearLocalesFn,
+}) => {
   clearLocalesFn();
   const loaded = loadLocalesFn({ localesDir, log, fsLib });
   for (const [name, locale] of loaded) {

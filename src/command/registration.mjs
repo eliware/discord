@@ -2,15 +2,11 @@ import { log as logger } from "@eliware/log";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord.js";
 import { reportRegistrationError } from "./registration-error.mjs";
+import { resolveRegistrationConfig } from "./registration/environment.mjs";
 
-export const registerCommands = async ({
-  commandDefs,
-  clientId = process.env.DISCORD_CLIENT_ID,
-  token = process.env.DISCORD_TOKEN,
-  log = logger,
-  restClass = REST,
-  routes = Routes,
-}) => {
+export const registerCommands = async (options = {}) => {
+  const { commandDefs, log = logger, restClass = REST, routes = Routes } = options;
+  const { clientId, token } = resolveRegistrationConfig(options);
   if (!token) {
     log.warn("DISCORD_TOKEN is not set. Skip command setup.");
     return false;
