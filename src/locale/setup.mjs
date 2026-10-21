@@ -1,6 +1,8 @@
 import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
-import { loadLocales } from "./loader.mjs";
+import { discoverLocaleFiles } from "./discovery.mjs";
+import { readLocaleFiles } from "./file-reader.mjs";
+import { loadLocaleDefinitions } from "./definition-loader.mjs";
 
 export const setupLocaleStore = ({
   localesDir = path(import.meta, "..", "..", "locales"),
@@ -8,11 +10,15 @@ export const setupLocaleStore = ({
   fsLib,
   msg,
   locales: localeMaps,
-  loadLocalesFn = loadLocales,
+  discoverFiles = discoverLocaleFiles,
+  readFiles = readLocaleFiles,
+  loadDefinitions = loadLocaleDefinitions,
   clearLocalesFn,
 }) => {
   clearLocalesFn();
-  const loaded = loadLocalesFn({ localesDir, log, fsLib });
+  const files = discoverFiles({ localesDir, fsLib });
+  const contents = readFiles({ files, localesDir, fsLib, log });
+  const loaded = loadDefinitions({ files: contents, log });
   for (const [name, locale] of loaded) {
     Object.defineProperty(localeMaps, name, {
       value: locale,

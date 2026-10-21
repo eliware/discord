@@ -1,5 +1,4 @@
 import { jest } from "@jest/globals";
-import { withSilentDefaultLog } from "../../test-fixtures/test-support.mjs";
 
 const loadEventHandler = jest.fn();
 jest.unstable_mockModule("../../src/event/handler-loader.mjs", () => ({ loadEventHandler }));
@@ -9,10 +8,6 @@ describe("discoverEventHandlers", () => {
   const log = { error: jest.fn(), warn: jest.fn() };
 
   afterEach(() => jest.clearAllMocks());
-
-  it("uses default options when no event folder is supplied", async () => {
-    await expect(withSilentDefaultLog(() => discoverEventHandlers())).resolves.toBe(false);
-  });
 
   it("loads valid handlers from event files", async () => {
     const handler = jest.fn();

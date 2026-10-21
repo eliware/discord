@@ -13,12 +13,14 @@ describe("createClientLocaleStore", () => {
     first.setupLocales({
       localesDir: "/first",
       log,
-      loadLocalesFn: () => [["en-US", { message: "First client" }]],
+      discoverFiles: () => ["en-US.json"],
+      readFiles: () => [{ file: "en-US.json", content: '{"message":"First client"}' }],
     });
     second.setupLocales({
       localesDir: "/second",
       log,
-      loadLocalesFn: () => [["en-US", { message: "Second client" }]],
+      discoverFiles: () => ["en-US.json"],
+      readFiles: () => [{ file: "en-US.json", content: '{"message":"Second client"}' }],
     });
 
     expect(first.msg("en-US", "message")).toBe("First client");
