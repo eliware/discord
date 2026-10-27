@@ -4,6 +4,9 @@ export const cleanupShutdownClient = async (
   client,
   { signalRegistration, processHandlerRegistration },
 ) => {
-  cleanupShutdownHandlers({ signalRegistration, processHandlerRegistration });
-  if (typeof client.destroy === "function") await client.destroy();
+  try {
+    cleanupShutdownHandlers({ signalRegistration, processHandlerRegistration });
+  } finally {
+    if (typeof client.destroy === "function") await client.destroy();
+  }
 };

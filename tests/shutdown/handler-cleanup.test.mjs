@@ -12,4 +12,20 @@ describe("cleanupShutdownHandlers", () => {
     expect(removeSignals).toHaveBeenCalledTimes(1);
     expect(removeProcesses).toHaveBeenCalledTimes(1);
   });
+
+  it("removes process handlers when signal handler removal throws", () => {
+    const error = new Error("signal cleanup failed");
+    const removeSignals = jest.fn(() => {
+      throw error;
+    });
+    const removeProcesses = jest.fn();
+
+    expect(() =>
+      cleanupShutdownHandlers({
+        signalRegistration: { removeHandlers: removeSignals },
+        processHandlerRegistration: { removeHandlers: removeProcesses },
+      }),
+    ).toThrow(error);
+    expect(removeProcesses).toHaveBeenCalledTimes(1);
+  });
 });

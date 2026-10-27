@@ -8,6 +8,7 @@ directives:
       - Require credentials when enabled is true.
       - Keep commands, events, and locales in the consuming app.
       - Load command definitions from commands/<name>.json.
+      - Validate chat input command names against Discord naming rules.
       - Load command adapters from commands/<name>.mjs.
       - Load event adapters from events/<event>.mjs.
       - Load locale records from locales/<locale>.json.

@@ -2,7 +2,7 @@ import { setupEvents } from "./events.mjs";
 import { setupCommands } from "./command/setup.mjs";
 import { registerCommands } from "./command/registration.mjs";
 import { setupLocales } from "./locales.mjs";
-import { createEventCleanup } from "./event/cleanup-snapshot.mjs";
+import { setupEventCleanup } from "./initialize/event-cleanup.mjs";
 
 export const initializeDiscord = async ({
   client,
@@ -36,23 +36,18 @@ export const initializeDiscord = async ({
     throw new TypeError("setupCommandsFn must return { commandDefs, commandHandlers }.");
   }
   const commandDefs = commandResult.commandDefs ?? [];
-  const fallbackCleanup = createEventCleanup(client);
-  let eventResult;
-  try {
-    eventResult = await setupEventsFn({
+  const { eventResult, cleanupEvents } = await setupEventCleanup({
+    client,
+    setupEventsFn,
+    eventOptions: {
       client,
       eventsDir,
       log,
       msg: localeResult.msg,
       commandHandlers: commandResult.commandHandlers,
       context,
-    });
-  } catch (error) {
-    fallbackCleanup();
-    throw error;
-  }
-  const cleanupEvents =
-    typeof eventResult?.cleanup === "function" ? eventResult.cleanup : fallbackCleanup;
+    },
+  });
   try {
     if (!eventResult || !Array.isArray(eventResult.loadedEvents)) {
       throw new TypeError("setupEventsFn must return { loadedEvents, cleanup }.");

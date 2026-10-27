@@ -6,7 +6,7 @@ describe("validateCommandDefinition", () => {
   });
 
   it.each([
-    [{}, "name must be 1-32 characters"],
+    [{}, "name must use 1-32 valid Discord command characters"],
     [{ name: "help" }, "description must be 1-100 characters"],
   ])("rejects invalid definition %#", (definition, message) => {
     expect(validateCommandDefinition(definition)).toBe(message);

@@ -38,6 +38,17 @@ describe("loadCommandDefinitions", () => {
     );
   });
 
+  it("logs and skips names that Discord will reject", () => {
+    const fsLib = {
+      readFileSync: jest.fn(() => '{"name":"bad name","description":"Help"}'),
+    };
+
+    expect(load({ files: ["bad name.json"], commandsDir, fsLib, log })).toEqual([]);
+    expect(log.error).toHaveBeenCalledWith(
+      "Invalid command definition for bad name.json: name must use 1-32 valid Discord command characters",
+    );
+  });
+
   it("logs file read and JSON parse errors", () => {
     const fsLib = {
       readFileSync: (file) => {

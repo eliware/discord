@@ -9,7 +9,7 @@ jest.unstable_mockModule("@discordjs/rest", () => ({ REST: defaultRest }));
 jest.unstable_mockModule("discord.js", () => ({ Routes: defaultRoutes }));
 const { createCommandRequest } = await import("../../../src/command/registration/request.mjs");
 
-it("constructs REST command requests for global commands", async () => {
+it("constructs REST command requests with injected and default dependencies", async () => {
   const get = jest.fn().mockResolvedValue([]);
   const post = jest.fn().mockResolvedValue({});
   const put = jest.fn().mockResolvedValue({});
@@ -32,9 +32,7 @@ it("constructs REST command requests for global commands", async () => {
   expect(post).toHaveBeenCalledWith("/commands", { body: definition });
   expect(routes.applicationCommand).toHaveBeenCalledWith("app-id", "command-id");
   expect(put).toHaveBeenCalledWith("/commands/command-id", { body: definition });
-});
 
-it("uses the Discord REST and route defaults", () => {
   createCommandRequest({ clientId: "app-id", token: "token" });
 
   expect(defaultRest).toHaveBeenCalledWith({ version: "10" });

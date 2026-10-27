@@ -2,8 +2,8 @@ import { log as logger } from "@eliware/log";
 import { path } from "@eliware/path";
 import { createDiscordClient } from "./client/create.mjs";
 import { createClientLocaleStore } from "./client/locale-store.mjs";
+import { setupClientShutdown } from "./client/shutdown-setup.mjs";
 import { initializeDiscord } from "./initialize.mjs";
-import { shutdownDiscord } from "./shutdown.mjs";
 import { validateContext } from "./context-validation.mjs";
 import { registerOptionalHandlers } from "./handler-registration.mjs";
 import { loginDiscordClient } from "./client/login.mjs";
@@ -39,13 +39,12 @@ export const createDiscord = async ({
   const appLog = createClientLogger(log, resolvedClientId);
   const registrations = {};
   let cleanupEvents = () => {};
-  const cleanup = () =>
-    shutdownDiscord(client, {
-      cleanupEvents,
-      clearLocalesFn: localeStore.clearLocales,
-      registrations,
-    });
-  client.shutdown = cleanup;
+  const cleanup = setupClientShutdown({
+    client,
+    getCleanupEvents: () => cleanupEvents,
+    clearLocalesFn: localeStore.clearLocales,
+    registrations,
+  });
 
   try {
     registerOptionalHandlers({

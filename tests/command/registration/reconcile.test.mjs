@@ -2,12 +2,9 @@ import { jest } from "@jest/globals";
 import { reconcileCommands } from "../../../src/command/registration/reconcile.mjs";
 
 describe("reconcileCommands", () => {
-  it("updates a matching command and creates a new command", async () => {
+  it("updates a matching command without creating a duplicate", async () => {
     const request = { createCommand: jest.fn(), updateCommand: jest.fn() };
-    const commandDefs = [
-      { name: "managed", description: "New description" },
-      { name: "new", description: "New command" },
-    ];
+    const commandDefs = [{ name: "managed", description: "New description" }];
     const existingCommands = [
       { id: "managed-id", name: "managed", description: "Old description" },
       { id: "unrelated-id", name: "other" },
@@ -16,7 +13,7 @@ describe("reconcileCommands", () => {
     await reconcileCommands({ commandDefs, existingCommands, request });
 
     expect(request.updateCommand).toHaveBeenCalledWith("managed-id", commandDefs[0]);
-    expect(request.createCommand).toHaveBeenCalledWith(commandDefs[1]);
+    expect(request.createCommand).not.toHaveBeenCalled();
   });
 
   it("treats command types as part of a match", async () => {

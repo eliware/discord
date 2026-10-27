@@ -17,4 +17,26 @@ describe("cleanupShutdownClient", () => {
     expect(removeProcesses).toHaveBeenCalledTimes(1);
     expect(destroy).toHaveBeenCalledTimes(1);
   });
+
+  it("destroys the client when handler removal throws", async () => {
+    const error = new Error("signal cleanup failed");
+    const removeSignals = jest.fn(() => {
+      throw error;
+    });
+    const removeProcesses = jest.fn();
+    const destroy = jest.fn().mockResolvedValue(undefined);
+
+    await expect(
+      cleanupShutdownClient(
+        { destroy },
+        {
+          signalRegistration: { removeHandlers: removeSignals },
+          processHandlerRegistration: { removeHandlers: removeProcesses },
+        },
+      ),
+    ).rejects.toThrow(error);
+
+    expect(removeProcesses).toHaveBeenCalledTimes(1);
+    expect(destroy).toHaveBeenCalledTimes(1);
+  });
 });

@@ -15,7 +15,8 @@ Create `commands/ping.json`:
 }
 ```
 
-The package requires a `name` from 1 to 32 characters and a `description` from 1 to 100 characters.
+The package requires a `name` that follows Discord's chat input command rules and a `description` from 1 to 100 characters.
+Use 1 to 32 lowercase letters, numbers, hyphens, underscores, or apostrophes. Discord also allows uncased Devanagari and Thai characters.
 Add other Discord application command fields when required. Discord checks those fields when it sends the command.
 
 ## Handler

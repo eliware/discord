@@ -1,6 +1,8 @@
+const commandNamePattern = /^[-_'\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$/u;
+
 export const validateCommandName = (name) => {
-  if (typeof name !== "string" || name.length < 1 || name.length > 32) {
-    return "name must be 1-32 characters";
+  if (typeof name !== "string" || !commandNamePattern.test(name) || name !== name.toLowerCase()) {
+    return "name must use 1-32 valid Discord command characters";
   }
   return null;
 };

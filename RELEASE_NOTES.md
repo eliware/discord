@@ -1,5 +1,16 @@
 # Release Notes
 
+## 15.0.1 — 2026-10-26
+
+### Changed
+
+- The package version and lock file change to 15.0.1. The Eliware runtime packages and `@eliware/test` update to 15.0.1.
+- Client startup and event initialization use focused helpers for shutdown setup and event listener cleanup.
+- Command validation enforces Discord chat input naming rules. The loader logs and skips invalid command names.
+- Command documentation and the consumer specification state the supported command name rules.
+- Shutdown removes process handlers and destroys the client when signal handler removal fails.
+- Command registration tests remove duplicate checks and keep distinct reconciliation and request cases.
+
 ## 15.0.0 — 2026-10-21
 
 ### Changed
