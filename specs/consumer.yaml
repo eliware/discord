@@ -9,6 +9,8 @@ directives:
       - Keep commands, events, and locales in the consuming app.
       - Load command definitions from commands/<name>.json.
       - Validate chat input command names against Discord naming rules.
+      - Use lowercase letters and numbers in chat input names.
+      - Use only hyphens, underscores, or U+02BC as chat input punctuation.
       - Load command adapters from commands/<name>.mjs.
       - Load event adapters from events/<event>.mjs.
       - Load locale records from locales/<locale>.json.
