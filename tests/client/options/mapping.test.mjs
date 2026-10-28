@@ -1,11 +1,13 @@
-import { GatewayIntentBits, Partials } from "discord.js";
+import { Partials } from "discord.js";
 import { mapClientOptionMaps } from "../../../src/client/options/mapping.mjs";
 
 describe("mapClientOptionMaps", () => {
-  it("maps enabled names and includes default partials", () => {
-    expect(mapClientOptionMaps({ Guilds: true }, { User: true, Message: false })).toEqual({
-      intents: [GatewayIntentBits.Guilds],
-      partials: [Partials.Channel, Partials.Reaction, Partials.User],
+  it("keeps defaults disabled by explicit false values and ignores unknown keys", () => {
+    expect(
+      mapClientOptionMaps({ UnknownIntent: true }, { User: false, UnknownPartial: true }),
+    ).toEqual({
+      intents: [],
+      partials: [Partials.Message, Partials.Channel, Partials.Reaction],
     });
   });
 });

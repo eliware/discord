@@ -121,6 +121,10 @@
     ".": {
       "types": "./src/index.d.ts",
       "import": "./src/index.mjs"
+    },
+    "./locales": {
+      "types": "./src/locales.d.ts",
+      "import": "./src/locales.mjs"
     }
   }
 }

@@ -1,5 +1,6 @@
 import { jest } from "@jest/globals";
-import { clearLocales, locales, msg, setupLocales } from "../src/locales.mjs";
+import { clearLocales, locales, msg } from "../src/locale/api.mjs";
+import { setupLocales } from "../src/locale/setup-api.mjs";
 
 describe("locales.mjs", () => {
   afterEach(() => clearLocales());

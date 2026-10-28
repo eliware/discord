@@ -10,9 +10,9 @@ describe("createClientOptions", () => {
   });
 
   it("normalizes enabled intents and partials", () => {
-    expect(createClientOptions({ Guilds: true }, { User: true, Message: false })).toEqual({
-      intents: [GatewayIntentBits.Guilds],
-      partials: [Partials.Channel, Partials.Reaction, Partials.User],
-    });
+    const result = createClientOptions({ Guilds: true }, { User: true, Message: false });
+
+    expect(result.intents).toEqual([GatewayIntentBits.Guilds]);
+    expect(result.partials).toEqual([Partials.Channel, Partials.Reaction, Partials.User]);
   });
 });

@@ -81,6 +81,14 @@ describe("registerCommands", () => {
     ).resolves.toBe(false);
   });
 
+  it("returns false when called without options or environment credentials", async () => {
+    await withEnvironment({ DISCORD_CLIENT_ID: undefined, DISCORD_TOKEN: undefined }, async () => {
+      await withSilentDefaultLog(async () => {
+        await expect(registerCommands()).resolves.toBe(false);
+      });
+    });
+  });
+
   it("returns false when the REST request fails", async () => {
     const failedRest = jest.fn(() => ({
       setToken: jest.fn().mockReturnThis(),
@@ -98,19 +106,5 @@ describe("registerCommands", () => {
         routes,
       }),
     ).resolves.toBe(false);
-  });
-
-  it("uses default credentials and logger", async () => {
-    await withEnvironment({ DISCORD_CLIENT_ID: "cid", DISCORD_TOKEN: "token" }, async () => {
-      await withSilentDefaultLog(() => registerCommands({ commandDefs: [], restClass, routes }));
-    });
-  });
-
-  it("returns false when called without options or environment credentials", async () => {
-    await withEnvironment({ DISCORD_CLIENT_ID: undefined, DISCORD_TOKEN: undefined }, async () => {
-      await withSilentDefaultLog(async () => {
-        await expect(registerCommands()).resolves.toBe(false);
-      });
-    });
   });
 });

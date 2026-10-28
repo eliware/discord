@@ -1,7 +1,7 @@
 import { setupEvents } from "./events.mjs";
 import { setupCommands } from "./command/setup.mjs";
 import { registerCommands } from "./command/registration.mjs";
-import { setupLocales } from "./locales.mjs";
+import { setupLocales } from "./locale/setup-api.mjs";
 import { setupEventCleanup } from "./initialize/event-cleanup.mjs";
 
 export const initializeDiscord = async ({
