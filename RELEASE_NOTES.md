@@ -2,6 +2,13 @@
 
 ## 15.0.2 — 2026-10-28
 
+### Changed
+
+- The package and lock file versions change to 15.0.2.
+- The package adds the `@eliware/discord/locales` subpath for locale setup and lookup APIs.
+- Chat input command names follow Discord's lowercase and character rules. The allowed set includes U+02BC.
+- Locale setup wiring moves to a focused module, and the consumer specification records the command name rules.
+
 ### Fixed
 
 - Existing global application commands use PATCH requests when they are updated.
