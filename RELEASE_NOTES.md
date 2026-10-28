@@ -1,5 +1,11 @@
 # Release Notes
 
+## 15.0.2 — 2026-10-28
+
+### Fixed
+
+- Existing global application commands use PATCH requests when they are updated.
+
 ## 15.0.1 — 2026-10-26
 
 ### Changed

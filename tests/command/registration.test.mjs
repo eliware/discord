@@ -11,12 +11,12 @@ const routes = {
 };
 const get = jest.fn().mockResolvedValue([]);
 const post = jest.fn().mockResolvedValue({});
-const put = jest.fn().mockResolvedValue({});
+const patch = jest.fn().mockResolvedValue({});
 const restClass = jest.fn(() => ({
   setToken: jest.fn().mockReturnThis(),
   get,
   post,
-  put,
+  patch,
 }));
 
 afterEach(() => jest.clearAllMocks());
@@ -31,7 +31,7 @@ describe("registerCommands", () => {
     expect(post).toHaveBeenCalledWith("/commands", {
       body: commandDefs[0],
     });
-    expect(put).not.toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalled();
   });
 
   it("updates app commands and preserves unrelated or skipped commands", async () => {
@@ -50,9 +50,9 @@ describe("registerCommands", () => {
       registerCommands({ commandDefs, clientId: "cid", token: "token", log, restClass, routes }),
     ).resolves.toBe(true);
 
-    expect(put).toHaveBeenCalledWith("/commands/cid/managed-id", { body: commandDefs[0] });
+    expect(patch).toHaveBeenCalledWith("/commands/cid/managed-id", { body: commandDefs[0] });
     expect(post).toHaveBeenCalledWith("/commands", { body: commandDefs[1] });
-    expect(put).toHaveBeenCalledTimes(1);
+    expect(patch).toHaveBeenCalledTimes(1);
     expect(post).toHaveBeenCalledTimes(1);
   });
 
@@ -65,7 +65,7 @@ describe("registerCommands", () => {
     ).resolves.toBe(true);
 
     expect(post).toHaveBeenCalledWith("/commands", { body: commandDefs[0] });
-    expect(put).not.toHaveBeenCalled();
+    expect(patch).not.toHaveBeenCalled();
   });
 
   it("returns false when credentials or definitions are absent", async () => {
@@ -86,7 +86,7 @@ describe("registerCommands", () => {
       setToken: jest.fn().mockReturnThis(),
       get: jest.fn().mockRejectedValue(new Error("network failed")),
       post: jest.fn(),
-      put: jest.fn(),
+      patch: jest.fn(),
     }));
     await expect(
       registerCommands({

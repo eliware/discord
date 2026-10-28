@@ -8,6 +8,6 @@ export const createCommandRequest = ({ clientId, token, restClass = REST, routes
     getExistingCommands: () => rest.get(commandRoute),
     createCommand: (commandDef) => rest.post(commandRoute, { body: commandDef }),
     updateCommand: (commandId, commandDef) =>
-      rest.put(routes.applicationCommand(clientId, commandId), { body: commandDef }),
+      rest.patch(routes.applicationCommand(clientId, commandId), { body: commandDef }),
   };
 };

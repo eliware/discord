@@ -12,9 +12,9 @@ const { createCommandRequest } = await import("../../../src/command/registration
 it("constructs REST command requests with injected and default dependencies", async () => {
   const get = jest.fn().mockResolvedValue([]);
   const post = jest.fn().mockResolvedValue({});
-  const put = jest.fn().mockResolvedValue({});
+  const patch = jest.fn().mockResolvedValue({});
   const setToken = jest.fn().mockReturnThis();
-  const restClass = jest.fn(() => ({ setToken, get, post, put }));
+  const restClass = jest.fn(() => ({ setToken, get, post, patch }));
   const routes = {
     applicationCommands: jest.fn(() => "/commands"),
     applicationCommand: jest.fn(() => "/commands/command-id"),
@@ -31,7 +31,7 @@ it("constructs REST command requests with injected and default dependencies", as
   expect(get).toHaveBeenCalledWith("/commands");
   expect(post).toHaveBeenCalledWith("/commands", { body: definition });
   expect(routes.applicationCommand).toHaveBeenCalledWith("app-id", "command-id");
-  expect(put).toHaveBeenCalledWith("/commands/command-id", { body: definition });
+  expect(patch).toHaveBeenCalledWith("/commands/command-id", { body: definition });
 
   createCommandRequest({ clientId: "app-id", token: "token" });
 
